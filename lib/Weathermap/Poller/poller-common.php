@@ -106,7 +106,7 @@ function runMaps($mydir)
     global $weathermap_debugging;
     global $weathermap_map;
     global $weathermap_warncount;
-    global $weathermap_poller_start_time;
+    global $weathermapPollerStartTime;
 
 //    include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "HTMLImagemap.php";
 //    include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "Map.php";
@@ -129,8 +129,8 @@ function runMaps($mydir)
     $warningNotes = "";
 
     $startTime = microtime(true);
-    if ($weathermap_poller_start_time == 0) {
-        $weathermap_poller_start_time = intval($startTime);
+    if ($weathermapPollerStartTime == 0) {
+        $weathermapPollerStartTime = intval($startTime);
     }
 
     $outputDirectory = $mydir . DIRECTORY_SEPARATOR . 'output';
@@ -188,7 +188,7 @@ function runMaps($mydir)
 
                     MapUtility::debug("FIRST TOUCH\n");
 
-                    if (checkCronString($weathermap_poller_start_time, $mapSpec->schedule)) {
+                    if (checkCronString($weathermapPollerStartTime, $mapSpec->schedule)) {
                         $mapFileName = $confdir . DIRECTORY_SEPARATOR . $mapSpec->configfile;
 
                         $htmlFileName = $outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".html";

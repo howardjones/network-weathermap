@@ -30,3 +30,11 @@ releases/*
 dev/Vagrant/settings.sh
 dev/Vagrant/.vagrant
 dev/Vagrant/*.log
+websrc/cacti-mgmt/node_modules
+websrc/cacti-mgmt/build
+websrc/cacti-mgmt/*.log
+websrc/cacti-mgmt/yarn.lock
+websrc/cacti-user/node_modules
+websrc/cacti-user/yarn.lock
+websrc/cacti-user/build
+websrc/cacti-user/*.log

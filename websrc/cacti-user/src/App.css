@@ -1,0 +1,64 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 80px;
+}
+
+.App-header {
+  background-color: #f8f8f8;
+  height: 150px;
+  padding: 20px;
+  color: #3d464d;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+code {
+  color: #e73a37;
+}
+
+.layoutbox {
+  border: 1px solid lightgray;
+  padding: 5px;
+  margin: 5px;
+}
+
+.tab {
+  padding: 10px;
+  margin: 2px;
+  border: 1px solid gray;
+  text-decoration: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.tab.active {
+  background-color: blue;
+  color: white;
+  font-weight: bold;
+}
+
+.wm_thumbcontainer {
+  margin: 2px;
+  border: 1px solid #bbbbbb;
+  padding: 2px;
+  float:left;
+}
+.wm_thumbtitle {
+  font-size: 1.2em;
+  font-weight: bold;
+  text-align: center
+}
+
+.wm_thumb {
+  margin: 5px;
+  border: 0;
+}
+
+.MapCollection_clear {
+  clear: both;
+}

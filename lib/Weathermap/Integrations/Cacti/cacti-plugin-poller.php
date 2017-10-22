@@ -184,10 +184,10 @@ function weathermap_poller_bottom()
 // figure out if this poller run is hitting the 'cron' entry for any maps.
 function weathermap_poller_top()
 {
-    global $weathermap_poller_start_time;
+    global $weathermapPollerStartTime;
 
     $now = time();
 
     // round to the nearest minute, since that's all we need for the crontab-style stuff
-    $weathermap_poller_start_time = $now - ($now % 60);
+    $weathermapPollerStartTime = $now - ($now % 60);
 }

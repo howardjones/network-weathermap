@@ -8,7 +8,7 @@ function weathermap_setup_table()
     $myversion = $myversioninfo['version'];
 
     $pdo = weathermap_get_pdo();
-    $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface();
+    $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface($pdo);
     $manager = new Weathermap\Integrations\MapManager($pdo, "", $cactiInterface);
 
     if (($dbversion == '') || (preg_match('/dev$/', $myversion)) || ($dbversion != $myversion)) {
@@ -29,7 +29,7 @@ function weathermap_page_title($t)
         )) {
             $mapid = $matches[1];
             $pdo = weathermap_get_pdo();
-            $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface();
+            $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface($pdo);
             $manager = new Weathermap\Integrations\MapManager($pdo, "", $cactiInterface);
 
             // TODO: Should numeric ID ever happen?

@@ -862,18 +862,18 @@ class EditorUI extends UIBase
             // include the cacti-config, so we know about the database
             include_once $cactiBaseDirectory . "/include/global.php";
             $config['base_url'] = $cacti_url;
-            $cacti_found = true;
+            $cactiFound = true;
         } elseif (is_dir($cactiBaseDirectory) && file_exists($cactiBaseDirectory . "/include/config.php")) {
             // include the cacti-config, so we know about the database
             include_once $cactiBaseDirectory . "/include/config.php";
 
             $config['base_url'] = $cacti_url;
-            $cacti_found = true;
+            $cactiFound = true;
         } else {
-            $cacti_found = false;
+            $cactiFound = false;
         }
 
-        $this->foundCacti = $cacti_found;
+        $this->foundCacti = $cactiFound;
         return $this->foundCacti;
     }
 

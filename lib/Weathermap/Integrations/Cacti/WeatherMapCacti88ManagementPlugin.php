@@ -2,10 +2,7 @@
 
 namespace Weathermap\Integrations\Cacti;
 
-//require_once "WeatherMapUIBase.class.php";
-//require_once 'WeathermapManager.php';
-//require_once 'WeatherMapCactiManagementPlugin.php';
-//require_once 'weathermap-cacti88-plugin-compat.php';
+require_once dirname(__FILE__) . "/WeatherMapCactiManagementPlugin.php";
 
 class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
 {
@@ -26,6 +23,7 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
     public function handleManagementMainScreen($request, $appObject)
     {
         $this->cactiHeader();
+        print "This will all be replaced.";
         $this->maplistWarnings();
         $this->maplist();
         $this->footerLinks();

@@ -22,6 +22,7 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
     public function handleManagementMainScreen($request, $appObject)
     {
         $this->cactiHeader();
+        print "This will all be replaced.";
         $this->maplistWarnings();
         $this->maplist();
         $this->footerLinks();

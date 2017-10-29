@@ -617,7 +617,7 @@ class MapManager
                 $col = $rs->getColumnMeta($i);
                 $columns[] = $col['name'];
             }
-        } catch (PDOException $Exception) {
+        } catch (PDOException $exception) {
             // we want to allow for the table being completely missing
         }
 
@@ -790,6 +790,4 @@ class MapManager
         // TODO: get the version from...
         $this->application->setAppSetting("weathermap_db_version", "1.0.0");
     }
-
-
 }

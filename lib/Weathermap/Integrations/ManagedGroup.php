@@ -8,7 +8,6 @@
 
 namespace Weathermap\Integrations;
 
-
 class ManagedGroup
 {
     public $id;
@@ -17,11 +16,9 @@ class ManagedGroup
 
     public function __construct()
     {
-        
     }
 
     public function maps()
     {
-        
     }
 }

@@ -60,5 +60,4 @@ class DatabaseTest extends PHPUnit_Extensions_Database_TestCase
     {
         return $this->createMySQLXMLDataSet(realpath(dirname(__FILE__) . '/weathermap-seed.xml'));
     }
-
 }

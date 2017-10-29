@@ -32,4 +32,3 @@ function weathermap_get_pdo()
 
     return $pdo;
 }
-

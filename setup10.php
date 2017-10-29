@@ -22,6 +22,7 @@ require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugi
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/ApplicationInterface.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/CactiApplicationInterface.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/MapManager.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Core/constants.php";
 
 function plugin_weathermap_version()
 {

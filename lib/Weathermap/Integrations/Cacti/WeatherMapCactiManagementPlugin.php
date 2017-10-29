@@ -8,7 +8,7 @@ require_once dirname(__FILE__) . "/../ApplicationInterface.php";
 require_once dirname(__FILE__) . "/CactiApplicationInterface.php";
 require_once dirname(__FILE__) . "/database.php";
 require_once dirname(__FILE__) . "/../../Core/MapUtility.php";
-
+require_once dirname(__FILE__) . "/../../Core/constants.php";
 
 //require_once "database.php";
 //require_once "Map.php";

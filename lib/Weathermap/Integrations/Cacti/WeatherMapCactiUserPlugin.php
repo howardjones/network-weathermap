@@ -7,6 +7,7 @@ require_once dirname(__FILE__) . "/../MapManager.php";
 require_once dirname(__FILE__) . "/../ApplicationInterface.php";
 require_once dirname(__FILE__) . "/CactiApplicationInterface.php";
 require_once dirname(__FILE__) . "/database.php";
+require_once dirname(__FILE__) . "/../../Core/constants.php";
 
 use Weathermap\UI\UIBase;
 use Weathermap\Integrations\MapManager;
@@ -228,6 +229,8 @@ class WeatherMapCactiUserPlugin extends UIBase
     {
         $this->cactiHeader();
 
+        print "This will all be replaced.";
+
         $pageStyle = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
         $userId = $this->manager->application->getCurrentUserId();
         $limitToGroup = $this->getGroupFilter($request);
@@ -379,11 +382,11 @@ class WeatherMapCactiUserPlugin extends UIBase
                                         )
                                     );
                                     print '<a href = "' . $this->makeURL(
-                                            array(
+                                        array(
                                                 "action" => "viewcycle_filtered",
                                                 "group" => $limitingToGroup
                                             )
-                                        ) . '">within this group</a>, or ';
+                                    ) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)

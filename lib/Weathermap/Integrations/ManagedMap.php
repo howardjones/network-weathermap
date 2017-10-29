@@ -32,62 +32,50 @@ class ManagedMap
 
     public function checkAccess($userId)
     {
-
     }
 
     public function delete()
     {
-
     }
 
     public function update()
     {
-
     }
 
     public function enable()
     {
-
     }
 
     public function disable()
     {
-
     }
 
     public function enableArchiving()
     {
-
     }
 
     public function disableArchiving()
     {
-
     }
 
     public function updateTitleCache()
     {
-
     }
 
     public function setDebug($newState)
     {
-
     }
 
     public function setGroup($groupId)
     {
-
     }
 
     public function addAccess($userId)
     {
-
     }
 
 
     public function removeAccess($userId)
     {
-
     }
 }

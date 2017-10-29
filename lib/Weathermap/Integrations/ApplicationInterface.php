@@ -30,12 +30,10 @@ class ApplicationInterface
 
     public function setAppSetting($name, $value)
     {
-
     }
 
     public function deleteAppSetting($name)
     {
-
     }
 
     public function getUserList()

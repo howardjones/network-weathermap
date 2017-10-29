@@ -10,7 +10,6 @@ namespace Weathermap\Tests;
 
 use Weathermap\Core\HTMLImagemapAreaPolygon;
 
-
 class HTMLImagemapAreaPolygonTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
@@ -74,5 +73,4 @@ class HTMLImagemapAreaPolygonTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($point[2], $this->object->hitTest($point[0], $point[1]), $desc);
         }
     }
-
 }

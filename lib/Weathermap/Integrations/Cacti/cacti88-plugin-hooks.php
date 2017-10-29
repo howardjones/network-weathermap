@@ -219,8 +219,11 @@ function weathermap_show_tab()
         }
         $tabURL = $weathermapBaseURL . "/images/" . $tabName;
 
-        printf('<a href="%s"><img src="%s" alt="Weathermap" align="absmiddle" border="0" /></a>', $weathermapURL,
-            $tabURL);
+        printf(
+            '<a href="%s"><img src="%s" alt="Weathermap" align="absmiddle" border="0" /></a>',
+            $weathermapURL,
+            $tabURL
+        );
     }
 
     weathermap_setup_table();

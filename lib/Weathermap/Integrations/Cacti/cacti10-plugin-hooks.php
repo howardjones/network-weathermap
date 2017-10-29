@@ -98,8 +98,11 @@ function weathermap_show_tab()
         }
         $tabURL = $weathermapBaseURL . '/images/' . $tabName;
 
-        printf('<a href="%s"><img src="%s" alt="' . __('Weathermap') . '" align="absmiddle" border="0" /></a>',
-            $weathermapURL, $tabURL);
+        printf(
+            '<a href="%s"><img src="%s" alt="' . __('Weathermap') . '" align="absmiddle" border="0" /></a>',
+            $weathermapURL,
+            $tabURL
+        );
     }
 
     weathermap_setup_table();
@@ -111,8 +114,12 @@ function weathermap_config_arrays()
 
     if (function_exists('api_plugin_register_realm')) {
         api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin.php', __('Weathermap: View'), 1);
-        api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-mgmt.php',
-            __('Weathermap: Configure/Manage'), 1);
+        api_plugin_register_realm(
+            'weathermap',
+            'weathermap-cacti10-plugin-mgmt.php',
+            __('Weathermap: Configure/Manage'),
+            1
+        );
         api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-editor.php', __('Weathermap: Edit Maps'), 1);
     }
 

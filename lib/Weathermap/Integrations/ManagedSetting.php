@@ -8,7 +8,6 @@
 
 namespace Weathermap\Integrations;
 
-
 class ManagedSetting
 {
     public $mapId;
@@ -19,6 +18,5 @@ class ManagedSetting
     
     public function set($newValue)
     {
-
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Weathermap\Integrations\Cacti;
 
-//require_once "WeatherMapUIBase.class.php";
-//require_once 'WeathermapManager.php';
-//require_once 'WeatherMapCactiUserPlugin.php';
+//require_once dirname(__FILE__) . "/../../UI/UIBase.php";
+//require_once dirname(__FILE__) . "/../MapManager.php";
+require_once dirname(__FILE__) . "/WeatherMapCactiUserPlugin.php";
 
 class WeatherMapCacti10UserPlugin extends WeatherMapCactiUserPlugin
 {

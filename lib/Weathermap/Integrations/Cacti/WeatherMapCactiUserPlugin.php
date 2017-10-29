@@ -2,17 +2,24 @@
 
 namespace Weathermap\Integrations\Cacti;
 
+require_once dirname(__FILE__) . "/../../UI/UIBase.php";
+require_once dirname(__FILE__) . "/../MapManager.php";
+require_once dirname(__FILE__) . "/../ApplicationInterface.php";
+require_once dirname(__FILE__) . "/CactiApplicationInterface.php";
+require_once dirname(__FILE__) . "/database.php";
+
 use Weathermap\UI\UIBase;
+use Weathermap\Integrations\MapManager;
 
 //require_once "database.php";
 //require_once "Map.php";
 //require_once "WeatherMap.functions.php";
 //require_once "WeatherMapUIBase.class.php";
 //include_once 'WeathermapManager.php';
-use Weathermap\Integrations\MapManager;
 
 class WeatherMapCactiUserPlugin extends UIBase
 {
+    /** @var MapManager $manager */
     public $manager;
     public $myURL;
     public $editorURL;
@@ -75,7 +82,9 @@ class WeatherMapCactiUserPlugin extends UIBase
         $this->configPath = realpath(dirname(__FILE__) . '/../configs');
         $this->outputDirectory = realpath(dirname(__FILE__) . '/../output/');
         $this->imageFormat = $imageFormat;
-        $this->manager = new MapManager(weathermap_get_pdo(), $this->configPath);
+        $pdo = weathermap_get_pdo();
+        $cactiInterface = new CactiApplicationInterface($pdo);
+        $this->manager = new MapManager($pdo, $this->configPath, $cactiInterface);
     }
 
     public function main($request)
@@ -146,15 +155,15 @@ class WeatherMapCactiUserPlugin extends UIBase
         $styleTextOptions = array("thumbs", "full", "full-first-only");
         $trueFalseLookup = array(false, true);
 
-        $style = $this->manager->getAppSetting("weathermap_pagestyle", 0);
+        $style = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
 
-        $cycleTime = $this->manager->getAppSetting("weathermap_cycle_refresh", 0);
+        $cycleTime = $this->manager->application->getAppSetting("weathermap_cycle_refresh", 0);
         if ($cycleTime == 0) {
             $cycleTime = 'auto';
         }
 
-        $showAllMapsTab = $this->manager->getAppSetting("weathermap_all_tab", 0);
-        $showMapSelector = $this->manager->getAppSetting("weathermap_map_selector", 0);
+        $showAllMapsTab = $this->manager->application->getAppSetting("weathermap_all_tab", 0);
+        $showMapSelector = $this->manager->application->getAppSetting("weathermap_map_selector", 0);
 
         $data = array(
             'wm_version' => WEATHERMAP_VERSION,
@@ -219,8 +228,8 @@ class WeatherMapCactiUserPlugin extends UIBase
     {
         $this->cactiHeader();
 
-        $pageStyle = $this->manager->getAppSetting("weathermap_pagestyle", 0);
-        $userId = $this->manager->getUserId();
+        $pageStyle = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
+        $userId = $this->manager->application->getCurrentUserId();
         $limitToGroup = $this->getGroupFilter($request);
 
         $mapList = $this->manager->getMapsForUser($userId, $limitToGroup);
@@ -278,18 +287,18 @@ class WeatherMapCactiUserPlugin extends UIBase
         $groupID = -1;
         if (isset($request['group_id'])) {
             $groupID = $request['group_id'];
-            $this->manager->setAppSetting("wm_last_group", $groupID);
+            $this->manager->application->setAppSetting("wm_last_group", $groupID);
             return $groupID;
         }
 
-        return $this->manager->getAppSetting("wm_last_group", $groupID);
+        return $this->manager->application->getAppSetting("wm_last_group", $groupID);
     }
 
     protected function getValidTabs()
     {
         $tabs = array();
 
-        $maps = $this->manager->getMapsWithAccessAndGroups($this->manager->getUserId());
+        $maps = $this->manager->getMapsWithAccessAndGroups($this->manager->application->getCurrentUserId());
 
         foreach ($maps as $map) {
             $tabs[$map->group_id] = $map->name;
@@ -309,7 +318,7 @@ class WeatherMapCactiUserPlugin extends UIBase
             $realmId = $user_auth_realm_filenames[$realmName];
         }
         $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-        $allowed = $this->manager->checkUserForRealm($userid, $realmId);
+        $allowed = $this->manager->application->checkUserAccess($userid, $realmId);
 
         if ($allowed || (empty($realmId))) {
             return true;
@@ -370,11 +379,11 @@ class WeatherMapCactiUserPlugin extends UIBase
                                         )
                                     );
                                     print '<a href = "' . $this->makeURL(
-                                        array(
+                                            array(
                                                 "action" => "viewcycle_filtered",
                                                 "group" => $limitingToGroup
                                             )
-                                    ) . '">within this group</a>, or ';
+                                        ) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)
@@ -401,7 +410,7 @@ class WeatherMapCactiUserPlugin extends UIBase
             print "<p></p><table class='tabs' width='100%' cellspacing='0' cellpadding='3' align='center'><tr>\n";
 
             if (count($tabs) > 0) {
-                $showAll = intval($this->manager->getAppSetting("weathermap_all_tab", 0));
+                $showAll = intval($this->manager->application->getAppSetting("weathermap_all_tab", 0));
                 if ($showAll == 1) {
                     $tabs['-2'] = "All Maps";
                 }

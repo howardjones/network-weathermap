@@ -2,7 +2,13 @@
 
 namespace Weathermap\Integrations\Cacti;
 
-use Weathermap\UI\UIBase;
+require_once dirname(__FILE__) . "/../../UI/UIBase.php";
+require_once dirname(__FILE__) . "/../MapManager.php";
+require_once dirname(__FILE__) . "/../ApplicationInterface.php";
+require_once dirname(__FILE__) . "/CactiApplicationInterface.php";
+require_once dirname(__FILE__) . "/database.php";
+require_once dirname(__FILE__) . "/../../Core/MapUtility.php";
+
 
 //require_once "database.php";
 //require_once "Map.php";
@@ -11,6 +17,7 @@ use Weathermap\UI\UIBase;
 //include_once 'WeathermapManager.php';
 
 use Weathermap\Integrations\MapManager;
+use Weathermap\UI\UIBase;
 use Weathermap\Core\MapUtility;
 
 class WeatherMapCactiManagementPlugin extends UIBase
@@ -108,7 +115,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiConfig = $config;
         $this->configPath = realpath(dirname(__FILE__) . '/../configs');
         $this->cactiBasePath = $config["base_path"];
-        $this->manager = new MapManager(weathermap_get_pdo(), $this->configPath);
+        $pdo = weathermap_get_pdo();
+        $cactiInterface = new CactiApplicationInterface($pdo);
+        $this->manager = new MapManager($pdo, $this->configPath, $cactiInterface);
     }
 
     public function main($request)
@@ -620,14 +629,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
             exit;
         }
 
-        $tables = weathermap_get_table_list(weathermap_get_pdo());
+        $tables = $this->manager->getTableList();
         if (!in_array('weathermap_maps', $tables)) {
             print '<div align="center" class="wm_warning"><p>';
             print __('The weathermap_maps table is missing completely from the database. Something went wrong with the installation process.');
             print '</p></div>';
         }
 
-        $boostEnabled = $this->manager->getAppSetting('boost_rrd_update_enable', 'off');
+        $boostEnabled = $this->manager->application->getAppSetting('boost_rrd_update_enable', 'off');
 
         if ($boostEnabled == 'on') {
             $hasGlobalPollerOutput = $this->manager->getMapSettingByName(0, 'rrd_use_poller_output', false);
@@ -639,11 +648,11 @@ class WeatherMapCactiManagementPlugin extends UIBase
             }
         }
 
-        $lastStarted = $this->manager->getAppSetting('weathermap_last_started_file', true);
-        $lastFinished = $this->manager->getAppSetting('weathermap_last_finished_file', true);
-        $lastStartTime = intval($this->manager->getAppSetting('weathermap_last_start_time', true));
-        $lastFinishTime = intval($this->manager->getAppSetting('weathermap_last_finish_time', true));
-        $pollerInterval = intval($this->manager->getAppSetting('poller_interval'));
+        $lastStarted = $this->manager->application->getAppSetting('weathermap_last_started_file', true);
+        $lastFinished = $this->manager->application->getAppSetting('weathermap_last_finished_file', true);
+        $lastStartTime = intval($this->manager->application->getAppSetting('weathermap_last_start_time', true));
+        $lastFinishTime = intval($this->manager->application->getAppSetting('weathermap_last_finish_time', true));
+        $pollerInterval = intval($this->manager->application->getAppSetting('poller_interval'));
 
         if (($lastFinishTime - $lastStartTime) > $pollerInterval) {
             if (($lastStarted != $lastFinished) && ($lastStarted != '')) {
@@ -670,7 +679,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             __('Sort Order'),
             __('Accessible By')
         );
-        $userlist = $this->manager->getUserList();
+        $userlist = $this->manager->application->getUserList();
         $users[0] = __('Anyone');
 
         foreach ($userlist as $user) {
@@ -783,7 +792,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
         \html_end_box();
 
-        $lastStats = $this->manager->getAppSetting('weathermap_last_stats', '');
+        $lastStats = $this->manager->application->getAppSetting('weathermap_last_stats', '');
 
         if ($lastStats != '') {
             print '<div align="center">' . __('Last Completed Run: %s', $lastStats) . '</div>';
@@ -938,7 +947,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $map = $this->manager->getMap($id);
         $title = $map->titlecache;
 
-        $users = $this->manager->getUserList(true);
+        $users = $this->manager->application->getUserList(true);
         $auth = $this->manager->getMapAuth($id);
 
         $mapuserids = array();

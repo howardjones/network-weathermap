@@ -1,8 +1,16 @@
 <?php
 
+
 namespace Weathermap\Tests;
 
 require_once dirname(__FILE__) . '/../Integrations/Cacti/database.php';
+
+// the cacti config variables
+$database_default = null;
+$database_username = null;
+$database_password = null;
+$database_hostname = null;
+$database_type = null;
 
 use PDO;
 use PHPUnit_Extensions_Database_TestCase;
@@ -20,15 +28,29 @@ class DatabaseTest extends PHPUnit_Extensions_Database_TestCase
 
     public function setUp()
     {
+        global $database_type, $database_default, $database_hostname, $database_username, $database_password;
+
         $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
+
+        $database_default = $GLOBALS['DB_DBNAME'];
+        $database_username = $GLOBALS['DB_USER'];
+        $database_password = $GLOBALS['DB_PASSWD'];
+        $database_hostname = 'localhost';
+        $database_type = "mysqli";
     }
 
     public function getConnection()
     {
-
         $pdo = new PDO($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
 
         return $this->createDefaultDBConnection($pdo, $GLOBALS['DB_DBNAME']);
+    }
+
+    public function testGetPDO()
+    {
+        $pdo = weathermap_get_pdo();
+
+        $this->assertInstanceOf("PDO", $pdo);
     }
 
     /**
@@ -39,25 +61,4 @@ class DatabaseTest extends PHPUnit_Extensions_Database_TestCase
         return $this->createMySQLXMLDataSet(realpath(dirname(__FILE__) . '/weathermap-seed.xml'));
     }
 
-    public function testListTables()
-    {
-//        $this->assertNotNull(self::$pdo, "PDO is initialized");
-
-        $tableList = weathermap_get_table_list(self::$pdo);
-
-        $this->assertEquals(
-            $tableList,
-            array(
-                'settings',
-                'user_auth',
-                'user_auth_perms',
-                'user_auth_realm',
-                'weathermap_auth',
-                'weathermap_data',
-                'weathermap_groups',
-                'weathermap_maps',
-                'weathermap_settings'
-            )
-        );
-    }
 }

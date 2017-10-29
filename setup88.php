@@ -12,18 +12,22 @@
 /**
  * This file now contains only the functions for registering the plugin and doing plugin-admin stuff
  *
- * All the real work is in lib/cacti88-plugin-hooks.php and lib/cacti-plugin-poller.php
+ * All the real work is in lib/Weathermap/Integrations/Cacti/cacti88-plugin-hooks.php
+ * and lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php
  */
 
 
-require_once dirname(__FILE__) . "/lib/database.php";
-require_once dirname(__FILE__) . "/lib/cacti88-plugin-hooks.php";
-require_once dirname(__FILE__) . "/lib/cacti-plugin-poller.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti88-plugin-hooks.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/CactiApplicationInterface.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/MapManager.php";
 
 
 function plugin_weathermap_version()
 {
-    return array('name' => 'weathermap',
+    return array(
+        'name' => 'weathermap',
         'version' => '1.0.0',
         'longname' => 'PHP Network Weathermap for Cacti 0.8.x',
         'author' => 'Howard Jones',

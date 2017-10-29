@@ -33,23 +33,3 @@ function weathermap_get_pdo()
     return $pdo;
 }
 
-/**
- * @param PDO $pdo
- * @return string[]
- */
-function weathermap_get_table_list($pdo)
-{
-
-    $statement = $pdo->query("show tables");
-    $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-    $tables = array();
-
-    foreach ($result as $index => $arr) {
-        foreach ($arr as $t) {
-            $tables[] = $t;
-        }
-    }
-
-    return $tables;
-}

@@ -16,10 +16,11 @@
  */
 
 
-require_once dirname(__FILE__) . "/lib/database.php";
-require_once dirname(__FILE__) . "/lib/cacti10-plugin-hooks.php";
-require_once dirname(__FILE__) . "/lib/cacti-plugin-poller.php";
-
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti10-plugin-hooks.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/CactiApplicationInterface.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/MapManager.php";
 
 function plugin_weathermap_version()
 {

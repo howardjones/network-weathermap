@@ -2,19 +2,25 @@
 
 namespace Weathermap\Integrations;
 
-use \PDO;
+use PDOException;
+use PDO;
 
 class MapManager
 {
 
     /** @var PDO $pdo */
     private $pdo;
+
     private $configDirectory;
 
-    public function __construct($pdo, $configDirectory)
+    /** @var ApplicationInterface $application */
+    public $application;
+
+    public function __construct($pdo, $configDirectory, $applicationInterface = null)
     {
         $this->configDirectory = $configDirectory;
         $this->pdo = $pdo;
+        $this->application = $applicationInterface;
     }
 
     public function getMap($mapId)
@@ -481,6 +487,24 @@ class MapManager
         $this->pdo->prepare("UPDATE weathermap_groups SET name=? WHERE id=?")->execute(array($newName, $groupId));
     }
 
+    public function getMapTitle($mapid)
+    {
+        $statement = $this->pdo->prepare("SELECT titlecache FROM weathermap_maps WHERE ID=?");
+        $statement->execute(array(intval($mapid)));
+        $title = $statement->fetchColumn();
+
+        return $title;
+    }
+
+    public function getMapTitleByHash($mapid)
+    {
+        $statement = $this->pdo->prepare("SELECT titlecache FROM weathermap_maps WHERE filehash=?");
+        $statement->execute(array($mapid));
+        $title = $statement->fetchColumn();
+
+        return $title;
+    }
+
     public function extractMapTitle($filename)
     {
         $title = "(no file)";
@@ -565,73 +589,207 @@ class MapManager
         return str_replace($separator, '', ucwords($input, $separator));
     }
 
-    // *******************************************************************************************
-    // Below here will migrate into a Cacti API class at some point soon
-    // (to allow for other hosts to have equivalent functions)
-
-    public function getAppSetting($name, $defaultValue = "")
+    /**
+     * get a list of all tables in the database
+     *
+     * @return array
+     */
+    public function getTableList()
     {
-        $statement = $this->pdo->prepare("SELECT value FROM settings WHERE name=?");
-        $statement->execute(array($name));
-        $result = $statement->fetchColumn();
+        $statement = $this->pdo->query('show tables');
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        if ($result === false) {
-            return $defaultValue;
+        $tables = array();
+        foreach ($result as $arr) {
+            foreach ($arr as $t) {
+                $tables[] = $t;
+            }
+        }
+        return $tables;
+    }
+
+    public function getColumnList($tableName)
+    {
+        $columns = array();
+        try {
+            $rs = $this->pdo->query('SELECT * FROM ' . $tableName . ' LIMIT 0');
+            for ($i = 0; $i < $rs->columnCount(); $i++) {
+                $col = $rs->getColumnMeta($i);
+                $columns[] = $col['name'];
+            }
+        } catch (PDOException $Exception) {
+            // we want to allow for the table being completely missing
         }
 
-        return $result;
+        return $columns;
     }
 
-    public function setAppSetting($name, $value)
+    private function createMissingTables()
     {
-        $statement = $this->pdo->prepare("REPLACE INTO settings (name, value) VALUES (?,?)");
-        $statement->execute(array($name, $value));
-    }
+        $tables = $this->getTableList();
 
-    public function deleteAppSetting($name)
-    {
-        $statement = $this->pdo->prepare("DELETE FROM settings WHERE name=?");
-        $statement->execute(array($name));
-    }
+        $databaseUpdates = array();
 
-    public function getUserList($includeAnyone = false)
-    {
-        $statement = $this->pdo->query("SELECT id, username, full_name, enabled FROM user_auth");
-        $statement->execute();
-        $userlist = $statement->fetchAll(PDO::FETCH_OBJ);
-
-        $users = array();
-
-        foreach ($userlist as $user) {
-            $users[$user->id] = $user;
+        if (!in_array('weathermap_maps', $tables)) {
+            $databaseUpdates[] = "CREATE TABLE weathermap_maps (
+                                id INT(11) NOT NULL AUTO_INCREMENT,
+                                sortorder INT(11) NOT NULL DEFAULT 0,
+                                group_id INT(11) NOT NULL DEFAULT 1,
+                                active SET('on','off') NOT NULL DEFAULT 'on',
+                                configfile TEXT NOT NULL,
+                                imagefile TEXT NOT NULL,
+                                htmlfile TEXT NOT NULL,
+                                titlecache TEXT NOT NULL,
+                                filehash VARCHAR (40) NOT NULL DEFAULT '',
+                                warncount INT(11) NOT NULL DEFAULT 0,
+                                debug set('on','off','once') NOT NULL default 'off',
+                                runtime double NOT NULL default 0,
+                                lastrun datetime,
+                                config TEXT NOT NULL,
+                                thumb_width INT(11) NOT NULL DEFAULT 0,
+                                thumb_height INT(11) NOT NULL DEFAULT 0,
+                                schedule VARCHAR(32) NOT NULL DEFAULT '*',
+                                archiving SET('on','off') NOT NULL DEFAULT 'off',
+                                PRIMARY KEY  (id)
+                        );";
         }
 
-        if ($includeAnyone) {
-            $users[0] = new \stdClass();
-            $users[0]->id = 0;
-            $users[0]->username = "Anyone";
-            $users[0]->full_name = "Anyone";
-            $users[0]->enabled = true;
+        if (!in_array('weathermap_auth', $tables)) {
+            $databaseUpdates[] = "CREATE TABLE weathermap_auth (
+                                userid MEDIUMINT(9) NOT NULL DEFAULT '0',
+                                mapid INT(11) NOT NULL DEFAULT '0'
+                        );";
         }
 
-        return $users;
-    }
-
-    public function checkUserForRealm($userId, $realmId)
-    {
-        $statement = $this->pdo->prepare("SELECT user_auth_realm.realm_id FROM user_auth_realm WHERE user_auth_realm.user_id=? AND user_auth_realm.realm_id=?");
-        $statement->execute(array($userId, $realmId));
-        $userlist = $statement->fetchAll(PDO::FETCH_OBJ);
-
-        if (count($userlist) > 0) {
-            return true;
+        if (!in_array('weathermap_groups', $tables)) {
+            $databaseUpdates[] = "CREATE TABLE  weathermap_groups (
+                                `id` INT(11) NOT NULL AUTO_INCREMENT,
+                                `name` VARCHAR( 128 ) NOT NULL DEFAULT '',
+                                `sortorder` INT(11) NOT NULL DEFAULT 0,
+                                PRIMARY KEY (id)
+                                );";
+            $databaseUpdates[] = "INSERT INTO weathermap_groups (id,name,sortorder) VALUES (1,'Weathermaps',1)";
         }
 
-        return false;
+        if (!in_array('weathermap_settings', $tables)) {
+            $databaseUpdates[] = "CREATE TABLE weathermap_settings (
+                                id INT(11) NOT NULL AUTO_INCREMENT,
+                                mapid INT(11) NOT NULL DEFAULT '0',
+                                groupid INT(11) NOT NULL DEFAULT '0',
+                                optname VARCHAR(128) NOT NULL DEFAULT '',
+                                optvalue VARCHAR(128) NOT NULL DEFAULT '',
+                                PRIMARY KEY  (id)
+                        );";
+        }
+
+        if (!in_array('weathermap_data', $tables)) {
+            $databaseUpdates[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id INT(11) NOT NULL AUTO_INCREMENT,
+                                rrdfile VARCHAR(190) NOT NULL,data_source_name VARCHAR(19) NOT NULL,
+                                  last_time INT(11) NOT NULL,last_value VARCHAR(190) NOT NULL,
+                                last_calc VARCHAR(190) NOT NULL, sequence INT(11) NOT NULL, local_data_id INT(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
+                                  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) )";
+        }
+
+        return $databaseUpdates;
     }
 
-    public function getUserId()
+    /**
+     * Create and/or update the weathermap tables in the host database.
+     *
+     * Pulled out of Cacti's poller setup_tables() hook - we can re-use this in other integrations.
+     */
+    public function initializeDatabase()
     {
-        return isset($_SESSION['sess_user_id']) ? intval($_SESSION['sess_user_id']) : 1;
+        // only bother with all this if it's a new install, a new version, or we're in a development version
+        // - saves a handful of db hits per request!
+
+        $databaseUpdates = $this->createMissingTables();
+
+        $columns = $this->getColumnList("weathermap_maps");
+        if (count($columns) > 0) {
+            # Check that all the table columns exist for weathermap_maps
+            # There have been a number of changes over versions.
+
+            $mapsFieldChanges = array(
+                'sortorder' => array("alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id"),
+                'filehash' => array("alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache"),
+                'warncount' => array("alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash"),
+                'config' => array("alter table weathermap_maps add config text NOT NULL after warncount"),
+                'thumb_width' => array(
+                    "alter table weathermap_maps add thumb_width int(11) NOT NULL default 0 after config",
+                    "alter table weathermap_maps add thumb_height int(11) NOT NULL default 0 after thumb_width",
+                    "alter table weathermap_maps add schedule varchar(32) NOT NULL default '*' after thumb_height",
+                    "alter table weathermap_maps add archiving set('on','off') NOT NULL default 'off' after schedule"
+                ),
+                'group_id' => array(
+                    "alter table weathermap_maps add group_id int(11) NOT NULL default 1 after sortorder",
+                    "ALTER TABLE `weathermap_settings` ADD `groupid` INT NOT NULL DEFAULT '0' AFTER `mapid`"
+                ),
+                'debug' => array(
+                    "alter table weathermap_maps add runtime double NOT NULL default 0 after warncount",
+                    "alter table weathermap_maps add lastrun datetime after runtime",
+                    "alter table weathermap_maps add debug set('on','off','once') NOT NULL default 'off' after warncount;"
+                )
+            );
+
+            foreach ($mapsFieldChanges as $field => $changes) {
+                if (!in_array($field, $columns)) {
+                    foreach ($changes as $change) {
+                        $databaseUpdates[] = $change;
+                    }
+                }
+            }
+        }
+
+        $databaseUpdates[] = "UPDATE weathermap_maps SET filehash=LEFT(MD5(concat(id,configfile,rand())),20) WHERE filehash = ''";
+
+        $columns = $this->getColumnList("weathermap_data");
+        if (count($columns) > 0) {
+            if (!in_array('local_data_id', $columns)) {
+                $databaseUpdates[] = "ALTER TABLE weathermap_data ADD local_data_id INT(11) NOT NULL DEFAULT 0 AFTER sequence";
+                $databaseUpdates[] = "ALTER TABLE weathermap_data ADD INDEX ( `local_data_id` )";
+                # if there is existing data without a local_data_id, ditch it
+                $databaseUpdates[] = "DELETE FROM weathermap_data";
+            }
+        }
+
+        // patch up the sortorder for any maps that don't have one.
+        $databaseUpdates[] = "UPDATE weathermap_maps SET sortorder=id WHERE sortorder IS NULL OR sortorder=0;";
+
+        if (!empty($databaseUpdates)) {
+            for ($a = 0; $a < count($databaseUpdates); $a++) {
+                $this->pdo->query($databaseUpdates[$a]);
+            }
+        }
     }
+
+    public function initializeAppSettings()
+    {
+        // create the settings entries, if necessary
+        $defaults = array(
+            "weathermap_pagestyle" => 0,
+            "weathermap_cycle_refresh" => 0,
+            "weathermap_render_period" => 0,
+            "weathermap_quiet_logging" => 0,
+            "weathermap_render_counter" => 0,
+            "weathermap_output_format" => "png",
+            "weathermap_thumbsize" => 250,
+            "weathermap_map_selector" => 1,
+            "weathermap_all_tab" => 0,
+            "weathermap_debug_data_only" => 1
+        );
+
+        foreach ($defaults as $key => $defaultValue) {
+            $current = $this->application->getAppSetting($key, '');
+            if ($current == '') {
+                $this->application->setAppSetting($key, $defaultValue);
+            }
+        }
+
+        // update the version, so we can skip this next time
+        // TODO: get the version from...
+        $this->application->setAppSetting("weathermap_db_version", "1.0.0");
+    }
+
+
 }

@@ -5,6 +5,7 @@ namespace Weathermap\Tests;
 require_once dirname(__FILE__) . '/../../all.php';
 
 use PDO;
+use Weathermap\Integrations\Cacti\CactiApplicationInterface;
 use Weathermap\Integrations\MapManager;
 
 class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
@@ -45,7 +46,8 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
         $this->confdir = $this->projectRoot . '/configs';
         $this->testsuite = $this->projectRoot . "/test-suite";
 
-        $this->manager = new MapManager(self::$pdo, $this->confdir);
+        $cactiInterface = new CactiApplicationInterface(self::$pdo);
+        $this->manager = new MapManager(self::$pdo, $this->confdir, $cactiInterface);
     }
 
     /**
@@ -356,24 +358,24 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $this->assertEquals(40, $this->getConnection()->getRowCount('settings'), "Pre-Condition");
 
-        $this->manager->setAppSetting("fish", "trout");
+        $this->manager->application->setAppSetting("fish", "trout");
         $this->assertEquals(41, $this->getConnection()->getRowCount('settings'), "Add failed");
 
-        $result = $this->manager->getAppSetting("fish");
+        $result = $this->manager->application->getAppSetting("fish");
         $this->assertEquals("trout", $result);
 
-        $this->manager->setAppSetting("fish", "carp");
+        $this->manager->application->setAppSetting("fish", "carp");
         $this->assertEquals(41, $this->getConnection()->getRowCount('settings'), "Update failed");
-        $result = $this->manager->getAppSetting("fish");
+        $result = $this->manager->application->getAppSetting("fish");
         $this->assertEquals("carp", $result);
 
 
-        $result = $this->manager->getAppSetting("dog", "pitbull");
+        $result = $this->manager->application->getAppSetting("dog", "pitbull");
         $this->assertEquals("pitbull", $result);
 
-        $this->manager->deleteAppSetting("fish");
+        $this->manager->application->deleteAppSetting("fish");
         $this->assertEquals(40, $this->getConnection()->getRowCount('settings'), "Update failed");
-        $result = $this->manager->getAppSetting("fish", "tuna");
+        $result = $this->manager->application->getAppSetting("fish", "tuna");
         $this->assertEquals("tuna", $result);
     }
 
@@ -381,10 +383,10 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('user_auth'), "Pre-Condition");
 
-        $users = $this->manager->getUserList();
+        $users = $this->manager->application->getUserList();
         $this->assertEquals(2, count($users), "via API");
 
-        $users = $this->manager->getUserList(true);
+        $users = $this->manager->application->getUserList(true);
         $this->assertEquals(3, count($users), "via API with Anyone");
 
         $user1 = $users[1];
@@ -395,12 +397,12 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testCactiPerms()
     {
-        $users = $this->manager->getUserList();
+        $users = $this->manager->application->getUserList();
         $this->assertEquals(2, count($users));
 
-        $this->assertTrue($this->manager->checkUserForRealm(1, 1));
-        $this->assertFalse($this->manager->checkUserForRealm(1, 33));
-        $this->assertFalse($this->manager->checkUserForRealm(19, 1));
+        $this->assertTrue($this->manager->application->checkUserAccess(1, 1));
+        $this->assertFalse($this->manager->application->checkUserAccess(1, 33));
+        $this->assertFalse($this->manager->application->checkUserAccess(19, 1));
     }
 
     private function objectArrayIncludes($arr, $field, $value)
@@ -510,5 +512,34 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
         $maps = $this->manager->getMapRunList();
         $this->assertEquals(5, count($maps));
         $this->assertInstanceOf(\stdClass::class, $maps[0]);
+    }
+
+    public function testDatabaseIntrospection()
+    {
+        $tableList = $this->manager->getTableList();
+
+        $this->assertEquals(
+            array(
+                'settings',
+                'user_auth',
+                'user_auth_perms',
+                'user_auth_realm',
+                'weathermap_auth',
+                'weathermap_data',
+                'weathermap_groups',
+                'weathermap_maps',
+                'weathermap_settings'
+            ),
+            $tableList
+        );
+
+        $columnList = $this->manager->getColumnList('settings');
+
+        $this->assertEquals(array('name', 'value'), $columnList);
+
+
+        $columnList = $this->manager->getColumnList('gazorpazorp');
+
+        $this->assertEquals(array(), $columnList);
     }
 }

@@ -5,6 +5,21 @@
 I decided it would be useful to add this section to the top of the README, while things are moving around a lot. Here
 is what is working, and what is being worked on:
 
+### General goals
+
+By the time 1.0.0 is done, near enough everything will have had some kind of rewrite work, even it's just
+tidying up the naming. A lot of it will have significantly more change, including stuff
+that was originally written before 0.98 a few years ago, and never used. The aim of all of that
+is to break the code up between the UI, the map-drawing, and data-collecting parts, and make
+it a generally more pleasant place for someone to work, in the hopes of getting some additional contributors.
+
+To make it easier to deal with multiple contributors, __automated testing__ is pretty essential. You
+should be able to quickly tell if your changes have broken anything. Lots of code has been pulled into
+smaller testable classes to make that easier (and tests written!). Previously, most of the stuff that
+appeared on a web page was not at all easy to test, and that's improving now. The editor has tests for
+the first time, for example, and a lot of the database manipulation that used to be buried in the cacti
+plugin does, too.
+
 ### Current Status/Usability
 
 * __Core__ - passing all tests (but one database-related). All code modified to use namespaces, one class per file, most PSR-2 standards.
@@ -20,9 +35,9 @@ is what is working, and what is being worked on:
 
 ### Work currently in progress:
 
-* Move to namespaces - PHP Namespaces help keep our code out of your code. Especially important for something that sits inside other software
+* ~~Move to namespaces - PHP Namespaces help keep our code out of your code. Especially important for something that sits inside other software~~
 
-* Remove dependency on PEAR - CLI uses a Composer module now for options
+* ~~Remove dependency on PEAR - CLI uses a Composer module now for options~~
 
 * Move to React for Cacti UI, with only JSON/API type stuff in the PHP code
 
@@ -32,6 +47,11 @@ is what is working, and what is being worked on:
 
 * Break down 'monster methods' into simpler ones. Identify groups within the larger classes for refactoring (e.g. plugin-related stuff in Map)
 
+* Move as much generic database-related stuff out of the Cacti plugin and into MapManager - MapManager is testable, whereas 
+the Cacti plugin is not (easily).  
+
+* Make an abstraction layer for things like `read_config_option` in the UI, so it doesn't depend on Cacti being underneath. When someone wants to make a plugin/integration for a new
+application, it'll be a lot 'thinner' this way, too.
 
 ## Normal README
 

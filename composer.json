@@ -11,7 +11,7 @@
   ],
   "require": {
     "ulrichsg/getopt-php": "~3",
-    "monolog/monolog": "^1.23",
+    "monolog/monolog": "^1",
     "erusev/parsedown": "^1.6"
   },
   "require-dev": {

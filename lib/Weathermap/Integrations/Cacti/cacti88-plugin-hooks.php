@@ -19,14 +19,14 @@ function weathermap_page_title($t)
         )) {
             $mapid = $matches[1];
             $pdo = weathermap_get_pdo();
+            $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface();
+            $manager = new Weathermap\Integrations\MapManager($pdo, "", $cactiInterface);
+
+            // TODO: Should numeric ID ever happen?
             if (preg_match('/^\d+$/', $mapid)) {
-                $statement = $pdo->prepare("SELECT titlecache FROM weathermap_maps WHERE ID=?");
-                $statement->execute(array(intval($mapid)));
-                $title = $statement->fetchColumn();
+                $title = $manager->getMapTitle($mapid);
             } else {
-                $statement = $pdo->prepare("SELECT titlecache FROM weathermap_maps WHERE filehash=?");
-                $statement->execute(array($mapid));
-                $title = $statement->fetchColumn();
+                $title = $manager->getMapTitleByHash($mapid);
             }
             if (isset($title)) {
                 $t .= " - $title";
@@ -144,218 +144,18 @@ function weathermap_config_settings()
 
 function weathermap_setup_table()
 {
-    global $config, $database_default;
-    include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
-
-    $dbversion = read_config_option("weathermap_db_version");
+    $dbversion = read_config_option('weathermap_db_version');
 
     $myversioninfo = weathermap_version();
     $myversion = $myversioninfo['version'];
 
     $pdo = weathermap_get_pdo();
+    $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface();
+    $manager = new Weathermap\Integrations\MapManager($pdo, "", $cactiInterface);
 
-    // only bother with all this if it's a new install, a new version, or we're in a development version
-    // - saves a handful of db hits per request!
-    if (($dbversion == "") || (preg_match('/dev$/', $myversion)) || ($dbversion != $myversion)) {
-        $statement = $pdo->query("show tables");
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        $tables = array();
-        foreach ($result as $index => $arr) {
-            foreach ($arr as $t) {
-                $tables[] = $t;
-            }
-        }
-
-        $databaseUpdates = array();
-        # $database_updates[] = "UPDATE weathermap_maps SET sortorder=id WHERE sortorder IS NULL;";
-
-        if (!in_array('weathermap_maps', $tables)) {
-            $databaseUpdates[] = "CREATE TABLE weathermap_maps (
-				id INT(11) NOT NULL AUTO_INCREMENT,
-				sortorder INT(11) NOT NULL DEFAULT 0,
-				group_id INT(11) NOT NULL DEFAULT 1,
-				active SET('on','off') NOT NULL DEFAULT 'on',
-				configfile TEXT NOT NULL,
-				imagefile TEXT NOT NULL,
-				htmlfile TEXT NOT NULL,
-				titlecache TEXT NOT NULL,
-				filehash VARCHAR (40) NOT NULL DEFAULT '',
-				warncount INT(11) NOT NULL DEFAULT 0,
-				debug set('on','off','once') NOT NULL default 'off',
-                runtime double NOT NULL default 0,
-                lastrun datetime,
-				config TEXT NOT NULL,
-				thumb_width INT(11) NOT NULL DEFAULT 0,
-				thumb_height INT(11) NOT NULL DEFAULT 0,
-				schedule VARCHAR(32) NOT NULL DEFAULT '*',
-				archiving SET('on','off') NOT NULL DEFAULT 'off',
-				PRIMARY KEY  (id)
-			);";
-        } else {
-            # Check that all the table columns exist for weathermap_maps
-            # There have been a number of changes over versions.
-            $statement = $pdo->query("show columns from weathermap_maps from " . $database_default);
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-            $fieldChanges = array(
-                'sortorder' => false,
-                'filehash' => false,
-                'warncount' => false,
-                'config' => false,
-                'thumb_width' => false,
-                'group_id' => false,
-                'debug' => false
-            );
-
-            foreach ($result as $row) {
-                if (array_key_exists($row['Field'], $fieldChanges)) {
-                    $fieldChanges[$row['Field']] = true;
-                }
-            }
-
-            if (!$fieldChanges['sortorder']) {
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD sortorder INT(11) NOT NULL DEFAULT 0 AFTER id";
-            }
-            if (!$fieldChanges['filehash']) {
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD filehash VARCHAR(40) NOT NULL DEFAULT '' AFTER titlecache";
-            }
-            if (!$fieldChanges['warncount']) {
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD warncount INT(11) NOT NULL DEFAULT 0 AFTER filehash";
-            }
-            if (!$fieldChanges['config']) {
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD config TEXT NOT NULL  DEFAULT '' AFTER warncount";
-            }
-            if (!$fieldChanges['thumb_width']) {
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD thumb_width INT(11) NOT NULL DEFAULT 0 AFTER config";
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD thumb_height INT(11) NOT NULL DEFAULT 0 AFTER thumb_width";
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD schedule VARCHAR(32) NOT NULL DEFAULT '*' AFTER thumb_height";
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD archiving SET('on','off') NOT NULL DEFAULT 'off' AFTER schedule";
-            }
-            if (!$fieldChanges['group_id']) {
-                $databaseUpdates[] = "ALTER TABLE weathermap_maps ADD group_id INT(11) NOT NULL DEFAULT 1 AFTER sortorder";
-                $databaseUpdates[] = "ALTER TABLE `weathermap_settings` ADD `groupid` INT NOT NULL DEFAULT '0' AFTER `mapid`";
-            }
-            if (!$fieldChanges['debug']) {
-                $databaseUpdates[] = "alter table weathermap_maps add runtime double NOT NULL default 0 after warncount";
-                $databaseUpdates[] = "alter table weathermap_maps add lastrun datetime after runtime";
-                $databaseUpdates[] = "alter table weathermap_maps add debug set('on','off','once') NOT NULL default 'off' after warncount";
-            }
-        }
-
-        $databaseUpdates[] = "UPDATE weathermap_maps SET filehash=LEFT(MD5(concat(id,configfile,rand())),20) WHERE filehash = '';";
-
-        if (!in_array('weathermap_auth', $tables)) {
-            $databaseUpdates[] = "CREATE TABLE weathermap_auth (
-				userid MEDIUMINT(9) NOT NULL DEFAULT '0',
-				mapid INT(11) NOT NULL DEFAULT '0'
-			);";
-        }
-
-        if (!in_array('weathermap_groups', $tables)) {
-            $databaseUpdates[] = "CREATE TABLE  weathermap_groups (
-				`id` INT(11) NOT NULL AUTO_INCREMENT,
-				`name` VARCHAR( 128 ) NOT NULL DEFAULT '',
-				`sortorder` INT(11) NOT NULL DEFAULT 0,
-				PRIMARY KEY (id)
-				);";
-            $databaseUpdates[] = "INSERT INTO weathermap_groups (id,name,sortorder) VALUES (1,'Weathermaps',1)";
-        }
-
-        if (!in_array('weathermap_settings', $tables)) {
-            $databaseUpdates[] = "CREATE TABLE weathermap_settings (
-				id INT(11) NOT NULL AUTO_INCREMENT,
-				mapid INT(11) NOT NULL DEFAULT '0',
-				groupid INT(11) NOT NULL DEFAULT '0',
-				optname VARCHAR(128) NOT NULL DEFAULT '',
-				optvalue VARCHAR(128) NOT NULL DEFAULT '',
-				PRIMARY KEY  (id)
-			);";
-        }
-
-        if (!in_array('weathermap_data', $tables)) {
-            $databaseUpdates[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id INT(11) NOT NULL AUTO_INCREMENT,
-				rrdfile VARCHAR(190) NOT NULL,data_source_name VARCHAR(19) NOT NULL,
-				  last_time INT(11) NOT NULL,last_value VARCHAR(190) NOT NULL,
-				last_calc VARCHAR(190) NOT NULL, sequence INT(11) NOT NULL, local_data_id INT(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
-				  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) )";
-        } else {
-            $foundLocalDataID = false;
-
-            $statement = $pdo->query("show columns from weathermap_data from " . $database_default);
-            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($result as $row) {
-                if ($row['Field'] == 'local_data_id') {
-                    $foundLocalDataID = true;
-                }
-            }
-            if (!$foundLocalDataID) {
-                $databaseUpdates[] = "ALTER TABLE weathermap_data ADD local_data_id INT(11) NOT NULL DEFAULT 0 AFTER sequence";
-                $databaseUpdates[] = "ALTER TABLE weathermap_data ADD INDEX ( `local_data_id` )";
-                # if there is existing data without a local_data_id, ditch it
-                $databaseUpdates[] = "DELETE FROM weathermap_data";
-            }
-        }
-
-        // create the settings entries, if necessary
-
-        $pagestyle = read_config_option("weathermap_pagestyle");
-        if ($pagestyle == '' or $pagestyle < 0 or $pagestyle > 2) {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_pagestyle',0)";
-        }
-
-        $cycledelay = read_config_option("weathermap_cycle_refresh");
-        if ($cycledelay == '' or intval($cycledelay < 0)) {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_cycle_refresh',0)";
-        }
-
-        $renderperiod = read_config_option("weathermap_render_period");
-        if ($renderperiod == '' or intval($renderperiod < -1)) {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_render_period',0)";
-        }
-
-        $quietlogging = read_config_option("weathermap_quiet_logging");
-        if ($quietlogging == '' or intval($quietlogging < -1)) {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_quiet_logging',0)";
-        }
-
-        $rendercounter = read_config_option("weathermap_render_counter");
-        if ($rendercounter == '' or intval($rendercounter < 0)) {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_render_counter',0)";
-        }
-
-        $outputformat = read_config_option("weathermap_output_format");
-        if ($outputformat == '') {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_output_format','png')";
-        }
-
-        $tsize = read_config_option("weathermap_thumbsize");
-        if ($tsize == '' or $tsize < 1) {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_thumbsize',250)";
-        }
-
-        $ms = read_config_option("weathermap_map_selector");
-        if ($ms == '' or intval($ms) < 0 or intval($ms) > 1) {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_map_selector',1)";
-        }
-
-        $at = read_config_option("weathermap_all_tab");
-        if ($at == '' or intval($at) < 0 or intval($at) > 1) {
-            $databaseUpdates[] = "REPLACE INTO settings VALUES('weathermap_all_tab',0)";
-        }
-
-        // update the version, so we can skip this next time
-        $databaseUpdates[] = "replace into settings values('weathermap_db_version','$myversion')";
-
-        // patch up the sortorder for any maps that don't have one.
-        $databaseUpdates[] = "UPDATE weathermap_maps SET sortorder=id WHERE sortorder IS NULL OR sortorder=0;";
-
-        if (!empty($databaseUpdates)) {
-            for ($a = 0; $a < count($databaseUpdates); $a++) {
-                $result = $pdo->query($databaseUpdates[$a]);
-            }
-        }
+    if (($dbversion == '') || (preg_match('/dev$/', $myversion)) || ($dbversion != $myversion)) {
+        $manager->initializeDatabase();
+        $manager->initializeAppSettings();
     }
 }
 
@@ -419,7 +219,8 @@ function weathermap_show_tab()
         }
         $tabURL = $weathermapBaseURL . "/images/" . $tabName;
 
-        printf('<a href="%s"><img src="%s" alt="Weathermap" align="absmiddle" border="0" /></a>', $weathermapURL, $tabURL);
+        printf('<a href="%s"><img src="%s" alt="Weathermap" align="absmiddle" border="0" /></a>', $weathermapURL,
+            $tabURL);
     }
 
     weathermap_setup_table();

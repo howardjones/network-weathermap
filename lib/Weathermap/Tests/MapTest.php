@@ -26,7 +26,7 @@ class MapTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->object = new Map;
-        $this->projectRoot = realpath(dirname(__FILE__) . "../../../");
+        $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
     }
 
     /**
@@ -52,7 +52,7 @@ class MapTest extends \PHPUnit_Framework_TestCase
      */
     public function testAccessors()
     {
-        $this->object->readConfig($this->projectRoot . 'test-suite/tests/simple-link-1.conf');
+        $this->object->readConfig($this->projectRoot . '/test-suite/tests/simple-link-1.conf');
 
         $n1 = $this->object->getNode("n1");
         $l1 = $this->object->getLink("l1");
@@ -113,7 +113,7 @@ class MapTest extends \PHPUnit_Framework_TestCase
         );
 
         // load a config file, so there are map objects to talk about
-        $this->object->readConfig($this->projectRoot . 'test-suite/tests/simple-link-1.conf');
+        $this->object->readConfig($this->projectRoot . '/test-suite/tests/simple-link-1.conf');
         // initialise the data, otherwise we'll get "" instead of 0 for bandwidth, etc
         $this->object->readData();
 

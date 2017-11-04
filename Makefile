@@ -38,12 +38,12 @@ release:
 test:
 	vendor/bin/parallel-lint -p php5.6 --exclude app --exclude vendor .
 	vendor/bin/parallel-lint -p php7.1 --exclude app --exclude vendor .
-	vendor/bin/phpunit -c build/phpunit.xml
+	php -d xdebug.profiler_enable=off vendor/bin/phpunit -c build/phpunit.xml
 	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
 	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 
 testcoverage:	
-	vendor/bin/phpunit -c build/phpunit.xml --coverage-html test-suite/code-coverage/
+	php -d xdebug.profiler_enable=on vendor/bin/phpunit -c build/phpunit.xml --coverage-html test-suite/code-coverage/
 
 sql:
 	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_maps > weathermap.sql

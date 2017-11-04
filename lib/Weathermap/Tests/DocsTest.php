@@ -14,8 +14,8 @@ class DocsTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->projectRoot = realpath(dirname(__FILE__) . "../../../");
-        $this->docsRoot = $this->projectRoot . "docs/src/";
+        $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
+        $this->docsRoot = $this->projectRoot . "/docs/src/";
     }
 
     public function testKeywordCoverage()

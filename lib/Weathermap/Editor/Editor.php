@@ -17,9 +17,9 @@ use Weathermap\Core\MapUtility;
 use Weathermap\Core\Target;
 use Weathermap\Core\StringUtility;
 
-/** Wrapper API around WeatherMap to provide the relevant operations to manipulate
+/** Wrapper API around Map to provide the relevant operations to manipulate
  *  the map contents that an editor will need, without it needing to see inside the map object.
- *  (a second class, WeatherMapEditorUI, is concerned with the actual presentation of the supplied editor)
+ *  (a second class, EditorUI, is concerned with the actual presentation of the supplied editor)
  */
 class Editor
 {

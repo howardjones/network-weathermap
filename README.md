@@ -1,6 +1,6 @@
 # PHP Network Weathermap 1.0.0 (dev)
 
-## Current Status
+## Current Status (2017-11-03)
 
 I decided it would be useful to add this section to the top of the README, while things are moving around a lot. Here
 is what is working, and what is being worked on:

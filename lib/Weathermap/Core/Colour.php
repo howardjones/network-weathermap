@@ -38,22 +38,25 @@ class Colour
                 // a single scalar argument - should be a 'special' colour
                 $arg = func_get_arg(0);
 
-                if ($arg == 'none') {
-                    $this->red = -1;
-                    $this->green = -1;
-                    $this->blue = -1;
-                }
-
-                if ($arg == 'copy') {
-                    $this->red = -2;
-                    $this->green = -2;
-                    $this->blue = -2;
-                }
-
-                if ($arg == 'contrast') {
-                    $this->red = -3;
-                    $this->green = -3;
-                    $this->blue = -3;
+                switch ($arg) {
+                    case "none":
+                        $this->red = -1;
+                        $this->green = -1;
+                        $this->blue = -1;
+                        break;
+                    case "copy":
+                        $this->red = -2;
+                        $this->green = -2;
+                        $this->blue = -2;
+                        break;
+                    case "contrast":
+                        $this->red = -3;
+                        $this->green = -3;
+                        $this->blue = -3;
+                        break;
+                    default:
+                        throw new \Exception("Unknown special colour type");
+                        break;
                 }
             }
         }

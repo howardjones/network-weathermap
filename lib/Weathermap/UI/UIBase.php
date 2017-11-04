@@ -24,6 +24,7 @@ class UIBase
     );
     public $commands;
 
+
     public function __construct()
     {
     }
@@ -135,26 +136,6 @@ class UIBase
 
         return false;
     }
-
-//    public function dispatch($action, $request)
-//    {
-//        $handler = null;
-//
-//        if (array_key_exists($action, $this->commands)) {
-//            $handler = $this->commands[$action];
-//        }
-//        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
-//            $handler = $this->commands[":: DEFAULT ::"];
-//        }
-//        if (null === $handler) {
-//            return null;
-//        }
-//
-//        // TODO - add argument parse/validation in here
-//
-//        $handlerMethod = $handler['handler'];
-//        return $this->$handlerMethod($request);
-//    }
 
     /**
      * Run through the command list, making sure all the handler functions actually exist
@@ -309,14 +290,14 @@ class UIBase
         return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
     }
 
-// much looser sanitise for general strings that shouldn't have HTML in them
-    public static function wmeSanitizeString($str)
-    {
-        static $dropMatchingCharacters = array('<', '>');
-        static $dropCharactersReplacements = array('', '');
-
-        return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
-    }
+//// much looser sanitise for general strings that shouldn't have HTML in them
+//    public static function wmeSanitizeString($str)
+//    {
+//        static $dropMatchingCharacters = array('<', '>');
+//        static $dropCharactersReplacements = array('', '');
+//
+//        return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
+//    }
 
     public static function wmeValidateBandwidth($bandwidth)
     {
@@ -344,21 +325,21 @@ class UIBase
         return false;
     }
 
-// Labels for Nodes, Links and Scales shouldn't have spaces in
+    // Labels for Nodes, Links and Scales shouldn't have spaces in
     public static function wmeSanitizeName($str)
     {
         return str_replace(array(" "), "", $str);
     }
 
-    public static function wmeSanitizeSelected($str)
-    {
-        $result = urldecode($str);
-
-        if (!preg_match('/^(LINK|NODE):/', $result)) {
-            return "";
-        }
-        return self::wmeSanitizeName($result);
-    }
+//    public static function wmeSanitizeSelected($str)
+//    {
+//        $result = urldecode($str);
+//
+//        if (!preg_match('/^(LINK|NODE):/', $result)) {
+//            return "";
+//        }
+//        return self::wmeSanitizeName($result);
+//    }
 
     public static function wmeSanitizeFile($filename, $allowedExtensions = array())
     {

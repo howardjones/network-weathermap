@@ -12,10 +12,19 @@
         <var name="DB_DBNAME" value="weathermaptest"/>
     </php>
 
+    <listeners>
+        <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener"/>
+        <listener class="PHPUnit\Runner\CleverAndSmart\TestListener">
+            <arguments>
+                <object class="PHPUnit\Runner\CleverAndSmart\Storage\Sqlite3Storage"/>
+            </arguments>
+        </listener>
+    </listeners>
+
     <testsuites>
         <testsuite name="Weathermap Test Suite">
-            <directory>../Tests/</directory>
-            <exclude>../Tests/ConfigTest.php</exclude>
+            <directory>../lib/Weathermap/Tests/</directory>
+            <exclude>../lib/Weathermap/Tests/ConfigTest.php</exclude>
         </testsuite>
     </testsuites>
 
@@ -23,6 +32,7 @@
         <whitelist>
             <directory>../</directory>
             <exclude>
+                <directory>../lib/Weathermap/Tests/</directory>
                 <directory>../Tests</directory>
                 <directory>../phpcallgraph-0.8.0</directory>
                 <directory>../cacti-0.8.8c</directory>

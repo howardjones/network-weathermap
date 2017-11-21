@@ -1069,7 +1069,7 @@ class EditorUI extends UIBase
         $tpl->set("map_width", $editor->map->width);
         $tpl->set("map_height", $editor->map->height);
         $tpl->set("log", $this->logMessage);
-        $tpl->set("editor_name", "editor16.php");
+        $tpl->set("editor_name", "editor.php");
 
         $tpl->set("nodeselection", $this->makeNodeSelector($editor->map));
 

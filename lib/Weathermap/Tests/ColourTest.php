@@ -77,7 +77,6 @@ class ColourTest extends \PHPUnit_Framework_TestCase
 
         $c3 = $c1->blendWith($c2, 0.5);
         $this->assertEquals("64 127 191", $c3->asConfig());
-
     }
 
     /**
@@ -88,5 +87,4 @@ class ColourTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Colour("scooby");
     }
-
 }

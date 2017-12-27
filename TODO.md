@@ -2,10 +2,10 @@
 
 
 PSR-0/PSR-1/PSR-2 Stuff:
-- namespaces (now we're in 5.3-land)
-- one class per file
-- use autoloader (now we're in 5.3-land)
-- use phpcs/phpcbf for conformance checking
+- ~~namespaces (now we're in 5.3-land)~~
+- ~~one class per file~~
+- ~~use autoloader (now we're in 5.3-land)~~
+- ~~use phpcs/phpcbf for conformance checking~~
 
 make a (no map yet) thumbnail for UI (that is, an image the same size as the map thumbnails so layout doesn't go strange)
 

@@ -116,41 +116,32 @@ class ImageUtility
     {
         $imageRef = null;
 
-        $conversion = array(
-            IMAGETYPE_GIF => array(IMG_GIF, 'GIF', "Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n"),
-            IMAGETYPE_JPEG => array(IMG_JPEG, 'JPEG', "Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n"),
-            IMAGETYPE_PNG => array(IMG_PNG, 'PNG', "Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n")
-        );
-
         if (!is_readable($filename)) {
             MapUtility::warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
 
             return $imageRef;
         }
 
+        $conversion = array(
+            IMAGETYPE_GIF => array(IMG_GIF, 'GIF', "Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n", 'imagecreatefromgif'),
+            IMAGETYPE_JPEG => array(IMG_JPEG, 'JPEG', "Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n", 'imagecreatefromjpeg'),
+            IMAGETYPE_PNG => array(IMG_PNG, 'PNG', "Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n", 'imagecreatefrompng')
+        );
+
         list (, , $type,) = getimagesize($filename);
 
-        list($typeBitfield, $typeName, $failureMessage) = $conversion[$type];
+        if (array_key_exists($type, $conversion)) {
+            list($typeBitfield, $typeName, $failureMessage, $loadFunction) = $conversion[$type];
 
-        if (!(imagetypes() & $typeBitfield)) {
-            MapUtility::warn($failureMessage);
+            if (!(imagetypes() & $typeBitfield)) {
+                MapUtility::warn($failureMessage);
 
-            return $imageRef;
-        }
+                return $imageRef;
+            }
 
-        switch ($type) {
-            case IMAGETYPE_GIF:
-                $imageRef = imagecreatefromgif($filename);
-                break;
-            case IMAGETYPE_JPEG:
-                $imageRef = imagecreatefromjpeg($filename);
-                break;
-            case IMAGETYPE_PNG:
-                $imageRef = imagecreatefrompng($filename);
-                break;
-            default:
-                MapUtility::warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
-                break;
+            $imageRef = $loadFunction($filename);
+        } else {
+            MapUtility::warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
         }
 
         return $imageRef;

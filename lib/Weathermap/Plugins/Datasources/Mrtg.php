@@ -6,6 +6,8 @@
 
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\MapUtility;
+
 class Mrtg extends Base
 {
 
@@ -19,29 +21,14 @@ class Mrtg extends Base
         $this->name = "MRTG";
     }
 
-    public function readData($targetstring, &$map, &$item)
+    private function readDataFromFile($targetstring, $matchvalue, $matchperiod)
     {
-        $this->data[IN] = null;
-        $this->data[OUT] = null;
-
-        $matchvalue = $item->get_hint('mrtg_value');
-        $matchperiod = $item->get_hint('mrtg_period');
-        $swap = intval($item->get_hint('mrtg_swap'));
-        $negate = intval($item->get_hint('mrtg_negate'));
-
-        if ($matchvalue == '') {
-            $matchvalue = "cu";
-        }
-        if ($matchperiod == '') {
-            $matchperiod = "d";
-        }
-
         $fd = fopen($targetstring, "r");
 
         if ($fd) {
             while (!feof($fd)) {
                 $buffer = fgets($fd, 4096);
-                wm_debug("MRTG ReadData: Matching on '${matchvalue}in $matchperiod' and '${matchvalue}out $matchperiod'\n");
+                MapUtility::debug("MRTG ReadData: Matching on '${matchvalue}in $matchperiod' and '${matchvalue}out $matchperiod'\n");
 
                 if (preg_match("/<\!-- ${matchvalue}in $matchperiod ([-+]?\d+\.?\d*) -->/", $buffer, $matches)) {
                     $this->data[IN] = $matches[1] * 8;
@@ -57,18 +44,31 @@ class Mrtg extends Base
             }
         } else {
             // some error code to go in here
-            wm_debug("MRTG ReadData: Couldn't open ($targetstring). \n");
+            MapUtility::debug("MRTG ReadData: Couldn't open ($targetstring). \n");
         }
+    }
+
+    public function readData($targetstring, &$map, &$item)
+    {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
+        $matchvalue = $item->get_hint('mrtg_value', 'cu');
+        $matchperiod = $item->get_hint('mrtg_period', 'd');
+        $swap = intval($item->get_hint('mrtg_swap'), 0);
+        $negate = intval($item->get_hint('mrtg_negate'), 0);
+
+        $this->readDataFromFile($targetstring, $matchvalue, $matchperiod);
 
         if ($swap == 1) {
-            wm_debug("MRTG ReadData: Swapping IN and OUT\n");
+            MapUtility::debug("MRTG ReadData: Swapping IN and OUT\n");
             $t = $this->data[OUT];
             $this->data[OUT] = $this->data[IN];
             $this->data[IN] = $t;
         }
 
         if ($negate) {
-            wm_debug("MRTG ReadData: Negating values\n");
+            MapUtility::debug("MRTG ReadData: Negating values\n");
             $this->data[OUT] = -$this->data[OUT];
             $this->data[IN] = -$this->data[IN];
         }

@@ -18,6 +18,7 @@ jobs:
 
     steps:
       - checkout
+      - run: sudo docker-php-ext-install xsl
       - run: sudo composer self-update
       # Download and cache dependencies
       - restore_cache:

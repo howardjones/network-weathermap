@@ -48,7 +48,7 @@ class Mrtg extends Base
         }
     }
 
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -58,7 +58,7 @@ class Mrtg extends Base
         $swap = intval($item->get_hint('mrtg_swap'), 0);
         $negate = intval($item->get_hint('mrtg_negate'), 0);
 
-        $this->readDataFromFile($targetstring, $matchvalue, $matchperiod);
+        $this->readDataFromFile($targetString, $matchvalue, $matchperiod);
 
         if ($swap == 1) {
             MapUtility::debug("MRTG ReadData: Swapping IN and OUT\n");

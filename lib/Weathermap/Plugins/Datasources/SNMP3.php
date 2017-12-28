@@ -17,10 +17,26 @@
 namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
+use Weathermap\Core\Map;
 
 class SNMP3 extends Base
 {
     protected $downCache;
+
+    private $snmpParamDefaults = array(
+        "username" => "",
+        "seclevel" => "noAuthNoPriv",
+        "authpass" => "",
+        "privpass" => "",
+        "authproto" => "",
+        "privproto" => ""
+    );
+
+    private $originalQuickPrint;
+    private $originalValueRetrieval;
+    private $abortCount;
+    private $timeout;
+    private $retryCount;
 
     public function __construct()
     {
@@ -34,8 +50,12 @@ class SNMP3 extends Base
 
     public function init(&$map)
     {
+        parent::init($map);
+
         // We can keep a list of unresponsive nodes, so we can give up earlier
         $this->downCache = array();
+
+        $this->getMapGlobals();
 
         if (function_exists('snmp3_get')) {
             return true;
@@ -56,105 +76,46 @@ class SNMP3 extends Base
         }
     }
 
+    /**
+     * Decide if this host has failed too much already
+     *
+     * @param string $host
+     * @return bool
+     */
+    private function isHostAborted($host)
+    {
+        // we're not keeping score
+        if ($this->abortCount == 0) {
+            return false;
+        }
 
-    public function readData($targetstring, &$map, &$item)
+        if (!isset($this->downCache[$host]) || intval($this->downCache[$host]) < $this->abortCount) {
+            return false;
+        }
+    }
+
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
-        $timeout = 1000000;
-        $retries = 2;
-        $abortCount = 0;
-
-        $getResults = null;
-        $outResult = null;
-
-        $timeout = intval($map->getHint("snmp_timeout", $timeout));
-        $abortCount = intval($map->getHint("snmp_abort_count", $abortCount));
-        $retries = intval($map->getHint("snmp_retries", $retries));
-
-        MapUtility::debug("Timeout changed to " . $timeout . " microseconds.\n");
-        MapUtility::debug("Will abort after $abortCount failures for a given host.\n");
-        MapUtility::debug("Number of retries changed to " . $retries . ".\n");
-
-        if (preg_match('/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/', $targetstring, $matches)) {
+        if (preg_match('/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/', $targetString, $matches)) {
             $profileName = $matches[1];
             $host = $matches[2];
             $oids = array(IN => $matches[3], OUT => $matches[4]);
 
-            if (($abortCount == 0)
-                || (
-                    ($abortCount > 0)
-                    && (!isset($this->downCache[$host]) || intval($this->downCache[$host]) < $abortCount)
-                )
-            ) {
-                if (function_exists("snmp_get_quick_print")) {
-                    $was = snmp_get_quick_print();
-                    snmp_set_quick_print(1);
-                }
-                if (function_exists("snmp_get_valueretrieval")) {
-                    $was2 = snmp_get_valueretrieval();
-                }
+            if ($this->isHostAborted($host)) {
 
-                if (function_exists('snmp_set_oid_output_format')) {
-                    snmp_set_oid_output_format(SNMP_OID_OUTPUT_NUMERIC);
-                }
-
-                if (function_exists('snmp_set_valueretrieval')) {
-                    snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
-                }
+                $this->prepareSNMPGlobals();
                 $params = $this->buildSNMPParams($map, $profileName);
 
                 MapUtility::debug("SNMPv3 ReadData: SNMP settings are %s\n", json_encode($params));
 
-                $channels = array(
-                    'in' => IN,
-                    'out' => OUT
-                );
-                $results = array();
-                $results[IN] = null;
-                $results[OUT] = null;
+                $this->getSNMPData($host, $params, $oids, $item, $this->timeout, $this->retryCount);
 
-                if ($params['username'] != "") {
-                    foreach ($channels as $name => $id) {
-                        if ($oids[$id] != '-') {
-                            $oid = $oids[$id];
-                            MapUtility::debug("Going to get $oid\n");
-                            $results[$id] = snmp3_get(
-                                $host,
-                                $params['username'],
-                                $params['seclevel'],
-                                $params['authproto'],
-                                $params['authpass'],
-                                $params['privproto'],
-                                $params['privpass'],
-                                $oid,
-                                $timeout,
-                                $retries
-                            );
-                            if ($results[$id] !== false) {
-                                $this->data[$id] = floatval($results[$id]);
-                                $item->addHint("snmp_" . $name . "_raw", $results[$id]);
-                            } else {
-                                $this->downCache{$host}++;
-                            }
-                        } else {
-                            MapUtility::debug("SNMPv3 ReadData: skipping $name channel: OID is '-'\n");
-                        }
-                    }
-                } else {
-                    MapUtility::debug("SNMPv3 ReadData: no username defined, not going to try.\n");
-                }
-
-                MapUtility::debug("SNMPv3 ReadData: Got '%s' and '%s'\n", $results[IN], $results[OUT]);
-
-                $this->dataTime = time();
-
-                if (function_exists("snmp_set_quick_print")) {
-                    snmp_set_quick_print($was);
-                }
+                $this->restoreSNMPGlobals();
             } else {
-                MapUtility::warn("SNMP for $host has reached $abortCount failures. Skipping. [WMSNMP01]");
+                MapUtility::warn("SNMP for $host has reached $this->abortCount failures. Skipping. [WMSNMP01]");
             }
         } else {
             MapUtility::debug("SNMPv3 ReadData: regexp didn't match after Recognise did - this is odd!\n");
@@ -164,7 +125,7 @@ class SNMP3 extends Base
     }
 
     /**
-     * @param $map
+     * @param Map $map
      * @param $profileName
      * @return array
      */
@@ -183,71 +144,174 @@ class SNMP3 extends Base
 
         $import = $map->getHint("snmp3_" . $profileName . "_import");
 
-        $parts = array(
-            "username" => "",
-            "seclevel" => "noAuthNoPriv",
-            "authpass" => "",
-            "privpass" => "",
-            "authproto" => "",
-            "privproto" => ""
-        );
-
         $params = array();
 
-        // If they are explicitly defined...
         if (is_null($import)) {
+            // If they are explicitly defined...
             MapUtility::debug("SNMPv3 ReadData: no import, defining profile $profileName from SET variables\n");
-            foreach ($parts as $keyname => $default) {
+            foreach ($this->snmpParamDefaults as $keyname => $default) {
                 $params[$keyname] = $map->getHint("snmp3_" . $profileName . "_" . $keyname, $default);
             }
         } else {
-            $import = intval($import);
             // if they are to be copied from a Cacti profile...
+            $import = intval($import);
             MapUtility::debug("SNMPv3 ReadData: will try to import profile $profileName from Cacti host id $import\n");
 
-            foreach ($parts as $keyname => $default) {
-                $params[$keyname] = $default;
-            }
-
-            if (function_exists("db_fetch_row")) {
-                // this is something that should be cached or done in prefetch
-                $result = \db_fetch_assoc(
-                    sprintf(
-                        "select * from host where snmp_version=3 and id=%d LIMIT 1",
-                        $import
-                    )
-                );
-
-                if (!$result) {
-                    MapUtility::warn("SNMPv3 ReadData snmp3_" . $profileName . "_import failed to read data from Cacti host id $import");
-                } else {
-                    $mapping = array(
-                        "username" => "snmp_username",
-                        "authpass" => "snmp_password",
-                        "privpass" => "snmp_priv_passphrase",
-                        "authproto" => "snmp_auth_protocol",
-                        "privproto" => "snmp_priv_protocol"
-                    );
-                    foreach ($mapping as $param => $fieldname) {
-                        $params[$param] = $result[0][$fieldname];
-                    }
-                    if ($params['privproto'] == "[None]" || $params['privpass'] == '') {
-                        $params['seclevel'] = "authNoPriv";
-                        $params['privproto'] = "";
-                    } else {
-                        $params['seclevel'] = "authPriv";
-                    }
-                    MapUtility::debug(
-                        "SNMPv3 ReadData Imported Cacti info for device %d into profile named %s\n",
-                        $import,
-                        $profileName
-                    );
-                }
-            } else {
-                MapUtility::warn("SNMPv3 ReadData snmp3_" . $profileName . "_import is set but not running in Cacti");
-            }
+            $params = $this->copyParamsFromCacti($profileName, $import);
         }
         return $params;
+    }
+
+    /**
+     * @param $profileName
+     * @param $hostId
+     * @return mixed
+     */
+    private function copyParamsFromCacti($profileName, $hostId)
+    {
+        $params = array();
+
+        foreach ($this->snmpParamDefaults as $keyname => $default) {
+            $params[$keyname] = $default;
+        }
+
+        if (!function_exists("db_fetch_row")) {
+            MapUtility::warn("SNMPv3 ReadData snmp3_" . $profileName . "_import is set but not running in Cacti");
+            return $params;
+        }
+        // this is something that should be cached or done in prefetch
+        $result = \db_fetch_assoc(
+            sprintf(
+                "select * from host where snmp_version=3 and id=%d LIMIT 1",
+                $hostId
+            )
+        );
+
+        if (!$result) {
+            MapUtility::warn("SNMPv3 ReadData snmp3_" . $profileName . "_import failed to read data from Cacti host id $hostId");
+            return $params;
+        }
+
+        $dbFieldMapping = array(
+            "username" => "snmp_username",
+            "authpass" => "snmp_password",
+            "privpass" => "snmp_priv_passphrase",
+            "authproto" => "snmp_auth_protocol",
+            "privproto" => "snmp_priv_protocol"
+        );
+
+        foreach ($dbFieldMapping as $param => $fieldname) {
+            $params[$param] = $result[0][$fieldname];
+        }
+
+        if ($params['privproto'] == "[None]" || $params['privpass'] == '') {
+            $params['seclevel'] = "authNoPriv";
+            $params['privproto'] = "";
+        } else {
+            $params['seclevel'] = "authPriv";
+        }
+
+        MapUtility::debug(
+            "SNMPv3 ReadData Imported Cacti info for device %d into profile named %s\n",
+            $hostId,
+            $profileName
+        );
+
+        return $params;
+    }
+
+    private function prepareSNMPGlobals()
+    {
+        if (function_exists("snmp_get_quick_print")) {
+            $this->originalQuickPrint = snmp_get_quick_print();
+            snmp_set_quick_print(1);
+        }
+        if (function_exists("snmp_get_valueretrieval")) {
+            $this->originalValueRetrieval = snmp_get_valueretrieval();
+        }
+
+        if (function_exists('snmp_set_oid_output_format')) {
+            snmp_set_oid_output_format(SNMP_OID_OUTPUT_NUMERIC);
+        }
+
+        if (function_exists('snmp_set_valueretrieval')) {
+            snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
+        }
+    }
+
+    private function restoreSNMPGlobals()
+    {
+        if (function_exists("snmp_set_quick_print")) {
+            snmp_set_quick_print($this->originalQuickPrint);
+        }
+    }
+
+    /**
+     * @param $host
+     * @param $params
+     * @param $oids
+     * @param $item
+     * @param $timeout
+     * @param $retries
+     */
+    private function getSNMPData($host, $params, $oids, &$item, $timeout, $retries)
+    {
+        $channels = array(
+            'in' => IN,
+            'out' => OUT
+        );
+        $results = array();
+        $results[IN] = null;
+        $results[OUT] = null;
+
+        if ($params['username'] != "") {
+            foreach ($channels as $name => $id) {
+                if ($oids[$id] != '-') {
+                    $oid = $oids[$id];
+                    MapUtility::debug("Going to get $oid\n");
+                    $results[$id] = snmp3_get(
+                        $host,
+                        $params['username'],
+                        $params['seclevel'],
+                        $params['authproto'],
+                        $params['authpass'],
+                        $params['privproto'],
+                        $params['privpass'],
+                        $oid,
+                        $timeout,
+                        $retries
+                    );
+                    if ($results[$id] !== false) {
+                        $this->data[$id] = floatval($results[$id]);
+                        $item->addHint("snmp_" . $name . "_raw", $results[$id]);
+                    } else {
+                        $this->downCache{$host}++;
+                    }
+                } else {
+                    MapUtility::debug("SNMPv3 ReadData: skipping $name channel: OID is '-'\n");
+                }
+            }
+        } else {
+            MapUtility::debug("SNMPv3 ReadData: no username defined, not going to try.\n");
+        }
+
+        MapUtility::debug("SNMPv3 ReadData: Got '%s' and '%s'\n", $results[IN], $results[OUT]);
+
+        $this->dataTime = time();
+    }
+
+    /**
+     * Get the map-global SNMP settings
+     */
+    private function getMapGlobals()
+    {
+        $this->timeout = intval($this->owner->getHint("snmp_timeout", 1000000));
+        $this->abortCount = intval($this->owner->getHint("snmp_abort_count", 0));
+        $this->retryCount = intval($this->owner->getHint("snmp_retries", 2));
+
+        MapUtility::debug("Timeout changed to " . $this->timeout . " microseconds.\n");
+        MapUtility::debug("Will abort after $this->abortCount failures for a given host.\n");
+        MapUtility::debug("Number of retries changed to " . $this->retryCount . ".\n");
     }
 }
 

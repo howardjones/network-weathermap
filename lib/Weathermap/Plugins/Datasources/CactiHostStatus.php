@@ -38,17 +38,17 @@ class CactiHostStatus extends Base
     }
 
     /**
-     * @param string $targetstring
+     * @param string $targetString
      * @param Map $map
      * @param MapDataItem $item
      * @return array
      */
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
-        if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
+        if (preg_match($this->regexpsHandled[0], $targetString, $matches)) {
             $cactiHostId = intval($matches[1]);
 
             $pdo = weathermap_get_pdo();

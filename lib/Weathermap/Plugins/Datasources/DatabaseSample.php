@@ -35,19 +35,19 @@ class DatabaseSample extends Base
     }
 
     /**
-     * @param string $targetstring
+     * @param string $targetString
      * @param Map $map
      * @param MapDataItem $item
      * @return array
      */
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $pdo = null;
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
 
-        if (preg_match('/^dbplug:([^:]+)$/', $targetstring, $matches)) {
+        if (preg_match('/^dbplug:([^:]+)$/', $targetString, $matches)) {
             $databaseUser = $map->getHint('dbplug_dbuser');
             $databasePassword = $map->getHint('dbplug_dbpass');
             $databaseName = $map->getHint('dbplug_dbname');

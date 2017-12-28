@@ -88,12 +88,12 @@ class CactiDSStats extends Base
 
 
     /**
-     * @param string $targetstring
+     * @param string $targetString
      * @param Map $map
      * @param MapDataItem $item
      * @return array
      */
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -110,7 +110,7 @@ class CactiDSStats extends Base
         $datatype = "";
         $field = "";
 
-        if (preg_match('/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
+        if (preg_match('/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetString, $matches)) {
             $localDataId = $matches[1];
             $dsNames[IN] = $matches[2];
             $dsNames[OUT] = $matches[3];
@@ -121,7 +121,7 @@ class CactiDSStats extends Base
                 $datatype = $map->getHint("dsstats_default_type");
                 MapUtility::debug("Default datatype changed to " . $datatype . ".\n");
             }
-        } elseif (preg_match('/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
+        } elseif (preg_match('/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetString, $matches)) {
             $dsNames[IN] = $matches[3];
             $dsNames[OUT] = $matches[4];
             $datatype = $matches[1];

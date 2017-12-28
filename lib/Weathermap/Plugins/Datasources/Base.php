@@ -67,12 +67,12 @@ class Base
      * the actual ReadData
      * returns an array of two values (in,out). -1,-1 if it couldn't get valid data
      *
-     * @param string $targetstring
+     * @param string $targetString
      * @param Map $map
      * @param MapDataItem $item
      * @return array
      */
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         return array(-1, -1);
     }

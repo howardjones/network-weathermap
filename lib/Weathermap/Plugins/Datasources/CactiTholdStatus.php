@@ -108,12 +108,12 @@ class CactiTholdStatus extends Base
     }
 
     /**
-     * @param string $targetstring The string from the config file
+     * @param string $targetString The string from the config file
      * @param Map $map A reference to the map object (redundant)
      * @param MapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -121,7 +121,7 @@ class CactiTholdStatus extends Base
 
         $pdo = weathermap_get_pdo();
 
-        if (preg_match('/^cactithold:(\d+):(\d+)$/', $targetstring, $matches)) {
+        if (preg_match('/^cactithold:(\d+):(\d+)$/', $targetString, $matches)) {
             // Returns 0 if threshold is not breached, 1 if it is.
             // use target aggregation to build these up into a 'badness' percentage
             // takes the same two values that are visible in thold's own URLs (the actual thold ID isn't shown anywhere)
@@ -144,7 +144,7 @@ class CactiTholdStatus extends Base
                 }
                 $this->data[OUT] = 0;
             }
-        } elseif (preg_match('/^cacti(thold|monitor):(\d+)$/', $targetstring, $matches)) {
+        } elseif (preg_match('/^cacti(thold|monitor):(\d+)$/', $targetString, $matches)) {
             $type = $matches[1];
             $id = intval($matches[2]);
 

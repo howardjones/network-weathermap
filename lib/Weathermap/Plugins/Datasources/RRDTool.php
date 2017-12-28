@@ -377,13 +377,13 @@ class RRDTool extends Base
     // returns a 3-part array (invalue, outvalue and datavalid time_t)
     // invalue and outvalue should be -1,-1 if there is no valid data
     // data_time is intended to allow more informed graphing in the future
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
         $dsnames = array(IN=>"traffic_in", OUT=>"traffic_out");
 
-        $rrdfile = $targetstring;
+        $rrdfile = $targetString;
 
         if ($map->getHint("rrd_default_in_ds") != '') {
             $dsnames[IN] = $map->getHint("rrd_default_in_ds");
@@ -396,7 +396,7 @@ class RRDTool extends Base
 
         $multiplier = 8; // default bytes-to-bits
 
-        if (preg_match('/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
+        if (preg_match('/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetString, $matches)) {
             $rrdfile = $matches[1];
 
             $dsnames[IN] = $matches[2];

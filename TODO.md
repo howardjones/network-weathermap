@@ -1,5 +1,6 @@
 ## TODO
 
+MapScale should really be divided into MapScale and MapLegend.
 
 PSR-0/PSR-1/PSR-2 Stuff:
 - ~~namespaces (now we're in 5.3-land)~~

@@ -30,19 +30,19 @@ class Time extends Base
 
 
     /**
-     * @param string $targetstring
+     * @param string $targetString
      * @param Map $map
      * @param MapDataItem $item
      * @return array
      */
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
         $matches = 0;
 
-        if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
+        if (preg_match($this->regexpsHandled[0], $targetString, $matches)) {
             $timezone = $matches[1];
             $timezoneLowerCase = strtolower($timezone);
 
@@ -68,7 +68,7 @@ class Time extends Base
             }
         } else {
             // some error code to go in here
-            MapUtility::warn("Time ReadData: Couldn't recognize $targetstring \n");
+            MapUtility::warn("Time ReadData: Couldn't recognize $targetString \n");
         }
 
         return $this->returnData();

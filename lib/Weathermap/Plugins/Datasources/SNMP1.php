@@ -56,7 +56,7 @@ class SNMP1 extends Base
     }
 
 
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -76,7 +76,7 @@ class SNMP1 extends Base
         MapUtility::debug("Will abort after $abortCount failures for a given host.\n");
         MapUtility::debug("Number of retries changed to " . $retries . ".\n");
 
-        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
+        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetString, $matches)) {
             $community = $matches[1];
             $host = $matches[2];
             $inOID = $matches[3];

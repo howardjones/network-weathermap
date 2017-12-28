@@ -57,7 +57,7 @@ class FPing extends Base
         }
     }
 
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -67,7 +67,7 @@ class FPing extends Base
             $pingCount = 5;
         }
 
-        if (preg_match('/^fping:(\S+)$/', $targetstring, $matches)) {
+        if (preg_match('/^fping:(\S+)$/', $targetString, $matches)) {
             $target = $matches[1];
 
             $pattern = '/^$target\s:';

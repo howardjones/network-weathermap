@@ -18,12 +18,12 @@ class WeathermapData extends Base
     }
 
     /**
-     * @param string $targetstring The string from the config file
+     * @param string $targetString The string from the config file
      * @param Map $map A reference to the map object (redundant)
      * @param MapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -32,13 +32,13 @@ class WeathermapData extends Base
         $datafile = "";
         $dataname = "";
 
-        if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
+        if (preg_match($this->regexpsHandled[0], $targetString, $matches)) {
             $datafile = $matches[1];
             $dataname = $matches[2];
         }
 
         if (file_exists($datafile)) {
-            $fd = fopen($targetstring, "r");
+            $fd = fopen($targetString, "r");
             if ($fd) {
                 $found = false;
                 while (!feof($fd)) {

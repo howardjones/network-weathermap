@@ -38,12 +38,12 @@ class Cacti extends Base
         return false;
     }
 
-    public function readData($targetstring, &$map, &$item)
+    public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
-        if (1 === preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
+        if (1 === preg_match($this->regexpsHandled[0], $targetString, $matches)) {
             $localDataId = intval($matches[1]);
 
             // This is very unlikely to work - nothing is ADDING the correct lines to weathermap_data!

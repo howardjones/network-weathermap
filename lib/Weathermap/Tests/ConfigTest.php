@@ -177,8 +177,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         if (is_dir(self::$testdir)) {
             $dh = opendir(self::$testdir);
 
-            while ($testFiles[] = readdir($dh)) {
-            };
+            while (false !== ($entry = readdir($dh))) {
+                $testFiles[] = $entry;
+            }
             sort($testFiles);
             closedir($dh);
         } else {

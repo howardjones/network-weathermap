@@ -1238,35 +1238,35 @@ class ConfigReader
     {
         $matches = null;
 
-        if (true === isset($args[0])) {
-            // check if there is even an entry in this context for the current keyword
-            if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
-                // if there is, then the entry is an array of arrays - iterate them to validate the config
-                MapUtility::debug("    Possible!\n");
-                foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
-                    unset($matches);
-                    MapUtility::debug("      Trying $keyword[0]\n");
-                    if ((substr($keyword[0], 0, 1) != '/') || (1 === preg_match($keyword[0], $buffer, $matches))) {
-                        #   MapUtility::wm_debug("Might be $args[0]\n");
+        if (!isset($args[0])) {
+            return false;
+        }
 
-                        // if we came here without a regexp, then the \1 etc
-                        // refer to arg numbers, not match numbers
+        // check if there is even an entry in this context for the current keyword
+        if (!isset($this->configKeywords[$this->currentType][$args[0]])) {
+            return false;
+        }
 
-                        $params = isset($matches) ? $matches : $args;
+        // if there is, then the entry is an array of arrays - iterate them to validate the config
+        MapUtility::debug("    Possible!\n");
 
-                        // The second array item is either an array of config variables to populate,
-                        // or a function to call that will handle decoding this stuff
-                        if (is_array($keyword[1])) {
-                            $this->readConfigSimpleAssignment($keyword, $params);
-                            return true;
-                        } else {
-                            // the second arg wasn't an array, it was a function name.
-                            // call that function to handle this keyword
-                            if (call_user_func(array($this, $keyword[1]), $buffer, $args, $params)) {
-                                return true;
-                            }
-                        }
-                    }
+        foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
+            unset($matches);
+            MapUtility::debug("      Trying $keyword[0]\n");
+            if ((substr($keyword[0], 0, 1) != '/') || (1 === preg_match($keyword[0], $buffer, $matches))) {
+                // if we came here without a regexp, then the \1 etc
+                // refer to arg numbers, not match numbers
+                $params = isset($matches) ? $matches : $args;
+
+                // The second array item is either an array of config variables to populate,
+                // or a function to call that will handle decoding this stuff
+                if (is_array($keyword[1])) {
+                    $this->readConfigSimpleAssignment($keyword, $params);
+                    return true;
+                } else {
+                    // the second arg wasn't an array, it was a function name.
+                    // call that function to handle this keyword
+                    return call_user_func(array($this, $keyword[1]), $buffer, $args, $params);
                 }
             }
         }
@@ -1301,12 +1301,10 @@ class ConfigReader
                 // if the key ends in a plus, it's an array we should append to
                 $key = substr($key, 0, -1);
                 array_push($this->currentObject->$key, $val);
-                // array_push($this->currentObject->config[$key], $val);
                 $this->currentObject->addConfigValue($key, $val);
             } else {
                 // otherwise, it's just the name of a property on the
                 // appropriate object.
-                # MapUtility::wm_debug("      DONE! ($key, $val)\n");
                 $this->currentObject->$key = $val;
                 $this->currentObject->setConfigValue($key, $val);
             }
@@ -1347,32 +1345,39 @@ class ConfigReader
         $nodeName = $input;
         $xOffset = 0;
         $yOffset = 0;
-        $needSizePrecalculate = false;
 
         // percentage of compass - must be first
         if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i', $input, $submatches)) {
             MapUtility::debug("Matching partial compass offset\n");
             $endOffset = $submatches[1] . $submatches[2];
             $nodeName = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $input);
-            $needSizePrecalculate = true;
-        } elseif (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', $input, $submatches)) {
+            return array(0, 0, $nodeName, $endOffset, true);
+        }
+
+        if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', $input, $submatches)) {
             MapUtility::debug("Matching 100% compass offset\n");
             $endOffset = $submatches[1];
             $nodeName = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $input);
-            $needSizePrecalculate = true;
-        } elseif (preg_match('/:(-?\d+r\d+)$/i', $input, $submatches)) {
+            return array(0, 0, $nodeName, $endOffset, true);
+        }
+
+        if (preg_match('/:(-?\d+r\d+)$/i', $input, $submatches)) {
             MapUtility::debug("Matching radial offset\n");
             $endOffset = $submatches[1];
             $nodeName = preg_replace('/:(-?\d+r\d+)$/i', '', $input);
-            $needSizePrecalculate = true;
-        } elseif (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $input, $submatches)) {
+            return array(0, 0, $nodeName, $endOffset, true);
+        }
+
+        if (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $input, $submatches)) {
             MapUtility::debug("Matching regular x,y link offset\n");
             $xoff = $submatches[1];
             $yoff = $submatches[2];
             $endOffset = $xoff . ':' . $yoff;
             $nodeName = preg_replace("/:$xoff:$yoff$/i", '', $input);
-            $needSizePrecalculate = true;
-        } elseif (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
+            return array(0, 0, $nodeName, $endOffset, true);
+        }
+
+        if (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
             MapUtility::debug("Matching node namedoffset %s on node %s\n", $submatches[2], $submatches[1]);
             $otherNode = $this->mapObject->getNode($submatches[1]);
             if (array_key_exists($submatches[2], $otherNode->namedOffsets)) {
@@ -1385,7 +1390,7 @@ class ConfigReader
             }
         }
 
-        return array($xOffset, $yOffset, $nodeName, $endOffset, $needSizePrecalculate);
+        return array($xOffset, $yOffset, $nodeName, $endOffset, false);
     }
 
     private function handleNODES($fullcommand, $args, $matches)
@@ -1449,26 +1454,30 @@ class ConfigReader
     {
         global $weathermap_error_suppress;
 
-        if (preg_match('/^SET\s+(\S+)\s+(.*)\s*$/i', $fullcommand, $matches)) {
-            $this->currentObject->addHint($matches[1], trim($matches[2]));
+        $key = null;
+        $value = "";
 
-            if ($this->currentObject->myType() == 'MAP' && substr($matches[1], 0, 7) == 'nowarn_') {
-                $key = substr(strtoupper($matches[1]), 7);
-                MapUtility::debug("Suppressing warning $key for this map\n");
-                $weathermap_error_suppress[$key] = 1;
-            }
-            return true;
+        if (preg_match('/^SET\s+(\S+)\s+(.*)\s*$/i', $fullcommand, $matches)) {
+            $key = $matches[1];
+            $value = trim($matches[2]);
         }
-        // allow setting a variable to ""
+
+        // also allow setting a variable to ""
         if (preg_match('/^SET\s+(\S+)\s*$/i', $fullcommand, $matches)) {
-            $this->currentObject->addHint($matches[1], '');
-            if ($this->currentObject->myType() == 'MAP' && substr($matches[1], 0, 7) == 'nowarn_') {
-                $key = substr(strtoupper($matches[1]), 7);
-                MapUtility::debug("Suppressing warning $key for this map\n");
-                $weathermap_error_suppress[$key] = 1;
+            $key = $matches[1];
+        }
+
+        if (!is_null($key)) {
+            $this->currentObject->addHint($key, $value);
+
+            if ($this->currentObject->myType() == 'MAP' && substr($key, 0, 7) == 'nowarn_') {
+                $nowarn_key = substr(strtoupper($key), 7);
+                MapUtility::debug("Suppressing warning $nowarn_key for this map\n");
+                $weathermap_error_suppress[$nowarn_key] = 1;
             }
             return true;
         }
+
         return false;
     }
 
@@ -1841,6 +1850,7 @@ class ConfigReader
 
             foreach ($keywords as $keyword => $matches) {
                 print "\n## $keyword\n";
+
                 foreach ($matches as $match) {
                     $nicer = str_replace('\\', '\\\\', $match[0]);
 
@@ -1881,8 +1891,10 @@ class ConfigReader
         foreach ($this->configKeywords as $scope => $keywords) {
             foreach ($keywords as $keyword => $matches) {
                 foreach ($matches as $match) {
+
                     # $match[0] is a regexp or string match
                     // TODO - can we validate a regexp?
+
                     # $match[1] is either an array of properties to set, or a function to handle it
                     if (is_array($match[1])) {
                         # TODO: if it's a list of variables, check they exist on the relevant object (from scope)
@@ -1903,6 +1915,7 @@ class ConfigReader
                             $result = false;
                         }
                     }
+
                 }
             }
         }

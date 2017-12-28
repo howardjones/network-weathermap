@@ -665,55 +665,6 @@ class MapLink extends MapDataItem
         return $newOutput;
     }
 
-    protected function asJSCore()
-    {
-        throw new WeathermapDeprecatedException("This is redundant");
-
-        $newOutput = array(
-            "id" => "L" . $this->id,
-            "name" => $this->name,
-            "a" => $this->endpoints[0]->node->name,
-            "b" => $this->endpoints[1]->node->name,
-            "width" => $this->width,
-            "target" => array(),
-            "via" => array(),
-            "bw_in" => $this->maxValuesConfigured[IN],
-            "bw_out" => $this->maxValuesConfigured[OUT],
-            "infourl" => $this->infourl[IN],
-            "overliburl" => $this->overliburl[IN],
-            "overlibcaption" => $this->overlibcaption[IN],
-            "overlibwidth" => $this->overlibwidth,
-            "overlibheight" => $this->overlibheight,
-            "commentin" => $this->comments[IN],
-            "commentposin" => $this->commentOffsets[IN],
-            "commentout" => $this->comments[OUT],
-            "commentposout" => $this->commentOffsets[OUT],
-        );
-
-        $tgt = '';
-
-        $i = 0;
-        foreach ($this->targets as $target) {
-            if ($i > 0) {
-                $tgt .= ' ';
-            }
-            $tgt .= $target->asConfig();
-            $i++;
-        }
-        $newOutput["target"] = $tgt;
-
-        $newOutput['via'] = $this->viaList;
-
-        $output = json_encode($newOutput);
-
-        return $output;
-    }
-
-    public function asJS($type = 'Link', $prefix = 'L')
-    {
-        return parent::asJS($type, $prefix);
-    }
-
     public function cleanUp()
     {
         parent::cleanUp();
@@ -721,7 +672,6 @@ class MapLink extends MapDataItem
         $this->owner = null;
         $this->endpoints[0]->node = null;
         $this->endpoints[1]->node = null;
-        // $this->parent = null;
         $this->descendents = null;
     }
 

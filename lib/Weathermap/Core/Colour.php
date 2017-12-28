@@ -56,7 +56,6 @@ class Colour
                         break;
                     default:
                         throw new \Exception("Unknown special colour type");
-                        break;
                 }
             }
         }

@@ -130,10 +130,10 @@ class Point
      */
     public function LERPWith($point2, $ratio)
     {
-        $x = (1 - $ratio) * $this->x + $ratio * ($point2->x);
-        $y = (1 - $ratio) * $this->y + $ratio * ($point2->y);
+        $newX = (1 - $ratio) * $this->x + $ratio * ($point2->x);
+        $newY = (1 - $ratio) * $this->y + $ratio * ($point2->y);
 
-        $newPoint = new Point($x, $y);
+        $newPoint = new Point($newX, $newY);
 
         return $newPoint;
     }

@@ -146,7 +146,8 @@ class MapDataItem extends MapItem
     public function updateMaxValues($kilo)
     {
         foreach ($this->getChannelList() as $const) {
-            $this->maxValues[$const] = StringUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const], $kilo);
+            $this->maxValues[$const] = StringUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const],
+                $kilo);
         }
 
         MapUtility::debug(
@@ -438,25 +439,6 @@ class MapDataItem extends MapItem
         return $output;
     }
 
-    protected function asJS($type = 'Thing', $prefix = 'T')
-    {
-        throw new WeathermapDeprecatedException("This is redundant");
-        $output = '';
-        $output .= $type . 's[' . StringUtility::jsEscape($this->name) . '] = ';
-
-        $output .= $this->asJSCore();
-
-        $output .= ";\n";
-
-        return $output;
-    }
-
-    protected function asJSCore()
-    {
-        throw new WeathermapDeprecatedException("This is redundant");
-        return '';
-    }
-
     private function getDirectionList()
     {
         return array('in' => IN, 'out' => OUT);
@@ -475,8 +457,7 @@ class MapDataItem extends MapItem
     {
         MapUtility::debug("MDI Fetching %s\n", $name);
 
-        $translations = array(
-        );
+        $translations = array();
 
         if (array_key_exists($name, $translations)) {
             return $translations[$name];

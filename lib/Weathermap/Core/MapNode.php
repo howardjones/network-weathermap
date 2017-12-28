@@ -612,38 +612,6 @@ class MapNode extends MapDataItem
         return $newOutput;
     }
 
-    protected function asJSCore()
-    {
-        throw new WeathermapDeprecatedException("This is redundant");
-
-        $newOutput = array(
-            "id" => "N" . $this->id,
-            "name" => $this->name,
-            "x" => $this->x,
-            "y" => $this->y,
-            "ox" => $this->originalX,
-            "oy" => $this->originalY,
-            "relative_to" => $this->positionRelativeTo,
-            "label" => $this->label,
-            "infourl" => $this->infourl[IN],
-            "overliburl" => $this->overliburl[IN],
-            "overlibcaption" => $this->overlibcaption[IN],
-            "overlibwidth" => $this->overlibwidth,
-            "overlibheight" => $this->overlibheight,
-            "iconfile" => $this->iconfile
-        );
-
-        if (preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/', $this->iconfile)) {
-            $newOutput['iconfile'] = '::' . $this->iconfile;
-        }
-        $output = json_encode($newOutput);
-        return $output;
-    }
-
-    public function asJS($type = 'Node', $prefix = 'N')
-    {
-        return parent::asJS($type, $prefix);
-    }
 
     public function isRelativePositionResolved()
     {

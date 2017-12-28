@@ -15,6 +15,7 @@ namespace Weathermap\Core;
 //
 //
 
+use Weathermap\Core\HTMLImagemapArea;
 
 class HTMLImagemap
 {
@@ -55,20 +56,25 @@ class HTMLImagemap
     {
         $preg = '/' . $namefilter . '/';
         foreach ($this->shapes as $shape) {
-            if ($shape->hitTest($x, $y)) {
-                if (($namefilter == '') || (preg_match($preg, $shape->name))) {
-                    return $shape->name;
-                }
+            if ($shape->hitTest($x, $y) &&
+                ($namefilter == '' || preg_match($preg, $shape->name))) {
+                return $shape->name;
             }
         }
         return false;
     }
 
-    // update a property on all elements in the map that match a name
-    // (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
-    // returns the number of elements that were matched/changed
-    public function setProp($which, $what, $where)
-    {
+
+
+// update a property on all elements in the map that match a name
+// (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
+// returns the number of elements that were matched/changed
+    public
+    function setProp(
+        $which,
+        $what,
+        $where
+    ) {
         $count = 0;
 
         if (true === isset($this->shapes[$where])) {
@@ -89,11 +95,15 @@ class HTMLImagemap
         return $count;
     }
 
-    // update a property on all elements in the map that match a name as a substring
-    // (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
-    // returns the number of elements that were matched/changed
-    public function setPropSub($which, $what, $where)
-    {
+// update a property on all elements in the map that match a name as a substring
+// (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
+// returns the number of elements that were matched/changed
+    public
+    function setPropSub(
+        $which,
+        $what,
+        $where
+    ) {
         $count = 0;
         foreach ($this->shapes as $shape) {
             if (($where == '') || (strstr($shape->name, $where) != false)) {
@@ -111,13 +121,18 @@ class HTMLImagemap
         return $count;
     }
 
-    public function getByName($name)
-    {
+    public
+    function getByName(
+        $name
+    ) {
         return $this->shapes[$name];
     }
 
-    public function getBySubstring($nameFilter, $reverseOrder = false)
-    {
+    public
+    function getBySubstring(
+        $nameFilter,
+        $reverseOrder = false
+    ) {
         $result = array();
 
         foreach ($this->shapes as $shape) {
@@ -133,8 +148,9 @@ class HTMLImagemap
         return $result;
     }
 
-    // Return the imagemap as an HTML client-side imagemap for inclusion in a page
-    public function asHTML()
+// Return the imagemap as an HTML client-side imagemap for inclusion in a page
+    public
+    function asHTML()
     {
         $html = '<map';
         if ($this->name != '') {
@@ -150,17 +166,20 @@ class HTMLImagemap
         return $html;
     }
 
-    public function exactHTML($name = '', $reverseOrder = false, $skipNoLinks = false)
-    {
+    public
+    function exactHTML(
+        $name = '',
+        $skipNoLinks = false
+    ) {
         $html = '';
         $shape = $this->shapes[$name];
 
-        if (true === isset($shape)) {
-            if ((false === $skipNoLinks) || ($shape->href !== '')
-                || ($shape->extrahtml !== '')
-            ) {
-                $html = $shape->asHTML();
-            }
+        if (true === isset($shape) &&
+            ((false === $skipNoLinks)
+                || ($shape->href !== '')
+                || ($shape->extrahtml !== ''))
+        ) {
+            $html = $shape->asHTML();
         }
 
         return $html;

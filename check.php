@@ -31,21 +31,20 @@ function expandSuffixes($val)
 {
     $val = trim($val);
 
+    $suffixes = array(
+        'g' => 1024 * 1024 * 1024,
+        'm' => 1024 * 1024,
+        'k' => 1024,
+    );
+
     if ($val != '') {
         $last = strtolower($val{strlen($val) - 1});
         $val = intval($val);
-        switch ($last) {
-            // The 'G' modifier is available since PHP 5.1.0
-            case 'g':
-                $val *= 1024;
-            // FALL THROUGH
-            case 'm':
-                $val *= 1024;
-            // FALL THROUGH
-            case 'k':
-                $val *= 1024;
-            // FALL THROUGH
+
+        if (isset($suffixes[$last])) {
+            $val *= $suffixes[$last];
         }
+
         return $val;
     }
 

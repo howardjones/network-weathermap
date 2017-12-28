@@ -7,6 +7,7 @@ namespace Weathermap\Core;
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
+use Weathermap\Core\HTMLImagemap;
 
 class Map extends MapBase
 {
@@ -27,7 +28,7 @@ class Map extends MapBase
     public $height;
     public $htmlstyle;
 
-    /** var  HTMLImagemap $imap */
+    /** var HTMLImagemap $imap */
     public $imap;
 
     public $rrdtool;
@@ -1504,7 +1505,6 @@ class Map extends MapBase
                         // skip the linkless areas if we are in the editor - they're redundant
                         $html .= $this->imap->exactHTML(
                             $areaname,
-                            true,
                             ($this->context != 'editor')
                         );
                         $html .= "\n";

@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - checkout
-      - run: sudo apt install -y libxslt1.1-dev xsltproc
+      - run: sudo apt install -y libxslt1.1 xsltproc
       - run: sudo docker-php-ext-install xsl
       - run: sudo composer self-update
       # Download and cache dependencies

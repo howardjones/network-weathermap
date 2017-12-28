@@ -290,14 +290,6 @@ class UIBase
         return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
     }
 
-//// much looser sanitise for general strings that shouldn't have HTML in them
-//    public static function wmeSanitizeString($str)
-//    {
-//        static $dropMatchingCharacters = array('<', '>');
-//        static $dropCharactersReplacements = array('', '');
-//
-//        return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
-//    }
 
     public static function wmeValidateBandwidth($bandwidth)
     {
@@ -331,15 +323,6 @@ class UIBase
         return str_replace(array(" "), "", $str);
     }
 
-//    public static function wmeSanitizeSelected($str)
-//    {
-//        $result = urldecode($str);
-//
-//        if (!preg_match('/^(LINK|NODE):/', $result)) {
-//            return "";
-//        }
-//        return self::wmeSanitizeName($result);
-//    }
 
     public static function wmeSanitizeFile($filename, $allowedExtensions = array())
     {

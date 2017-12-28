@@ -60,7 +60,6 @@ class MapBase
     {
         MapUtility::debug("Adding hint $name='$value' to " . $this->name . "\n");
         $this->hints[$name] = $value;
-        # warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
     }
 
     public function getHint($name, $default = null)

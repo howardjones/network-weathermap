@@ -11,6 +11,7 @@ namespace Weathermap\Core;
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\Target;
 use Weathermap\Core\MapDataItem;
+use Weathermap\Core\Plugin;
 
 class PluginManager
 {
@@ -54,7 +55,6 @@ class PluginManager
             MapUtility::debug("Loading $pluginType Plugin class from $file\n");
 
             $class = preg_replace('/\\.php$/', '', $file);
-            // include_once $fullFilePath;
 
             MapUtility::debug("Loaded $pluginType Plugin class $class from $file\n");
 
@@ -62,16 +62,21 @@ class PluginManager
 
             MapUtility::debug("full class path is $classFullPath\n");
 
-            $this->plugins[$pluginType][$class]['object'] = new $classFullPath;
-            $this->plugins[$pluginType][$class]['active'] = true;
+            $newPlugin = new Plugin();
+            $newPlugin->type = $pluginType;
+            $newPlugin->name = $class;
+            $newPlugin->source = $classFullPath;
+            $newPlugin->object = new $classFullPath;
+            $newPlugin->active = true;
+
+            $this->plugins[$pluginType][$class] = $newPlugin;
             $loaded++;
 
-            if (!isset($this->plugins[$pluginType][$class])) {
+            if (!isset($this->plugins[$pluginType][$class]->object)) {
                 MapUtility::debug("** Failed to create an object for plugin $pluginType/$class\n");
-                $this->plugins[$pluginType][$class]['active'] = false;
+                $this->plugins[$pluginType][$class]->active = false;
                 $loaded--;
             }
-            $this->plugins[$pluginType][$class]['name'] = $class;
         }
         MapUtility::debug("Finished loading $loaded $pluginType plugins.\n");
     }
@@ -141,19 +146,27 @@ class PluginManager
             foreach ($this->plugins[$type] as $name => $pluginEntry) {
                 MapUtility::debug("Running $name" . "->Init()\n");
 
-                $ret = $pluginEntry['object']->init($this->map);
+                $ret = $pluginEntry->object->init($this->map);
 
                 if (!$ret) {
                     MapUtility::debug("Marking $name plugin as inactive, since Init() failed\n");
-                    $this->plugins[$type][$name]['active'] = false;
-                    MapUtility::debug(
-                        "State is now %s\n",
-                        ($this->plugins['data'][$name]['active'] ? 'active' : 'inactive')
-                    );
+                    $this->plugins[$type][$name]->active = false;
                 }
             }
         }
         MapUtility::debug("Finished Initialising Plugins...\n");
+    }
+
+    private function pluginMethod($type, $method)
+    {
+        MapUtility::debug("Running $type plugin $method method\n");
+
+        foreach ($this->plugins[$type] as $name => $pluginEntry) {
+            if ($pluginEntry->active) {
+                MapUtility::debug("Running $name->$method()\n");
+                $pluginEntry->object->$method($this->map);
+            }
+        }
     }
 
     public function runProcessorPlugins($stage = 'pre')
@@ -165,31 +178,15 @@ class PluginManager
         MapUtility::debug("Finished $stage-processing plugins...\n");
     }
 
-
     public function prefetchPlugins()
     {
         // give all the plugins a chance to prefetch their results
-        MapUtility::debug("======================================\n");
         MapUtility::debug("Starting DS plugin prefetch\n");
         $this->pluginMethod('data', 'preFetch');
     }
 
-    private function pluginMethod($type, $method)
-    {
-        MapUtility::debug("======================================\n");
-        MapUtility::debug("Running $type plugin $method method\n");
-
-        foreach ($this->plugins[$type] as $name => $pluginEntry) {
-            if ($pluginEntry['active']) {
-                MapUtility::debug("Running $name->$method()\n");
-                $pluginEntry['object']->$method($this->map);
-            }
-        }
-    }
-
     public function cleanupPlugins($type)
     {
-        MapUtility::debug("======================================\n");
         MapUtility::debug("Starting DS plugin cleanup\n");
         $this->pluginMethod($type, 'cleanUp');
     }
@@ -197,7 +194,7 @@ class PluginManager
     /**
      * @param string $targetString
      * @param MapDataItem $mapItem
-     * @return bool|int|string
+     * @return bool|Plugin
      */
     public function findHandlingPlugin($targetString, $mapItem)
     {
@@ -205,10 +202,10 @@ class PluginManager
 
         MapUtility::debug("Finding handler for %s '%s'\n", $mapItem, $targetString);
         foreach ($pluginList as $name => $pluginEntry) {
-            $isRecognised = $pluginEntry['object']->recognise($targetString);
+            $isRecognised = $pluginEntry->object->recognise($targetString);
 
             if ($isRecognised) {
-                MapUtility::debug("plugin %s says it can handle it (state=%s)\n", $name, $pluginEntry['active']);
+                MapUtility::debug("plugin %s says it can handle it (state=%s)\n", $name, $pluginEntry->active);
                 return $pluginEntry;
             }
         }

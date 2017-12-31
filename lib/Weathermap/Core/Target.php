@@ -94,15 +94,15 @@ class Target
 
     /**
      * @param PluginManager $pluginManager
-     * @return bool|string
+     * @return bool|Plugin
      */
     public function findHandlingPlugin($pluginManager)
     {
         $pluginEntry = $pluginManager->findHandlingPlugin($this->finalTargetString, $this->mapItem);
         if ($pluginEntry !== false) {
-            $this->pluginName = $pluginEntry['name'];
-            $this->pluginObject = $pluginEntry['object'];
-            $this->pluginRunnable = $pluginEntry['active'];
+            $this->pluginName = $pluginEntry->name;
+            $this->pluginObject = $pluginEntry->object;
+            $this->pluginRunnable = $pluginEntry->active;
         }
         return $pluginEntry;
     }

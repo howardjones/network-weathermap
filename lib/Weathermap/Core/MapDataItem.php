@@ -173,7 +173,7 @@ class MapDataItem extends MapItem
             $matchedBy = $target->findHandlingPlugin($this->owner->pluginManager);
 
             if ($matchedBy !== false) {
-                if ($matchedBy['active']) {
+                if ($matchedBy->active) {
                     $target->registerWithPlugin($this, $this->owner);
                 } else {
                     MapUtility::warn(
@@ -181,7 +181,7 @@ class MapDataItem extends MapItem
                             "ProcessTargets: %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
                             $this,
                             $target,
-                            $matchedBy
+                            $matchedBy->name
                         )
                     );
                 }

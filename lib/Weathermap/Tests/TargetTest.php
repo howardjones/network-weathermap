@@ -60,7 +60,7 @@ class TargetTest extends \PHPUnit_Framework_TestCase
         $tg1->preProcess($node, $map);
         $matchedBy = $tg1->findHandlingPlugin($map->pluginManager);
 
-        $this->assertEquals("StaticData", $matchedBy['name']);
+        $this->assertEquals("StaticData", $matchedBy->name);
 
         $tg2 = new Target("garbage-with-no-extension-and-no-prefix", "myfile.conf", 22);
         $tg2->preProcess($node, $map);
@@ -72,6 +72,6 @@ class TargetTest extends \PHPUnit_Framework_TestCase
         $tg3->preProcess($node, $map);
         $matchedBy = $tg3->findHandlingPlugin($map->pluginManager);
 
-        $this->assertEquals("RRDTool", $matchedBy['name']);
+        $this->assertEquals("RRDTool", $matchedBy->name);
     }
 }

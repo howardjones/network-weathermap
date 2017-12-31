@@ -99,11 +99,11 @@ class Colour
      */
     public function blendWith($colour2, $ratio)
     {
-        $red = $this->red + ($colour2->red - $this->red) * $ratio;
-        $green = $this->green + ($colour2->green - $this->green) * $ratio;
-        $blue = $this->blue + ($colour2->blue - $this->blue) * $ratio;
+        $newRed = $this->red + ($colour2->red - $this->red) * $ratio;
+        $newGreen = $this->green + ($colour2->green - $this->green) * $ratio;
+        $newBlue = $this->blue + ($colour2->blue - $this->blue) * $ratio;
 
-        return new Colour($red, $green, $blue);
+        return new Colour($newRed, $newGreen, $newBlue);
     }
 
     // Is this a transparent/none colour?

@@ -656,7 +656,7 @@ class Map extends MapBase
     /**
      * TODO: Temporary function to bridge between the old and new
      * scale-worlds. Just until the ConfigReader updates these
-     * directly.
+     * directly, and we support per-legend colour/font settings (these are global right now)
      */
     private function replicateLegendSettings()
     {
@@ -1840,16 +1840,17 @@ class Map extends MapBase
 
         $translations = array(
             'max_data_time' => $this->maximumDataTime,
-            'min_data_time' => $this->minimumDataTime
+            'min_data_time' => $this->minimumDataTime,
+            'title' => $this->title
         );
 
         if (array_key_exists($name, $translations)) {
             return $translations[$name];
         }
         // TODO - at some point, we can remove this bit, and limit access to ONLY the things listed above
-        if (property_exists($this, $name)) {
-            return $this->$name;
-        }
+//        if (property_exists($this, $name)) {
+//            return $this->$name;
+//        }
 
         throw new WeathermapRuntimeWarning("NoSuchProperty");
     }

@@ -1689,7 +1689,7 @@ class ConfigReader
         return true;
     }
 
-// TODO: refactor this - it doesn't need to be one big handler anymore (multiple regexps for different styles?)
+    // TODO: refactor this - it doesn't need to be one big handler anymore (multiple regexps for different styles?)
     private function handleSCALE($fullcommand, $args, $matches)
     {
 
@@ -1707,7 +1707,6 @@ class ConfigReader
         }
         $newScale = $this->mapObject->scales[$scaleName];
 
-        $key = $matches[2] . '_' . $matches[3];
         $tag = $matches[11];
 
         $colour1 = null;
@@ -1775,20 +1774,27 @@ class ConfigReader
 
         $this->mapObject->keyx[$whichKey] = $matches[2];
         $this->mapObject->keyy[$whichKey] = $matches[3];
+
+        $this->mapObject->legends[$whichKey]->keyx = $matches[2];
+        $this->mapObject->legends[$whichKey]->keyy = $matches[3];
+
         $extra = trim($matches[4]);
 
         if ($extra != '') {
             $this->mapObject->keytext[$whichKey] = $extra;
+            $this->mapObject->legends[$whichKey]->keytitle = $extra;
         }
 
         // it's possible to have keypos before the scale is defined.
         // this is to make it at least mostly consistent internally
         if (!isset($this->mapObject->keytext[$whichKey])) {
             $this->mapObject->keytext[$whichKey] = 'DEFAULT TITLE';
+            $this->mapObject->legends[$whichKey]->keytitle = 'DEFAULT TITLE';
         }
 
         if (!isset($this->mapObject->keystyle[$whichKey])) {
             $this->mapObject->keystyle[$whichKey] = 'classic';
+            $this->mapObject->legends[$whichKey]->keystyle = 'classic';
         }
 
         return true;
@@ -1906,7 +1912,7 @@ class ConfigReader
 
                     # $match[1] is either an array of properties to set, or a function to handle it
                     if (is_array($match[1])) {
-                        # TODO: if it's a list of variables, check they exist on the relevant object (from scope)
+                        # if it's a list of variables, check they exist on the relevant object (from scope)
                         foreach ($match[1] as $key => $val) {
                             if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
                                 $key = $m[1];
@@ -1918,7 +1924,7 @@ class ConfigReader
                             }
                         }
                     } else {
-                        # TODO: if it's a handleXXXX function, check that exists
+                        # if it's a handleXXXX function, check that exists
                         if (!method_exists($this, $match[1])) {
                             MapUtility::warn("$scope:$keyword has a missing handler ($match[1])");
                             $result = false;

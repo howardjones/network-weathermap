@@ -102,6 +102,9 @@ class Map extends MapBase
 
     /** var MapScale[] $scales */
     public $scales;
+
+    /** @var Legend[] $legends */
+    public $legends;
     public $fonts;
 
     /** var Stats $stats - a generic place to keep various statistics about the map */

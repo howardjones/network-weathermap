@@ -10,20 +10,202 @@ namespace Weathermap\Core;
 
 use Weathermap\Core\MapScale;
 
-class Legend
+class Legend extends MapItem
 {
-    public $style = 'classic';
+    /** @var MapScale $scale */
     private $scale;
+    /** @var Map $owner */
 
-    public function __construct($scale, $style)
+    public $colourtable;
+
+    public $keypos;
+    public $keytitle;
+    public $keystyle;
+    public $keysize;
+    public $keytextcolour;
+    public $keyoutlinecolour;
+    public $keybgcolour;
+    public $scalemisscolour;
+    /** @var Font */
+    public $keyfont;
+
+    public function __construct($name, $owner, $scale)
     {
+        parent::__construct();
+
+        $this->name = $name;
         $this->scale = $scale;
-        $this->style = $style;
+        $this->owner = $owner;
+
+        $this->inheritedFieldList = array(
+            'scaleType' => 'percent',
+            'keystyle' => 'classic',
+            'keybgcolour' => new Colour(255, 255, 255),
+            'keyoutlinecolour' => new Colour(0, 0, 0),
+            'keytextcolour' => new Colour(0, 0, 0),
+            'scalemisscolour' => new Colour(255, 255, 255),
+            'keypos' => null,
+            'keytitle' => 'Traffic Load',
+            'keysize' => 0
+        );
+
+        $this->reset($owner);
+    }
+
+    public function reset(&$owner)
+    {
+        $this->owner = $owner;
+
+        foreach (array_keys($this->inheritedFieldList) as $fld) {
+            $this->$fld = $this->inheritedFieldList[$fld];
+        }
+
+        //        $this->setColour("KEYBG", new Colour(255, 255, 255));
+        //        $this->setColour("KEYOUTLINE", new Colour(0, 0, 0));
+        //        $this->setColour("KEYTEXT", new Colour(0, 0, 0));
+        //        $this->setColour("SCALEMISS", new Colour(255, 255, 255));
+
+        assert(isset($owner));
+    }
+
+    public function myType()
+    {
+        return 'LEGEND';
+    }
+
+
+    private function drawLegendImage($gdTargetImage, $gdScaleImage)
+    {
+        $xTarget = $this->keypos->x;
+        $yTarget = $this->keypos->y;
+        $width = imagesx($gdScaleImage);
+        $height = imagesy($gdScaleImage);
+
+        MapUtility::debug("New scale - blitting\n");
+        imagecopy($gdTargetImage, $gdScaleImage, $xTarget, $yTarget, 0, 0, $width, $height);
+    }
+
+    /**
+     * @param $gdTargetImage
+     * @param $gdScaleImage
+     */
+    private function createImageMapArea($gdScaleImage)
+    {
+        $xTarget = $this->keypos->x;
+        $yTarget = $this->keypos->y;
+        $width = imagesx($gdScaleImage);
+        $height = imagesy($gdScaleImage);
+
+        $areaName = 'LEGEND:' . $this->name;
+
+        $newArea = new HTMLImageMapAreaRectangle(
+            array(
+                array(
+                    $xTarget,
+                    $yTarget,
+                    $xTarget + $width,
+                    $yTarget + $height
+                )
+            ),
+            $areaName,
+            ''
+        );
+        $this->owner->imap->addArea($newArea);
+
+        // TODO: stop tracking z-order separately. addArea() should take the z layer
+        $this->imagemapAreas[] = $newArea;
+    }
+
+
+
+    public function asConfigData()
+    {
+        $config = parent::asConfigData();
+
+        // $config['pos'] = array($this->keypos->x, $this->keypos->y);
+        // $config['font'] = $this->keyfont->asConfigData();
+        $config['textcolour'] = $this->keytextcolour;
+        $config['bgcolour'] = $this->keybgcolour;
+        $config['outlinecolour'] = $this->keyoutlinecolour;
+        $config['misscolour'] = $this->scalemisscolour;
+        $config['style'] = $this->keystyle;
+        $config['size'] = $this->keysize;
+
+        return $config;
+    }
+
+    public function getConfig()
+    {
+        assert(isset($this->owner));
+
+        $output = '';
+
+        if ($this->keypos != $this->inheritedFieldList['keypos']) {
+            $output .= sprintf(
+                "\tKEYPOS %s %d %d %s\n",
+                $this->name,
+                $this->keypos->x,
+                $this->keypos->y,
+                $this->keytitle
+            );
+        }
+
+        if ($this->keystyle != $this->inheritedFieldList['keystyle']) {
+            if ($this->keysize != $this->inheritedFieldList['keysize']) {
+                $output .= sprintf(
+                    "\tKEYSTYLE %s %s %d\n",
+                    $this->name,
+                    $this->keystyle,
+                    $this->keysize
+                );
+            } else {
+                $output .= sprintf(
+                    "\tKEYSTYLE %s %s\n",
+                    $this->name,
+                    $this->keystyle
+                );
+            }
+        }
+
+        // TODO - these aren't actually defined per-legend at the moment!
+
+        /*
+        $output .= sprintf("\tKEYBGCOLOR %s %s\n",
+            $this->name,
+            $this->keybgcolour->asConfig()
+        );
+
+        $output .= sprintf("\tKEYTEXTCOLOR %s %s\n",
+            $this->name,
+            $this->keytextcolour->asConfig()
+        );
+
+        $output .= sprintf("\tKEYOUTLINECOLOR %s %s\n",
+            $this->name,
+            $this->keyoutlinecolour->asConfig()
+        );
+
+        $output .= sprintf("\tSCALEMISSCOLOR %s %s\n",
+            $this->name,
+            $this->scalemisscolour->asConfig()
+        );
+        */
+
+        if ($output != '') {
+            $output .= "\n";
+        }
+
+
+        if ($output != '') {
+            $output = '# All settings for legend ' . $this->name . "\n" . $output . "\n";
+        }
+
+        return $output;
     }
 
     public function draw()
     {
-        switch ($this->style) {
+        switch ($this->keystyle) {
             case 'classic':
                 return $this->drawLegendClassic(false);
             case 'horizontal':
@@ -39,9 +221,7 @@ class Legend
 
     private function drawLegendClassic($useTags = false)
     {
-        $this->sortScale();
-
-        $nScales = $this->spanCount();
+        $nScales = $this->scale->spanCount();
 
         MapUtility::debug("Drawing $nScales colours into SCALE\n");
 
@@ -50,10 +230,13 @@ class Legend
 
         // did we actually hide anything?
         $didHideZero = false;
-        if (($hideZero == 1) && isset($this->entries['0_0'])) {
+
+        if (($hideZero == 1) && isset($this->scale->entries['0_0'])) {
             $nScales--;
             $didHideZero = true;
         }
+
+        MapUtility::debug("HIDE for $this->name: ZERO $hideZero($didHideZero) PERCENT $hidePercentSign\n");
 
         $fontObject = $this->keyfont;
 
@@ -67,7 +250,7 @@ class Legend
 
         // pre-calculate all the text for the legend, and its size
         $maxTextSize = 0;
-        foreach ($this->entries as $index => $scaleEntry) {
+        foreach ($this->scale->entries as $index => $scaleEntry) {
             $labelString = sprintf('%s-%s', $scaleEntry['bottom'], $scaleEntry['top']);
             if ($hidePercentSign == 0) {
                 $labelString .= '%';
@@ -79,7 +262,7 @@ class Legend
                     $labelString = $scaleEntry['tag'];
                 }
             }
-            $this->entries[$index]['label'] = $labelString;
+            $this->scale->entries[$index]['label'] = $labelString;
             list($w,) = $fontObject->calculateImageStringSize($labelString);
             $maxTextSize = max($maxTextSize, $w);
         }
@@ -113,7 +296,7 @@ class Legend
 
         $rowNumber = 1;
 
-        foreach ($this->entries as $key => $scaleEntry) {
+        foreach ($this->scale->entries as $key => $scaleEntry) {
             // pick a value in the middle...
             $value = ($scaleEntry['bottom'] + $scaleEntry['top']) / 2;
             MapUtility::debug(
@@ -141,13 +324,13 @@ class Legend
                 if (isset($scaleEntry['c2']) && !$scaleEntry['c1']->equals($scaleEntry['c2'])) {
                     for ($n = 0; $n <= $tileWidth; $n++) {
                         $value = $fudgeFactor + $scaleEntry['bottom'] + ($n / $tileWidth) * ($scaleEntry['top'] - $scaleEntry['bottom']);
-                        list($entryColour,) = $this->findScaleHit($value);
+                        list($entryColour,) = $this->scale->findScaleHit($value);
                         $gdColourRef = $entryColour->gdallocate($gdScaleImage);
                         imagefilledrectangle($gdScaleImage, $x + $n, $y, $x + $n, $y + $tileHeight, $gdColourRef);
                     }
                 } else {
                     // pick a value in the middle...
-                    list($entryColour,) = $this->findScaleHit($value);
+                    list($entryColour,) = $this->scale->findScaleHit($value);
                     $gdColourRef = $entryColour->gdallocate($gdScaleImage);
                     imagefilledrectangle($gdScaleImage, $x, $y, $x + $tileWidth, $y + $tileHeight, $gdColourRef);
                 }
@@ -171,7 +354,7 @@ class Legend
 
         $title = $this->keytitle;
 
-        $nScales = $this->spanCount();
+        $nScales = $this->scale->spanCount();
 
         MapUtility::debug("Drawing $nScales colours into SCALE\n");
 
@@ -257,7 +440,7 @@ class Legend
                 );
             }
 
-            list($col,) = $this->findScaleHit($percentage);
+            list($col,) = $this->scale->findScaleHit($percentage);
 
             if ($col->isRealColour()) {
                 $gdColourRef = $col->gdAllocate($gdScaleImage);
@@ -286,7 +469,7 @@ class Legend
     {
         $title = $this->keytitle;
 
-        $nScales = $this->spanCount();
+        $nScales = $this->scale->spanCount();
 
         MapUtility::debug("Drawing $nScales colours into SCALE\n");
 
@@ -362,7 +545,7 @@ class Legend
             }
 
             /** @var Colour $col */
-            list($col,) = $this->findScaleHit($percentage);
+            list($col,) = $this->scale->findScaleHit($percentage);
 
             if ($col->isRealColour()) {
                 $gdColourRef = $col->gdAllocate($gdScaleImage);

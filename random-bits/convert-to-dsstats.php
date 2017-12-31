@@ -96,6 +96,31 @@ $map->ReadConfig($inputfile);
 $allMapItems = $map->buildAllItemsList();
 $this->preProcessTargets($allMapItems);
 
+/**
+ * @param $local_data_id
+ * @param $dsnames
+ * @param $multiply
+ * @param $multiplier
+ * @return array
+ */
+function make_target_string($local_data_id, $dsnames, $multiply, $multiplier)
+{
+    $new_target = sprintf("dsstats:%d:%s:%s", $local_data_id, $dsnames[IN], $dsnames[OUT]);
+    $m = $multiply * $multiplier;
+
+    if ($m != 1) {
+        if ($m == -1) {
+            $new_target = "-" . $new_target;
+        }
+        if ($m == intval($m)) {
+            $new_target = sprintf("%d*%s", $m, $new_target);
+        } else {
+            $new_target = sprintf("%f*%s", $m, $new_target);
+        }
+    }
+    return $new_target;
+}
+
 foreach ($allMapItems as $myobj) {
     $type = $myobj->my_type();
     $name = $myobj->name;
@@ -110,14 +135,14 @@ foreach ($allMapItems as $myobj) {
                 wm_debug("ReadData: New Target: $target[4]\n");
 
                 $targetstring = $target[0];
-                $multiply = $target[1];
+                $prefixMultiplier = $target[1];
 
                 if ($reverse == 0 && $target[5] == "RRDTool") {
                     $candidates++;
                     # list($in,$out,$datatime) =  $map->plugins['data'][ $target[5] ]->ReadData($targetstring, $map, $myobj);
                     wm_debug("ConvertDS: $targetstring is a candidate for conversion.");
                     $rrdfile = $targetstring;
-                    $multiplier = 8;
+                    $targetMultiplier = 8;
                     $dsnames[IN] = "traffic_in";
                     $dsnames[OUT] = "traffic_out";
 
@@ -134,16 +159,15 @@ foreach ($allMapItems as $myobj) {
                     }
                     if (preg_match('/^gauge:(.*)/', $rrdfile, $matches)) {
                         $rrdfile = $matches[1];
-                        $multiplier = 1;
+                        $targetMultiplier = 1;
                     }
                     if (preg_match('/^scale:([+-]?\d*\.?\d*):(.*)/', $rrdfile, $matches)) {
                         $rrdfile = $matches[2];
-                        $multiplier = $matches[1];
+                        $targetMultiplier = $matches[1];
                     }
 
                     $path_rra = $config["rra_path"];
-                    $db_rrdname = $rrdfile;
-                    $db_rrdname = str_replace($path_rra, "<path_rra>", $db_rrdname);
+                    $db_rrdname = str_replace($path_rra, "<path_rra>", $rrdfile);
                     # special case for relative paths
                     $db_rrdname = str_replace("../../rra", "<path_rra>", $db_rrdname);
 
@@ -156,18 +180,7 @@ foreach ($allMapItems as $myobj) {
 
                         if ((sizeof($results) > 0) && (isset($results[0]['local_data_id']))) {
                             $local_data_id = $results[0]['local_data_id'];
-                            $new_target = sprintf("dsstats:%d:%s:%s", $local_data_id, $dsnames[IN], $dsnames[OUT]);
-                            $m = $multiply * $multiplier;
-                            if ($m != 1) {
-                                if ($m == -1) {
-                                    $new_target = "-" . $new_target;
-                                }
-                                if ($m == intval($m)) {
-                                    $new_target = sprintf("%d*%s", $m, $new_target);
-                                } else {
-                                    $new_target = sprintf("%f*%s", $m, $new_target);
-                                }
-                            }
+                            $new_target = make_target_string($local_data_id, $dsnames, $prefixMultiplier, $targetMultiplier);
 
                             wm_debug("ConvertDS: Converting to $new_target");
                             $converted++;
@@ -181,52 +194,6 @@ foreach ($allMapItems as $myobj) {
                     }
                 }
 
-                // XXX - not implemented yet!
-                if ($reverse == 1 && $target[5] == "CactiDSStats" && 1 == 0) {
-                    $candidates++;
-                    # list($in,$out,$datatime) =  $map->plugins['data'][ $target[5] ]->ReadData($targetstring, $map, $myobj);
-                    wm_debug("ConvertDS: $targetstring is a candidate for conversion.");
-
-                    $multiplier = 1;
-                    $dsnames[IN] = "traffic_in";
-                    $dsnames[OUT] = "traffic_out";
-
-                    $path_rra = $config["rra_path"];
-                    $db_rrdname = $rrdfile;
-                    $db_rrdname = str_replace($path_rra, "<path_rra>", $db_rrdname);
-                    # special case for relative paths
-                    $db_rrdname = str_replace("../../rra", "<path_rra>", $db_rrdname);
-
-
-                    wm_debug("ConvertDS: Looking for $db_rrdname in the database.");
-
-                    $SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='" . PDO::quote($db_rrdname) . "'";
-                    wm_debug("ConvertDS: " . $SQLcheck);
-                    $results = db_fetch_assoc($SQLcheck);
-
-                    if ((sizeof($results) > 0) && (isset($results[0]['local_data_id']))) {
-                        $new_target = sprintf("dsstats:%d:%s:%s", $results[0]['local_data_id'], $dsnames[IN], $dsnames[OUT]);
-                        $m = $multiply * $multiplier;
-
-                        if ($m != 1) {
-                            if ($m == -1) {
-                                $new_target = "-" . $new_target;
-                            }
-                            if ($m == intval($m)) {
-                                $new_target = sprintf("%d*%s", $m, $new_target);
-                            } else {
-                                $new_target = sprintf("%f*%s", $m, $new_target);
-                            }
-                        }
-
-                        wm_debug("ConvertDS: Converting to $new_target");
-                        $converted++;
-
-                        $myobj->targets[$tindex][4] = $new_target;
-                    } else {
-                        wm_warn("ConvertDS: Failed to find a match for $db_rrdname - can't convert back to rrdfile.");
-                    }
-                }
                 $tindex++;
             }
 

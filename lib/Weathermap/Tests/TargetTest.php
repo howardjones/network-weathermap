@@ -54,24 +54,24 @@ class TargetTest extends \PHPUnit_Framework_TestCase
         $map->readConfig("\nNODE n1\n");
 
         $node = $map->getNode("n1");
-        $plugins = $map->plugins['data'];
+//        $plugins = $map->plugins['data'];
 
         $tg1 = new Target("static:20M:10M", "myfile.conf", 22);
         $tg1->preProcess($node, $map);
-        $matchedBy = $tg1->findHandlingPlugin($plugins);
+        $matchedBy = $tg1->findHandlingPlugin($map->pluginManager);
 
-        $this->assertEquals("StaticData", $matchedBy);
+        $this->assertEquals("StaticData", $matchedBy['name']);
 
         $tg2 = new Target("garbage-with-no-extension-and-no-prefix", "myfile.conf", 22);
         $tg2->preProcess($node, $map);
-        $matchedBy = $tg2->findHandlingPlugin($plugins);
+        $matchedBy = $tg2->findHandlingPlugin($map->pluginManager);
 
         $this->assertFalse($matchedBy);
 
         $tg3 = new Target("bozo.rrd", "myfile.conf", 22);
         $tg3->preProcess($node, $map);
-        $matchedBy = $tg3->findHandlingPlugin($plugins);
+        $matchedBy = $tg3->findHandlingPlugin($map->pluginManager);
 
-        $this->assertEquals("RRDTool", $matchedBy);
+        $this->assertEquals("RRDTool", $matchedBy['name']);
     }
 }

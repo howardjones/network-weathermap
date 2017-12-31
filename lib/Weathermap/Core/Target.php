@@ -14,7 +14,7 @@ use Weathermap\Plugins\Datasources\Base;
 
 class Target
 {
-    private $finalTargetString;
+    public $finalTargetString;
     private $originalTargetString;
 
     private $pluginName;
@@ -92,22 +92,19 @@ class Target
         }
     }
 
-    public function findHandlingPlugin($pluginList)
+    /**
+     * @param PluginManager $pluginManager
+     * @return bool|string
+     */
+    public function findHandlingPlugin($pluginManager)
     {
-        MapUtility::debug("Finding handler for %s '%s'\n", $this->mapItem, $this->finalTargetString);
-        foreach ($pluginList as $name => $pluginEntry) {
-            $isRecognised = $pluginEntry['object']->recognise($this->finalTargetString);
-
-            if ($isRecognised) {
-                MapUtility::debug("plugin %s says it can handle it (state=%s)\n", $name, $pluginEntry['active']);
-                $this->pluginName = $name;
-                $this->pluginObject = $pluginEntry['object'];
-                $this->pluginRunnable = $pluginEntry['active'];
-                return $name;
-            }
+        $pluginEntry = $pluginManager->findHandlingPlugin($this->finalTargetString, $this->mapItem);
+        if ($pluginEntry !== false) {
+            $this->pluginName = $pluginEntry['name'];
+            $this->pluginObject = $pluginEntry['object'];
+            $this->pluginRunnable = $pluginEntry['active'];
         }
-        MapUtility::debug("Failed to find a plugin\n");
-        return false;
+        return $pluginEntry;
     }
 
     public function registerWithPlugin(&$map, &$mapItem)

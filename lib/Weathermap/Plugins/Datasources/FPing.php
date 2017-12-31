@@ -62,23 +62,21 @@ class FPing extends Base
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
-        $pingCount = intval($map->getHint("fping_ping_count"));
-        if ($pingCount == 0) {
-            $pingCount = 5;
-        }
+        $pingCount = intval($map->getHint("fping_ping_count", 5));
 
         if (preg_match('/^fping:(\S+)$/', $targetString, $matches)) {
             $target = $matches[1];
 
-            $pattern = '/^$target\s:';
+            $resultPattern = '/^$target\s:';
             for ($i = 0; $i < $pingCount; $i++) {
-                $pattern .= '\s(\S+)';
+                $resultPattern .= '\s(\S+)';
             }
-            $pattern .= "/";
+            $resultPattern .= "/";
 
             if (is_executable($this->fpingCommand)) {
                 $command = $this->fpingCommand . " -t100 -r1 -p20 -u -C $pingCount -i10 -q $target 2>&1";
                 MapUtility::debug("Running $command\n");
+
                 $pipe = popen($command, "r");
 
                 $count = 0;
@@ -89,7 +87,7 @@ class FPing extends Base
                         $count++;
                         MapUtility::debug("Output: $line");
 
-                        if (preg_match($pattern, $line, $matches)) {
+                        if (preg_match($resultPattern, $line, $matches)) {
                             MapUtility::debug("Found output line for $target\n");
                             $hitCount++;
                             $loss = 0;
@@ -116,6 +114,7 @@ class FPing extends Base
                         }
                     }
                     pclose($pipe);
+
                     if ($count == 0) {
                         MapUtility::warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
                     } else {

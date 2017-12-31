@@ -170,10 +170,10 @@ class MapDataItem extends MapItem
             MapUtility::debug("ProcessTargets: New Target: $target\n");
 
             $target->preProcess($this, $this->owner);
-            $matchedBy = $target->findHandlingPlugin($this->owner->plugins['data']);
+            $matchedBy = $target->findHandlingPlugin($this->owner->pluginManager);
 
-            if ($matchedBy != '') {
-                if ($this->owner->plugins['data'][$matchedBy]['active']) {
+            if ($matchedBy !== false) {
+                if ($matchedBy['active']) {
                     $target->registerWithPlugin($this, $this->owner);
                 } else {
                     MapUtility::warn(
@@ -185,9 +185,7 @@ class MapDataItem extends MapItem
                         )
                     );
                 }
-            }
-
-            if ($matchedBy == '') {
+            } else {
                 MapUtility::warn(
                     sprintf(
                         "ProcessTargets: %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
@@ -199,7 +197,9 @@ class MapDataItem extends MapItem
         }
     }
 
-    public function zeroData()
+
+    public
+    function zeroData()
     {
         $channels = $this->getChannelList();
 
@@ -208,7 +208,8 @@ class MapDataItem extends MapItem
         }
     }
 
-    public function performDataCollection()
+    public
+    function performDataCollection()
     {
         $channels = $this->getChannelList();
 
@@ -252,8 +253,10 @@ class MapDataItem extends MapItem
      * @param $channels
      * @return array
      */
-    private function collectDataFromTargets($channels)
-    {
+    private
+    function collectDataFromTargets(
+        $channels
+    ) {
         $nFails = 0;
         $dataTime = 0;
 
@@ -283,7 +286,8 @@ class MapDataItem extends MapItem
         return array($nFails);
     }
 
-    public function aggregateDataResults()
+    public
+    function aggregateDataResults()
     {
         $channels = $this->getChannelList();
 
@@ -310,7 +314,8 @@ class MapDataItem extends MapItem
         }
     }
 
-    public function calculateScaleColours()
+    public
+    function calculateScaleColours()
     {
         $channels = $this->getChannelList();
 
@@ -340,26 +345,27 @@ class MapDataItem extends MapItem
         }
     }
 
-    /**
-     * @param mixed $comparison
-     * @return string
-     */
-    protected function getConfigHints($comparison)
-    {
-        $output = '';
-        foreach ($this->hints as $hintname => $hint) {
-            // all hints for DEFAULT node are for writing
-            // only changed ones, or unique ones, otherwise
-            if (($this->name == 'DEFAULT')
-                || (isset($comparison->hints[$hintname])
-                    && $comparison->hints[$hintname] != $hint)
-                || (!isset($comparison->hints[$hintname]))
-            ) {
-                $output .= "\tSET $hintname $hint\n";
-            }
-        }
-        return $output;
-    }
+//
+//    /**
+//     * @param mixed $comparison
+//     * @return string
+//     */
+//    protected function getConfigHints($comparison)
+//    {
+//        $output = '';
+//        foreach ($this->hints as $hintname => $hint) {
+//            // all hints for DEFAULT node are for writing
+//            // only changed ones, or unique ones, otherwise
+//            if (($this->name == 'DEFAULT')
+//                || (isset($comparison->hints[$hintname])
+//                    && $comparison->hints[$hintname] != $hint)
+//                || (!isset($comparison->hints[$hintname]))
+//            ) {
+//                $output .= "\tSET $hintname $hint\n";
+//            }
+//        }
+//        return $output;
+//    }
 
     /**
      * @param mixed $comparison
@@ -367,8 +373,12 @@ class MapDataItem extends MapItem
      * @param string $fieldName
      * @return string
      */
-    protected function getConfigInOutOrBoth($comparison, $configKeyword, $fieldName)
-    {
+    protected
+    function getConfigInOutOrBoth(
+        $comparison,
+        $configKeyword,
+        $fieldName
+    ) {
         $output = '';
         $myArray = $this->$fieldName;
         $theirArray = $comparison->$fieldName;
@@ -396,8 +406,11 @@ class MapDataItem extends MapItem
      * @param $comparison
      * @return string
      */
-    protected function getConfigSimple($simpleParameters, $comparison)
-    {
+    protected
+    function getConfigSimple(
+        $simpleParameters,
+        $comparison
+    ) {
         $output = '';
 
         # TEMPLATE must come first. DEFAULT
@@ -421,8 +434,11 @@ class MapDataItem extends MapItem
         return $output;
     }
 
-    protected function getMaxValueConfig($comparison, $keyword = 'MAXVALUE')
-    {
+    protected
+    function getMaxValueConfig(
+        $comparison,
+        $keyword = 'MAXVALUE'
+    ) {
         $output = '';
 
         if (($this->maxValues[IN] != $comparison->maxValues[IN])
@@ -439,12 +455,14 @@ class MapDataItem extends MapItem
         return $output;
     }
 
-    private function getDirectionList()
+    private
+    function getDirectionList()
     {
         return array('in' => IN, 'out' => OUT);
     }
 
-    public function asConfigData()
+    public
+    function asConfigData()
     {
         $config = parent::asConfigData();
 
@@ -453,8 +471,10 @@ class MapDataItem extends MapItem
         return $config;
     }
 
-    public function getProperty($name)
-    {
+    public
+    function getProperty(
+        $name
+    ) {
         MapUtility::debug("MDI Fetching %s\n", $name);
 
         $translations = array();

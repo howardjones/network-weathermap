@@ -1255,6 +1255,18 @@ class MapNode extends MapDataItem
         return $failed;
     }
 
+    /**
+     * processString used to just reach into objects to get properties. A lot of the
+     * property names were accidentally made permanent because of this. Now we're moving
+     * towards multi-channel everywhere, all the old in/out names are a problem, so now
+     * all properties are fetched by this function, which translates the old names to the
+     * actual property that holds that data now. This will also be the 'access-control' for
+     * which properties are exposed.
+     *
+     * @param $name
+     * @return mixed|null
+     * @throws WeathermapRuntimeWarning
+     */
     public function getProperty($name)
     {
         MapUtility::debug("Fetching %s\n", $name);

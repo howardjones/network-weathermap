@@ -1728,7 +1728,7 @@ class ConfigReader
             $colour2 = new Colour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
         }
 
-        $newScale->AddSpan($bottom, $top, $colour1, $colour2, $tag);
+        $newScale->addSpan($bottom, $top, $colour1, $colour2, $tag);
 
         return true;
     }

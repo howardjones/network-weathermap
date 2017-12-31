@@ -306,11 +306,6 @@ class MapDataItem extends MapItem
             }
 
             $this->percentUsages[$channel] = ($value / $this->maxValues[$channel]) * 100;
-
-            # set notes with the old names, so the properties are no longer necessary
-            // $this->addNote($channelName . 'percent', $this->percentUsages[$channel]);
-//            $this->addNote('max_bandwidth_' . $channelName, $this->maxValues[$channel]);
-//            $this->addNote('max_bandwidth_' . $channelName . '_cfg', $this->maxValuesConfigured[$channel]);
         }
     }
 

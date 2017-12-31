@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 31/12/17
- * Time: 14:07
- */
 
 namespace Weathermap\Core;
 
@@ -117,7 +111,6 @@ class Legend extends MapItem
     }
 
     /**
-     * @param $gdTargetImage
      * @param $gdScaleImage
      */
     private function createImageMapArea($gdScaleImage)
@@ -245,11 +238,7 @@ class Legend extends MapItem
 
         MapUtility::debug("New scale - still drawing\n");
         $this->scale->sort();
-        $gdScaleImage = null;
 
-//        $legend = new Legend($this->name, $this->owner, $this);
-//
-//        $this->copyToLegend($legend);
         $gdScaleImage = $this->drawLegend();
 
         $this->drawLegendImage($gdTargetImage, $gdScaleImage);
@@ -270,6 +259,8 @@ class Legend extends MapItem
             case 'tags':
                 return $this->drawLegendClassic(true);
         }
+
+        return null;
     }
 
     private function drawLegendClassic($useTags = false)
@@ -304,18 +295,19 @@ class Legend extends MapItem
         // pre-calculate all the text for the legend, and its size
         $maxTextSize = 0;
         foreach ($this->scale->entries as $index => $scaleEntry) {
-            $labelString = sprintf('%s-%s', $scaleEntry['bottom'], $scaleEntry['top']);
+            $labelString = sprintf('%s-%s', $scaleEntry->bottom, $scaleEntry->top);
             if ($hidePercentSign == 0) {
                 $labelString .= '%';
             }
 
             if ($useTags) {
                 $labelString = '';
-                if (isset($scaleEntry['tag'])) {
-                    $labelString = $scaleEntry['tag'];
+                if (isset($scaleEntry->tag)) {
+                    $labelString = $scaleEntry->tag;
                 }
             }
-            $this->scale->entries[$index]['label'] = $labelString;
+//            $this->scale->entries[$index]->label = $labelString;
+            $scaleEntry->label = $labelString;
             list($w,) = $fontObject->calculateImageStringSize($labelString);
             $maxTextSize = max($maxTextSize, $w);
         }
@@ -351,14 +343,14 @@ class Legend extends MapItem
 
         foreach ($this->scale->entries as $key => $scaleEntry) {
             // pick a value in the middle...
-            $value = ($scaleEntry['bottom'] + $scaleEntry['top']) / 2;
+            $value = ($scaleEntry->bottom + $scaleEntry->top) / 2;
             MapUtility::debug(
                 sprintf(
                     "%f-%f (%f)  %s\n",
-                    $scaleEntry['bottom'],
-                    $scaleEntry['top'],
+                    $scaleEntry->bottom,
+                    $scaleEntry->top,
                     $value,
-                    $scaleEntry['c1']
+                    $scaleEntry->c1
                 )
             );
 
@@ -367,16 +359,16 @@ class Legend extends MapItem
                 $x = 6;
 
                 $fudgeFactor = 0;
-                if ($didHideZero && $scaleEntry['bottom'] == 0) {
+                if ($didHideZero && $scaleEntry->bottom == 0) {
                     // calculate a small offset that can be added, which will hide the zero-value in a
                     // gradient, but not make the scale incorrect. A quarter of a pixel should do it.
-                    $fudgeFactor = ($scaleEntry['top'] - $scaleEntry['bottom']) / ($tileWidth * 4);
+                    $fudgeFactor = ($scaleEntry->top - $scaleEntry->bottom) / ($tileWidth * 4);
                 }
 
                 // if it's a gradient, red2 is defined, and we need to sweep the values
-                if (isset($scaleEntry['c2']) && !$scaleEntry['c1']->equals($scaleEntry['c2'])) {
+                if (isset($scaleEntry->c2) && !$scaleEntry->c1->equals($scaleEntry->c2)) {
                     for ($n = 0; $n <= $tileWidth; $n++) {
-                        $value = $fudgeFactor + $scaleEntry['bottom'] + ($n / $tileWidth) * ($scaleEntry['top'] - $scaleEntry['bottom']);
+                        $value = $fudgeFactor + $scaleEntry->bottom + ($n / $tileWidth) * ($scaleEntry->top - $scaleEntry->bottom);
                         list($entryColour,) = $this->scale->findScaleHit($value);
                         $gdColourRef = $entryColour->gdallocate($gdScaleImage);
                         imagefilledrectangle($gdScaleImage, $x + $n, $y, $x + $n, $y + $tileHeight, $gdColourRef);
@@ -392,7 +384,7 @@ class Legend extends MapItem
                     $gdScaleImage,
                     $x + 4 + $tileWidth,
                     $y + $tileHeight,
-                    $scaleEntry['label'],
+                    $scaleEntry->label,
                     $this->keytextcolour->gdAllocate($gdScaleImage)
                 );
                 $rowNumber++;

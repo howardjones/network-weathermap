@@ -1,6 +1,6 @@
 ## TODO
 
-MapScale should really be divided into MapScale and MapLegend.
+~~MapScale should really be divided into MapScale and MapLegend.~~
 
 Also, a MapScaleEntry class with the testing for ColourFromValue
 

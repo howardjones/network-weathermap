@@ -11,7 +11,9 @@ namespace Weathermap\Core;
  */
 class MapScale extends MapItem
 {
+    /** @var ScaleEntry[] $entries */
     public $entries;
+    /** @var Colour $scalemisscolour */
     public $scalemisscolour;
 
     public function __construct($name, &$owner)
@@ -77,12 +79,7 @@ class MapScale extends MapItem
         assert(isset($this->owner));
         $key = $lowValue . '_' . $highValue;
 
-        $this->entries[$key]['c1'] = $lowColour;
-        $this->entries[$key]['c2'] = $highColour;
-        $this->entries[$key]['tag'] = $tag;
-        $this->entries[$key]['bottom'] = $lowValue;
-        $this->entries[$key]['top'] = $highValue;
-        $this->entries[$key]['label'] = '';
+        $this->entries[$key] = new ScaleEntry($lowValue, $highValue, $lowColour, $highColour, $tag);
 
         MapUtility::debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
     }
@@ -140,54 +137,37 @@ class MapScale extends MapItem
         return array($col, $key, $tag);
     }
 
-    protected function deriveColour($value, $scaleEntry)
-    {
-        if (is_null($scaleEntry['c2']) or $scaleEntry['c1']->equals($scaleEntry['c2'])) {
-            $candidate = $scaleEntry['c1'];
-        } else {
-            if ($scaleEntry['bottom'] == $scaleEntry['top']) {
-                $ratio = 0;
-            } else {
-                $ratio = ($value - $scaleEntry['bottom'])
-                    / ($scaleEntry['top'] - $scaleEntry['bottom']);
-            }
-            $candidate = $scaleEntry['c1']->blendWith($scaleEntry['c2'], $ratio);
-        }
-
-        return $candidate;
-    }
-
     public function findScaleHit($value)
     {
-        $colour = null;
         $tag = '';
-        $matchSize = null;
-        $matchKey = null;
+        $smallestMatchColour = null;
+        $smallestMatchSize = null;
+        $smallestMatchKey = null;
+
         $candidate = null;
 
         foreach ($this->entries as $key => $scaleEntry) {
-            if (($value >= $scaleEntry['bottom']) and ($value <= $scaleEntry['top'])) {
-                MapUtility::debug("HIT for %s-%s\n", $scaleEntry['bottom'], $scaleEntry['top']);
+            if ($scaleEntry->hit($value)) {
+                MapUtility::debug("HIT for %s-%s\n", $scaleEntry->bottom, $scaleEntry->top);
 
-                $range = $scaleEntry['top'] - $scaleEntry['bottom'];
-
-                $candidate = $this->deriveColour($value, $scaleEntry);
+                $range = $scaleEntry->span();
+                $candidate = $scaleEntry->getColour($value);
 
                 // change in behaviour - with multiple matching ranges for a value, the smallest range wins
-                if (is_null($matchSize) || ($range < $matchSize)) {
+                if (is_null($smallestMatchSize) || ($range < $smallestMatchSize)) {
                     MapUtility::debug("Smallest match seen so far\n");
-                    $colour = $candidate;
-                    $matchSize = $range;
-                    $matchKey = $key;
+                    $smallestMatchColour = $candidate;
+                    $smallestMatchSize = $range;
+                    $smallestMatchKey = $key;
 
-                    $tag = $scaleEntry['tag'];
+                    $tag = $scaleEntry->tag;
                 } else {
                     MapUtility::debug("But bigger than existing match\n");
                 }
             }
         }
 
-        return array($colour, $matchKey, $tag);
+        return array($smallestMatchColour, $smallestMatchKey, $tag);
     }
 
     public function asConfigData()
@@ -196,13 +176,7 @@ class MapScale extends MapItem
 
         $configEntries = array();
         foreach ($this->entries as $entry) {
-            $configEntries[] = array(
-                'min' => $entry['bottom'],
-                'max' => $entry['top'],
-                'tag' => $entry['tag'],
-                'c1' => $entry['c1']->asArray(),
-                'c2' => (isset($entry['c2']) ? $entry['c2']->asArray() : null)
-            );
+            $configEntries[] = $entry->asConfigData();
         }
         $config['entries'] = $configEntries;
 
@@ -223,52 +197,7 @@ class MapScale extends MapItem
         }
 
         foreach ($this->entries as $k => $entry) {
-            $top = rtrim(
-                rtrim(
-                    sprintf('%f', $entry['top']),
-                    '0'
-                ),
-                $decimalPoint
-            );
-
-            $bottom = rtrim(
-                rtrim(
-                    sprintf('%f', $entry['bottom']),
-                    '0'
-                ),
-                $decimalPoint
-            );
-
-            if ($bottom > $this->owner->kilo) {
-                $bottom = StringUtility::formatNumberWithMetricSuffix($entry['bottom'], $this->owner->kilo);
-            }
-
-            if ($top > $this->owner->kilo) {
-                $top = StringUtility::formatNumberWithMetricSuffix($entry['top'], $this->owner->kilo);
-            }
-
-            $tag = (isset($entry['tag']) ? $entry['tag'] : '');
-
-            if (is_null($entry['c2']) || $entry['c1']->equals($entry['c2'])) {
-                $output .= sprintf(
-                    "\tSCALE %s %-4s %-4s   %s   %s\n",
-                    $this->name,
-                    $bottom,
-                    $top,
-                    $entry['c1']->asConfig(),
-                    $tag
-                );
-            } else {
-                $output .= sprintf(
-                    "\tSCALE %s %-4s %-4s   %s  %s  %s\n",
-                    $this->name,
-                    $bottom,
-                    $top,
-                    $entry['c1']->asConfig(),
-                    $entry['c2']->asConfig(),
-                    $tag
-                );
-            }
+            $output .= $entry->asConfig($this->name, $this->owner->kilo, $decimalPoint);
         }
 
         if ($output != '') {
@@ -283,11 +212,9 @@ class MapScale extends MapItem
         $max = -999999999999999999999;
         $min = -$max;
 
-        $colours = $this->entries;
-
-        foreach ($colours as $colour) {
-            $min = min($colour['bottom'], $min);
-            $max = max($colour['top'], $max);
+        foreach ($this->entries as $entry) {
+            $min = min($entry->bottom, $min);
+            $max = max($entry->top, $max);
         }
 
         return array($min, $max);
@@ -301,8 +228,8 @@ class MapScale extends MapItem
 
     private function scaleEntryCompare($left, $right)
     {
-        $lower = $left['bottom'] - $right['bottom'];
-        $upper = $left['top'] - $right['top'];
+        $lower = $left->bottom - $right->bottom;
+        $upper = $left->top - $right->top;
 
         if ($lower == 0) {
             return $upper;

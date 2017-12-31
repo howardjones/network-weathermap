@@ -74,6 +74,37 @@ class Legend extends MapItem
     }
 
 
+    /**
+     * @param Point $newPosition
+     */
+    public function setPosition($newPosition)
+    {
+        $this->keypos = $newPosition;
+    }
+
+
+
+    public function setColour($name, $colour)
+    {
+        $valid = array(
+            'KEYTEXT' => 'keytextcolour',
+            'KEYBG' => 'keybgcolour',
+            'KEYOUTLINE' => 'keyoutlinecolour',
+            'SCALEMISS' => 'scalemisscolour'
+        );
+
+        $k = strtoupper($name);
+
+        if (array_key_exists($k, $valid)) {
+            $prop = $valid[$k];
+            $this->$prop = $colour;
+            $this->colourtable[$name] = $colour;
+        } else {
+            MapUtility::warn('Unexpected colour name in WeatherMapScale->SetColour');
+        }
+    }
+
+
     private function drawLegendImage($gdTargetImage, $gdScaleImage)
     {
         $xTarget = $this->keypos->x;
@@ -124,10 +155,10 @@ class Legend extends MapItem
 
         // $config['pos'] = array($this->keypos->x, $this->keypos->y);
         // $config['font'] = $this->keyfont->asConfigData();
-        $config['textcolour'] = $this->keytextcolour;
-        $config['bgcolour'] = $this->keybgcolour;
-        $config['outlinecolour'] = $this->keyoutlinecolour;
-        $config['misscolour'] = $this->scalemisscolour;
+        $config['textcolour'] = $this->keytextcolour->asArray();
+        $config['bgcolour'] = $this->keybgcolour->asArray();
+        $config['outlinecolour'] = $this->keyoutlinecolour->asArray();
+        $config['misscolour'] = $this->scalemisscolour->asArray();
         $config['style'] = $this->keystyle;
         $config['size'] = $this->keysize;
 
@@ -203,7 +234,29 @@ class Legend extends MapItem
         return $output;
     }
 
-    public function draw()
+
+    public function draw($gdTargetImage)
+    {
+        MapUtility::debug("New scale\n");
+        // don't draw if the position is the default -1,-1
+        if (null === $this->keypos || $this->keypos->x == -1 && $this->keypos->y == -1) {
+            return;
+        }
+
+        MapUtility::debug("New scale - still drawing\n");
+        $this->scale->sort();
+        $gdScaleImage = null;
+
+//        $legend = new Legend($this->name, $this->owner, $this);
+//
+//        $this->copyToLegend($legend);
+        $gdScaleImage = $this->drawLegend();
+
+        $this->drawLegendImage($gdTargetImage, $gdScaleImage);
+        $this->createImageMapArea($gdScaleImage);
+    }
+
+    public function drawLegend()
     {
         switch ($this->keystyle) {
             case 'classic':

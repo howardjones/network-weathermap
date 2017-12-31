@@ -1692,17 +1692,20 @@ class ConfigReader
 // TODO: refactor this - it doesn't need to be one big handler anymore (multiple regexps for different styles?)
     private function handleSCALE($fullcommand, $args, $matches)
     {
+
         // The default scale name is DEFAULT
         if ($matches[1] == '') {
-            $matches[1] = 'DEFAULT';
+            $scaleName = 'DEFAULT';
         } else {
-            $matches[1] = trim($matches[1]);
+            $scaleName = trim($matches[1]);
         }
 
-        if (!isset($this->mapObject->scales[$matches[1]])) {
-            $this->mapObject->scales[$matches[1]] = new MapScale($matches[1], $this->mapObject);
+        if (!isset($this->mapObject->scales[$scaleName])) {
+            $this->mapObject->scales[$scaleName] = new MapScale($scaleName, $this->mapObject);
+            $this->mapObject->legends[$scaleName] = new Legend($scaleName, $this->mapObject,
+                $this->mapObject->scales[$scaleName]);
         }
-        $newscale = $this->mapObject->scales[$matches[1]];
+        $newScale = $this->mapObject->scales[$scaleName];
 
         $key = $matches[2] . '_' . $matches[3];
         $tag = $matches[11];
@@ -1725,7 +1728,7 @@ class ConfigReader
             $colour2 = new Colour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
         }
 
-        $newscale->AddSpan($bottom, $top, $colour1, $colour2, $tag);
+        $newScale->AddSpan($bottom, $top, $colour1, $colour2, $tag);
 
         return true;
     }
@@ -1737,12 +1740,18 @@ class ConfigReader
         if ($whichKey == '') {
             $whichKey = 'DEFAULT';
         }
-        $this->mapObject->keystyle[$whichKey] = strtolower($matches[2]);
+        $style = strtolower($matches[2]);
 
+        $this->mapObject->keystyle[$whichKey] = $style;
+        $this->mapObject->legends[$whichKey]->keystyle = $style;
+
+        // for horizontal and vertical, there's a size parameter too
         if (isset($matches[3]) && $matches[3] != '') {
             $this->mapObject->keysize[$whichKey] = $matches[3];
+            $this->mapObject->legends[$whichKey]->keysize = $matches[3];
         } else {
             $this->mapObject->keysize[$whichKey] = $this->mapObject->keysize['DEFAULT'];
+            $this->mapObject->legends[$whichKey]->keysize = $this->mapObject->legends['DEFAULT']->keysize;
         }
 
         return true;

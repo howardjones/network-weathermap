@@ -2,8 +2,6 @@
 
 namespace Weathermap\Core;
 
-use Weathermap\Core\ImageUtility;
-use Weathermap\Core\Legend;
 
 /**
  * Collect together everything scale-related
@@ -14,20 +12,7 @@ use Weathermap\Core\Legend;
 class MapScale extends MapItem
 {
     public $entries;
-    public $colourtable;
-
-    public $keypos;
-    public $keytitle;
-    public $keystyle;
-    public $keysize;
-    public $keytextcolour;
-    public $keyoutlinecolour;
-    public $keybgcolour;
     public $scalemisscolour;
-    /** @var Font */
-    public $keyfont;
-
-    public $scaleType;
 
     public function __construct($name, &$owner)
     {
@@ -36,16 +21,8 @@ class MapScale extends MapItem
         $this->name = $name;
 
         $this->inheritedFieldList = array(
-            'scaleType' => 'percent',
-            'keystyle' => 'classic',
             'entries' => array(),
-            'keybgcolour' => new Colour(255, 255, 255),
-            'keyoutlinecolour' => new Colour(0, 0, 0),
-            'keytextcolour' => new Colour(0, 0, 0),
             'scalemisscolour' => new Colour(255, 255, 255),
-            'keypos' => null,
-            'keytitle' => 'Traffic Load',
-            'keysize' => 0
         );
 
         $this->reset($owner);
@@ -59,37 +36,12 @@ class MapScale extends MapItem
             $this->$fld = $this->inheritedFieldList[$fld];
         }
 
-        //        $this->setColour("KEYBG", new Colour(255, 255, 255));
-        //        $this->setColour("KEYOUTLINE", new Colour(0, 0, 0));
-        //        $this->setColour("KEYTEXT", new Colour(0, 0, 0));
-        //        $this->setColour("SCALEMISS", new Colour(255, 255, 255));
-
         assert(isset($owner));
     }
 
     public function myType()
     {
         return 'SCALE';
-    }
-
-    public function copyToLegend($legend)
-    {
-        $properties = array(
-            'keystyle',
-            'keypos',
-            'keytitle',
-            'keyfont',
-            'keybgcolour',
-            'keytextcolour',
-            'keybgcolour',
-            'scalemisscolour',
-            'keyoutlinecolour',
-            'keysize'
-        );
-
-        foreach ($properties as $prop) {
-            $legend->$prop = $this->$prop;
-        }
     }
 
     public function populateDefaultsIfNecessary()
@@ -133,26 +85,6 @@ class MapScale extends MapItem
         $this->entries[$key]['label'] = '';
 
         MapUtility::debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
-    }
-
-    public function setColour($name, $colour)
-    {
-        $valid = array(
-            'KEYTEXT' => 'keytextcolour',
-            'KEYBG' => 'keybgcolour',
-            'KEYOUTLINE' => 'keyoutlinecolour',
-            'SCALEMISS' => 'scalemisscolour'
-        );
-
-        $k = strtoupper($name);
-
-        if (array_key_exists($k, $valid)) {
-            $prop = $valid[$k];
-            $this->$prop = $colour;
-            $this->colourtable[$name] = $colour;
-        } else {
-            MapUtility::warn('Unexpected colour name in WeatherMapScale->SetColour');
-        }
     }
 
     public function colourFromValue($value, $itemName = '', $isPercentage = true, $showScaleWarnings = true)
@@ -262,15 +194,6 @@ class MapScale extends MapItem
     {
         $config = parent::asConfigData();
 
-        // $config['pos'] = array($this->keypos->x, $this->keypos->y);
-        // $config['font'] = $this->keyfont->asConfigData();
-        $config['textcolour'] = $this->keytextcolour;
-        $config['bgcolour'] = $this->keybgcolour;
-        $config['outlinecolour'] = $this->keyoutlinecolour;
-        $config['misscolour'] = $this->scalemisscolour;
-        $config['style'] = $this->keystyle;
-        $config['size'] = $this->keysize;
-
         $configEntries = array();
         foreach ($this->entries as $entry) {
             $configEntries[] = array(
@@ -348,12 +271,6 @@ class MapScale extends MapItem
             }
         }
 
-        // TODO: TEMPORARY
-        $legend = new Legend($this->name, $this->owner, $this);
-        $this->copyToLegend($legend);
-
-        $output .= $legend->getConfig();
-
         if ($output != '') {
             $output = '# All settings for scale ' . $this->name . "\n" . $output . "\n";
         }
@@ -376,22 +293,13 @@ class MapScale extends MapItem
         return array($min, $max);
     }
 
-    /**
-     * @param Point $newPosition
-     */
-    public function setPosition($newPosition)
+    public function sort()
     {
-        $this->keypos = $newPosition;
+        usort($this->entries, array('Weathermap\\Core\\MapScale', 'scaleEntryCompare'));
     }
 
 
-    private function sortScale()
-    {
-        usort($this->entries, array('Weathermap\\Core\\MapScale', 'scaleEntrySort'));
-    }
-
-
-    private function scaleEntrySort($left, $right)
+    private function scaleEntryCompare($left, $right)
     {
         $lower = $left['bottom'] - $right['bottom'];
         $upper = $left['top'] - $right['top'];
@@ -402,69 +310,5 @@ class MapScale extends MapItem
 
         return $lower;
     }
-
-    public function draw($gdTargetImage)
-    {
-        MapUtility::debug("New scale\n");
-        // don't draw if the position is the default -1,-1
-        if (null === $this->keypos || $this->keypos->x == -1 && $this->keypos->y == -1) {
-            return;
-        }
-
-        MapUtility::debug("New scale - still drawing\n");
-        $this->sortScale();
-        $gdScaleImage = null;
-
-        $legend = new Legend($this->name, $this->owner, $this);
-
-        $this->copyToLegend($legend);
-        $gdScaleImage = $legend->draw();
-
-        $this->drawLegendImage($gdTargetImage, $gdScaleImage);
-        $this->createImageMapArea($gdScaleImage);
-    }
-
-    private function drawLegendImage($gdTargetImage, $gdScaleImage)
-    {
-        $xTarget = $this->keypos->x;
-        $yTarget = $this->keypos->y;
-        $width = imagesx($gdScaleImage);
-        $height = imagesy($gdScaleImage);
-
-        MapUtility::debug("New scale - blitting\n");
-        imagecopy($gdTargetImage, $gdScaleImage, $xTarget, $yTarget, 0, 0, $width, $height);
-    }
-
-    /**
-     * @param $gdTargetImage
-     * @param $gdScaleImage
-     */
-    private function createImageMapArea($gdScaleImage)
-    {
-        $xTarget = $this->keypos->x;
-        $yTarget = $this->keypos->y;
-        $width = imagesx($gdScaleImage);
-        $height = imagesy($gdScaleImage);
-
-        $areaName = 'LEGEND:' . $this->name;
-
-        $newArea = new HTMLImageMapAreaRectangle(
-            array(
-                array(
-                    $xTarget,
-                    $yTarget,
-                    $xTarget + $width,
-                    $yTarget + $height
-                )
-            ),
-            $areaName,
-            ''
-        );
-        $this->owner->imap->addArea($newArea);
-
-        // TODO: stop tracking z-order separately. addArea() should take the z layer
-        $this->imagemapAreas[] = $newArea;
-    }
-
 
 }

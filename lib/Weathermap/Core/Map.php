@@ -9,7 +9,7 @@ namespace Weathermap\Core;
 
 use Weathermap\Core\HTMLImagemap;
 use Weathermap\Core\PluginManager;
-
+use Weathermap\Core\Legend;
 
 class Map extends MapBase
 {
@@ -239,6 +239,8 @@ class Map extends MapBase
         $this->pluginManager->loadAllPlugins();
 
         $this->scales['DEFAULT'] = new MapScale('DEFAULT', $this);
+        $this->legends['DEFAULT'] = new Legend('DEFAULT', $this, $this->scales['DEFAULT']);
+
         $this->populateDefaultColours();
 
         MapUtility::debug("WeatherMap class Reset() complete\n");
@@ -626,7 +628,7 @@ class Map extends MapBase
         }
 
         $this->populateDefaultScales();
-        $this->replicateScaleSettings();
+        $this->replicateLegendSettings();
         $this->buildZLayers();
         $this->resolveRelativePositions();
         $this->updateMaxValues();
@@ -648,28 +650,29 @@ class Map extends MapBase
         }
 
         $this->scales['none'] = new MapScale('none', $this);
+        $this->legends['none'] = new Legend('none', $this, $this->scales['none']);
     }
 
     /**
-     * Temporary function to bridge between the old and new
+     * TODO: Temporary function to bridge between the old and new
      * scale-worlds. Just until the ConfigReader updates these
      * directly.
      */
-    private function replicateScaleSettings()
+    private function replicateLegendSettings()
     {
-        foreach ($this->scales as $scaleName => $scaleObject) {
+        foreach ($this->legends as $scaleName => $legendObject) {
             // These are currently global settings for a map, not per-scale
-            $scaleObject->keyoutlinecolour = $this->colourtable['KEYOUTLINE'];
-            $scaleObject->keytextcolour = $this->colourtable['KEYTEXT'];
-            $scaleObject->keybgcolour = $this->colourtable['KEYBG'];
-            $scaleObject->keyfont = $this->fonts->getFont($this->keyfont);
+            $legendObject->keyoutlinecolour = $this->colourtable['KEYOUTLINE'];
+            $legendObject->keytextcolour = $this->colourtable['KEYTEXT'];
+            $legendObject->keybgcolour = $this->colourtable['KEYBG'];
+            $legendObject->keyfont = $this->fonts->getFont($this->keyfont);
 
             if (isset($this->keyx[$scaleName])) {
-                $scaleObject->keypos = new Point($this->keyx[$scaleName], $this->keyy[$scaleName]);
-                $scaleObject->keystyle = $this->keystyle[$scaleName];
-                $scaleObject->keytitle = $this->keytext[$scaleName];
+                $legendObject->keypos = new Point($this->keyx[$scaleName], $this->keyy[$scaleName]);
+                $legendObject->keystyle = $this->keystyle[$scaleName];
+                $legendObject->keytitle = $this->keytext[$scaleName];
                 if (isset($this->keysize[$scaleName])) {
-                    $scaleObject->keysize = $this->keysize[$scaleName];
+                    $legendObject->keysize = $this->keysize[$scaleName];
                 }
             }
         }
@@ -881,6 +884,7 @@ class Map extends MapBase
 
         foreach ($this->scales as $scaleName => $scale) {
             $output .= $scale->getConfig();
+            $output .= $this->legends[$scaleName]->getConfig();
         }
         $output .= "\n";
 
@@ -1228,8 +1232,8 @@ class Map extends MapBase
         sort($allLayers);
 
         // stuff the scales into the seen-items list, so they are rendered along with everything else
-        foreach ($this->scales as $scaleName => $scaleObject) {
-            array_push($this->seenZLayers[1000], $scaleObject);
+        foreach ($this->legends as $scaleName => $legendObject) {
+            array_push($this->seenZLayers[1000], $legendObject);
         }
 
         foreach ($allLayers as $z) {
@@ -1791,8 +1795,8 @@ class Map extends MapBase
         $conf["pngfile"] = $this->imageoutputfile;
         $conf["htmlfile"] = $this->htmloutputfile;
         $conf["bgfile"] = $this->background;
-        $conf['imagemap'] = array();
 
+        $conf['imagemap'] = array();
         foreach ($this->imagemapAreas as $areaname) {
             $area = $this->imap->getByName($areaname);
             $conf['imagemap'] [] = $area->asJSONData();
@@ -1809,12 +1813,14 @@ class Map extends MapBase
         $conf = array(
             'global' => $this->asConfigData(),
             'scales' => array(),
+            'legends' => array(),
             'nodes' => array(),
             'links' => array()
         );
 
         foreach ($this->scales as $scale) {
             $conf['scales'][$scale->name] = $scale->asConfigData();
+            $conf['legends'][$scale->name] = $this->legends[$scale->name]->asConfigData();
         }
 
         foreach ($this->nodes as $node) {

@@ -1284,14 +1284,11 @@ class MapNode extends MapDataItem
             'max_bandwidth_in_cfg' => $this->maxValuesConfigured[IN],
             "max_bandwidth_out" => $this->maxValues[OUT],
             'max_bandwidth_out_cfg' => $this->maxValuesConfigured[OUT],
+            'name' => $this->name
         );
 
         if (array_key_exists($name, $translations)) {
             return $translations[$name];
-        }
-        // TODO - at some point, we can remove this bit, and limit access to ONLY the things listed above
-        if (property_exists($this, $name)) {
-            return $this->$name;
         }
 
         throw new WeathermapRuntimeWarning("NoSuchProperty");

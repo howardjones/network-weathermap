@@ -3,6 +3,7 @@
 namespace Weathermap\Core;
 
 use Weathermap\Core\ImageUtility;
+use Weathermap\Core\Legend;
 
 /**
  * Collect together everything scale-related
@@ -412,7 +413,6 @@ class MapScale extends MapItem
 
     private function sortScale()
     {
-        // $colours = $this->colours[$scaleName];
         usort($this->entries, array('Weathermap\\Core\\MapScale', 'scaleEntrySort'));
     }
 
@@ -438,8 +438,11 @@ class MapScale extends MapItem
         }
 
         MapUtility::debug("New scale - still drawing\n");
-
+        $this->sortScale();
         $gdScaleImage = null;
+
+//        $l = new Legend($this, $this->keystyle);
+//        $gdScaleImage = $l->draw();
 
         switch ($this->keystyle) {
             case 'classic':
@@ -459,37 +462,13 @@ class MapScale extends MapItem
                 break;
         }
 
-        $xTarget = $this->keypos->x;
-        $yTarget = $this->keypos->y;
-        $width = imagesx($gdScaleImage);
-        $height = imagesy($gdScaleImage);
-
-        MapUtility::debug("New scale - blitting\n");
-        imagecopy($gdTargetImage, $gdScaleImage, $xTarget, $yTarget, 0, 0, $width, $height);
-
-        $areaName = 'LEGEND:' . $this->name;
-
-        $newArea = new HTMLImageMapAreaRectangle(
-            array(
-                array(
-                    $xTarget,
-                    $yTarget,
-                    $xTarget + $width,
-                    $yTarget + $height
-                )
-            ),
-            $areaName,
-            ''
-        );
-        $this->owner->imap->addArea($newArea);
-
-        // TODO: stop tracking z-order separately. addArea() should take the z layer
-        $this->imagemapAreas[] = $newArea;
+        $this->drawScaleImage($gdTargetImage, $gdScaleImage);
+        $this->createImageMapArea($gdScaleImage);
     }
 
     private function drawLegendClassic($useTags = false)
     {
-        $this->sortScale();
+//        $this->sortScale();
 
         $nScales = $this->spanCount();
 
@@ -828,6 +807,48 @@ class MapScale extends MapItem
         }
 
         return $gdScaleImage;
+    }
+
+    private function drawScaleImage($gdTargetImage, $gdScaleImage)
+    {
+        $xTarget = $this->keypos->x;
+        $yTarget = $this->keypos->y;
+        $width = imagesx($gdScaleImage);
+        $height = imagesy($gdScaleImage);
+
+        MapUtility::debug("New scale - blitting\n");
+        imagecopy($gdTargetImage, $gdScaleImage, $xTarget, $yTarget, 0, 0, $width, $height);
+    }
+
+    /**
+     * @param $gdTargetImage
+     * @param $gdScaleImage
+     */
+    private function createImageMapArea($gdScaleImage)
+    {
+        $xTarget = $this->keypos->x;
+        $yTarget = $this->keypos->y;
+        $width = imagesx($gdScaleImage);
+        $height = imagesy($gdScaleImage);
+
+        $areaName = 'LEGEND:' . $this->name;
+
+        $newArea = new HTMLImageMapAreaRectangle(
+            array(
+                array(
+                    $xTarget,
+                    $yTarget,
+                    $xTarget + $width,
+                    $yTarget + $height
+                )
+            ),
+            $areaName,
+            ''
+        );
+        $this->owner->imap->addArea($newArea);
+
+        // TODO: stop tracking z-order separately. addArea() should take the z layer
+        $this->imagemapAreas[] = $newArea;
     }
 
 

@@ -4,6 +4,23 @@ namespace Weathermap\Core;
 
 class ImageUtility
 {
+    /**
+     * @param $boxWidth
+     * @param $boxHeight
+     * @return resource
+     */
+    public static function createTransparentImage($boxWidth, $boxHeight)
+    {
+        $gdScaleImage = imagecreatetruecolor($boxWidth, $boxHeight);
+
+        // Start with a transparent box, in case the fill or outline colour is 'none'
+        imagesavealpha($gdScaleImage, true);
+        $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
+        imagefill($gdScaleImage, 0, 0, $nothing);
+
+        return $gdScaleImage;
+    }
+
     public static function drawMarkerCross($gdImage, $colour, $point, $size = 5)
     {
         $relativeMoves = array(

@@ -7,6 +7,8 @@
 
 namespace Weathermap\Core;
 
+use Weathermap\Core\ImageUtility;
+
 class MapNode extends MapDataItem
 {
     public $drawable;
@@ -323,7 +325,7 @@ class MapNode extends MapDataItem
         // (so we can have close-spaced icons better)
 
         // create an image of that size and draw into it
-        $nodeImageRef = $this->createTransparentImage($totalBoundingBox->width(), $totalBoundingBox->height());
+        $nodeImageRef = ImageUtility::createTransparentImage($totalBoundingBox->width(), $totalBoundingBox->height());
 
         $labelBox->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
         $iconBox->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
@@ -737,7 +739,7 @@ class MapNode extends MapDataItem
         MapUtility::debug('Artificial Icon type ' . $this->iconfile . " for $this->name\n");
         // this is an artificial icon - we don't load a file for it
 
-        $iconImageRef = $this->createTransparentImage($this->iconscalew, $this->iconscaleh);
+        $iconImageRef = ImageUtility::createTransparentImage($this->iconscalew, $this->iconscaleh);
 
         list($finalFillColour, $finalInkColour) = $this->calculateAICONColours($labelColour, $map);
 
@@ -1237,20 +1239,6 @@ class MapNode extends MapDataItem
             }
         }
         return array($finalFillColour, $finalInkColour);
-    }
-
-    /**
-     * @return resource
-     */
-    private function createTransparentImage($width, $height)
-    {
-        $iconImageRef = imagecreatetruecolor($width, $height);
-        imagesavealpha($iconImageRef, true);
-
-        $nothing = imagecolorallocatealpha($iconImageRef, 128, 0, 0, 127);
-        imagefill($iconImageRef, 0, 0, $nothing);
-
-        return $iconImageRef;
     }
 
     public function selfValidate()

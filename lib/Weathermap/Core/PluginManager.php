@@ -62,21 +62,12 @@ class PluginManager
 
             MapUtility::debug("full class path is $classFullPath\n");
 
-            $newPlugin = new Plugin();
-            $newPlugin->type = $pluginType;
-            $newPlugin->name = $class;
-            $newPlugin->source = $classFullPath;
-            $newPlugin->object = new $classFullPath;
-            $newPlugin->active = true;
-
-            $this->plugins[$pluginType][$class] = $newPlugin;
-            $loaded++;
-
-            if (!isset($this->plugins[$pluginType][$class]->object)) {
-                MapUtility::debug("** Failed to create an object for plugin $pluginType/$class\n");
-                $this->plugins[$pluginType][$class]->active = false;
-                $loaded--;
+            $newPlugin = new Plugin($pluginType, $class, $classFullPath);
+            if ($newPlugin->load()) {
+                $loaded++;
             }
+            $this->plugins[$pluginType][$class] = $newPlugin;
+
         }
         MapUtility::debug("Finished loading $loaded $pluginType plugins.\n");
     }
@@ -88,26 +79,30 @@ class PluginManager
      */
     private function getPluginFileList($pluginType, $searchDirectory)
     {
+        $pluginList = array();
+
         $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
 
-        $pluginList = array();
         if (!$directoryHandle) {
             MapUtility::warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
+            return $pluginList;
         }
 
         while ($file = readdir($directoryHandle)) {
             $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
 
             if (!is_file($fullFilePath)
-                || !preg_match('/\.php$/', $fullFilePath)
-                || preg_match('/^Base\.php/', $file)
-                || preg_match('/^Utility\.php/', $file)
+                || substr($file,-4,4) != '.php'
+                || $file == 'Base.php'
+                || $file == 'Utility.php'
             ) {
                 continue;
             }
 
             $pluginList[$fullFilePath] = $file;
         }
+        closedir($directoryHandle);
+
         return $pluginList;
     }
 
@@ -123,9 +118,6 @@ class PluginManager
         if (!$directoryHandle) { // try to find it with the script, if the relative path fails
             $srcdir = substr($_SERVER['argv'][0], 0, strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
             $directoryHandle = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
-            if ($directoryHandle) {
-                $dir = $srcdir . DIRECTORY_SEPARATOR . $dir;
-            }
         }
 
         return $directoryHandle;
@@ -146,12 +138,7 @@ class PluginManager
             foreach ($this->plugins[$type] as $name => $pluginEntry) {
                 MapUtility::debug("Running $name" . "->Init()\n");
 
-                $ret = $pluginEntry->object->init($this->map);
-
-                if (!$ret) {
-                    MapUtility::debug("Marking $name plugin as inactive, since Init() failed\n");
-                    $this->plugins[$type][$name]->active = false;
-                }
+                $pluginEntry->init($this->map);
             }
         }
         MapUtility::debug("Finished Initialising Plugins...\n");

@@ -2,6 +2,8 @@
 
 namespace Weathermap\Core;
 
+use Weathermap\Core\ImageUtility;
+
 /**
  * Collect together everything scale-related
  *
@@ -407,6 +409,26 @@ class MapScale extends MapItem
         $this->keypos = $newPosition;
     }
 
+
+    private function sortScale()
+    {
+        // $colours = $this->colours[$scaleName];
+        usort($this->entries, array('Weathermap\\Core\\MapScale', 'scaleEntrySort'));
+    }
+
+
+    private function scaleEntrySort($left, $right)
+    {
+        $lower = $left['bottom'] - $right['bottom'];
+        $upper = $left['top'] - $right['top'];
+
+        if ($lower == 0) {
+            return $upper;
+        }
+
+        return $lower;
+    }
+
     public function draw($gdTargetImage)
     {
         MapUtility::debug("New scale\n");
@@ -518,7 +540,7 @@ class MapScale extends MapItem
 
         MapUtility::debug("Scale Box is %dx%d\n", $boxWidth + 1, $boxHeight + 1);
 
-        $gdScaleImage = $this->createTransparentImage($boxWidth + 1, $boxHeight + 1);
+        $gdScaleImage = ImageUtility::createTransparentImage($boxWidth + 1, $boxHeight + 1);
 
         $bgColour = $this->keybgcolour;
         $outlineColour = $this->keyoutlinecolour;
@@ -594,12 +616,6 @@ class MapScale extends MapItem
         return $gdScaleImage;
     }
 
-    private function sortScale()
-    {
-        // $colours = $this->colours[$scaleName];
-        usort($this->entries, array('Weathermap\\Core\\MapScale', 'scaleEntrySort'));
-    }
-
     private function drawLegendHorizontal($keyWidth = 400)
     {
 
@@ -630,7 +646,7 @@ class MapScale extends MapItem
 
         MapUtility::debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
 
-        $gdScaleImage = $this->createTransparentImage($boxRight + 1, $boxBottom + 1);
+        $gdScaleImage = ImageUtility::createTransparentImage($boxRight + 1, $boxBottom + 1);
 
         /** @var Colour $bgColour */
         $bgColour = $this->keybgcolour;
@@ -744,7 +760,7 @@ class MapScale extends MapItem
         $scaleBottom = $scaleTop + $keyHeight;
         $boxBottom = $scaleBottom + $scaleFactor + $tileHeight / 2 + 4;
 
-        $gdScaleImage = $this->createTransparentImage($boxRight + 1, $boxBottom + 1);
+        $gdScaleImage = ImageUtility::createTransparentImage($boxRight + 1, $boxBottom + 1);
 
         /** @var Colour $bgColour */
         $bgColour = $this->keybgcolour;
@@ -814,33 +830,5 @@ class MapScale extends MapItem
         return $gdScaleImage;
     }
 
-    private function scaleEntrySort($left, $right)
-    {
-        $lower = $left['bottom'] - $right['bottom'];
-        $upper = $left['top'] - $right['top'];
 
-        if ($lower==0) {
-            return $upper;
-        }
-
-        return $lower;
-    }
-
-    /**
-     * @param $boxWidth
-     * @param $boxHeight
-     * @return resource
-     */
-    private function createTransparentImage($boxWidth, $boxHeight)
-    {
-        // TODO - there is a similar/identical method in WeatherMapNode
-        $gdScaleImage = imagecreatetruecolor($boxWidth, $boxHeight);
-
-        // Start with a transparent box, in case the fill or outline colour is 'none'
-        imagesavealpha($gdScaleImage, true);
-        $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
-        imagefill($gdScaleImage, 0, 0, $nothing);
-
-        return $gdScaleImage;
-    }
 }

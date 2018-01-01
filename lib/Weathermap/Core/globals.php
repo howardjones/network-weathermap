@@ -2,6 +2,10 @@
 
 namespace Weathermap\Core;
 
+// TODO: This stuff should be in some kind of App/Runtime object
+
+// (and it's mostly to do with logging, so a proper logging class would take the rest)
+
 $weathermap_debugging = false;
 $weathermap_debugging_readdata = false;
 $weathermap_map = '';

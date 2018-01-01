@@ -1,0 +1,14 @@
+#!/usr/bin/php
+<?php
+
+// PHP Weathermap 1.0.0dev
+// Copyright Howard Jones, 2005-2018 howie@thingy.com
+// http://www.network-weathermap.com/
+// Released under the GNU Public License
+
+use Weathermap\CLI\Runner;
+
+require_once __DIR__ . '/lib/all.php';
+
+$run = new Runner();
+$run->run();

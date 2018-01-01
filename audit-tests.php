@@ -1,9 +1,8 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: howie
- * Date: 26/05/16
- * Time: 20:26
+ * Scan through all the .conf files in test-suite/tests and make sure there's a reference image for each.
+ * If there isn't, output the appropriate weathermap cli command to generate one.
  */
 
 $testdir = "test-suite/tests/";

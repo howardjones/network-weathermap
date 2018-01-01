@@ -1,7 +1,10 @@
 
 # Common settings for all test environments
-CACTI_VERSION="0.8.8h"
+# CACTI_VERSION="0.8.8h"
+CACTI_VERSION="1.1.29"
+
 # WEATHERMAP_VERSION can also be 'git' to clone from the local repository on the host
 # or 'rsync' to rsync local directory on host (even with no git commits)
-WEATHERMAP_VERSION="git"
+# if it is a version number, it looks for the LOCAL zip file with that version number in the releases/ directory
+WEATHERMAP_VERSION="rsync"
 

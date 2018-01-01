@@ -94,7 +94,7 @@ class ScaleEntry
             );
         } else {
             $output .= sprintf(
-                "\tSCALE %s %-4s %-4s   %s  %s  %s\n",
+                "\tSCALE %s %-4s %-4s   %s  %s   %s\n",
                 $scaleName,
                 $bottom,
                 $top,

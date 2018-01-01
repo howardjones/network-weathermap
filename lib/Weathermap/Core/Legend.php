@@ -306,7 +306,6 @@ class Legend extends MapItem
                     $labelString = $scaleEntry->tag;
                 }
             }
-//            $this->scale->entries[$index]->label = $labelString;
             $scaleEntry->label = $labelString;
             list($w,) = $fontObject->calculateImageStringSize($labelString);
             $maxTextSize = max($maxTextSize, $w);

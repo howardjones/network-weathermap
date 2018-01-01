@@ -18,6 +18,7 @@ class MapScaleTest extends \PHPUnit_Framework_TestCase
      * @var MapScale
      */
     protected $object;
+    protected $wmap;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -70,5 +71,31 @@ class MapScaleTest extends \PHPUnit_Framework_TestCase
         list($c, $key, $tag) = $this->object->ColourFromValue(200);
         $this->assertInstanceOf("Weathermap\\Core\\Colour", $c);
         $this->assertTrue($c->equals(new Colour(255, 0, 0)));
+
+        $this->object->addSpan(-10, 0, new Colour(0, 255, 0));
+
+        list($min, $max) = $this->object->FindScaleExtent();
+
+        $this->assertEquals(-10, $min);
+        $this->assertEquals(100, $max);
+
+        $this->object->sort();
+
+        $this->assertEquals(-10, $this->object->entries[0]->bottom);
+        $this->assertEquals(0, $this->object->entries[0]->top);
+        $this->assertEquals(10, $this->object->spanCount());
+
+        $this->object->addSpan(-10, -5, new Colour(128, 255, 0));
+
+        list($min, $max) = $this->object->FindScaleExtent();
+
+        $this->assertEquals(-10, $min);
+        $this->assertEquals(100, $max);
+
+        $this->object->sort();
+
+        $this->assertEquals(-10, $this->object->entries[0]->bottom);
+        $this->assertEquals(-5, $this->object->entries[0]->top);
+        $this->assertEquals(11, $this->object->spanCount());
     }
 }

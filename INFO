@@ -8,3 +8,4 @@ name=weathermap
 version=1.0.0
 email=howie@thingy.com
 url=http://www.network-weathermap.com/versions.php
+nosync = configs, output, *.html, *.conf, *.txt, *.png

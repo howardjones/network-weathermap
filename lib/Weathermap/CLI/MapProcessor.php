@@ -46,7 +46,7 @@ class MapProcessor
                 ->setDescription('Show version info and quit'),
             Option::create('h', 'help', GetOpt::NO_ARGUMENT)
                 ->setDescription('Show this help and quit'),
-        );
+        ));
 
         // process arguments and catch user errors
         try {

@@ -27,6 +27,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	  develop.vm.box = "ubuntu/xenial64"
 	  develop.vm.network "forwarded_port", guest:80, host: 8016
 	  develop.vm.hostname = "weathermap-dev"
+	  develop.vm.post_up_message = "Cacti should be available on http://localhost:8016/"
+
   end
 
 #  config.vm.define :guitest do |guitest|

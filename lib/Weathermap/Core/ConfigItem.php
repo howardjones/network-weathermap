@@ -2,6 +2,8 @@
 
 namespace Weathermap\Core;
 
+// XXX - unused
+
 class ConfigItem
 {
     public $definedIn;

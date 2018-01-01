@@ -10,13 +10,9 @@
     }
   ],
   "require": {
-    "ulrichsg/getopt-php": "~3",
-    "monolog/monolog": "^1",
-    "pimple/pimple": "~3.0",
-    "erusev/parsedown": "^1.6"
+    "ulrichsg/getopt-php": "~3"
   },
   "require-dev": {
-    "slevomat/coding-standard": "~4.0",
     "phpunit/dbunit": "*",
     "codeclimate/php-test-reporter": "*",
     "phpunit/phpunit": "~5",
@@ -26,7 +22,6 @@
     "theseer/phpdox": "*",
     "codacy/coverage": "dev-master",
     "phpunit/php-code-coverage": "~4",
-    "phan/phan": "*",
     "jakub-onderka/php-parallel-lint": "^0.9.2",
     "johnkary/phpunit-speedtrap": "^1.1",
     "lstrojny/phpunit-clever-and-smart": "^0.5.0"

@@ -8,3 +8,6 @@ CACTI_VERSION="1.1.29"
 # if it is a version number, it looks for the LOCAL zip file with that version number in the releases/ directory
 WEATHERMAP_VERSION="rsync"
 
+# Select which php is active (5.6 or 7.1)
+#
+PHP_VERSION="5.6"

@@ -114,4 +114,4 @@ These are released under the Creative Commons Attribution 2.5 License
    http://creativecommons.org/licenses/by/2.5/
 
 Other libraries in the vendor/ directory are provided by third-parties. `composer info` will
-provide licensing information per component.
+provide licensing information per component for php components. 

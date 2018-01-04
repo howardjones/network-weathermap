@@ -32,6 +32,20 @@ plugin does, too.
 
 * __Cacti 1.0 Plugin__ - broken UI, broken poller. Code has all been moved and not even run once yet.
 
+### Using the dev version
+
+This git repo deliberately DOES NOT contain third party libraries (and if it does now, it won't soon).
+
+Dependencies are managed with bower. If you have never used it before, you will need to:
+
+* Install nodejs (and npm - which should come with it)
+* Install bower: `npm install -g bower`
+* Install [composer](https://getcomposer.org/)
+* Go to the weathermap checkout directory
+* `bower install` should install all the necessary javascript dependencies to the vendor/ directory.
+* `composer update` will grab the PHP dependencies for both the runtime and testing environments
+The release process collects up these files and puts them in the zip file, via the packing.list file(s). You only need to do this if you are working with the current development code.
+
 
 ### Work currently in progress:
 
@@ -47,11 +61,23 @@ plugin does, too.
 
 * Break down 'monster methods' into simpler ones. Identify groups within the larger classes for refactoring (e.g. plugin-related stuff in Map)
 
+    * Poller - a single runMaps() function currently does almost everything. Replace with Poller class for general environment setup, which
+    asks MapManager for the maps to run. Use a Runtime class per-map to contain all the knowledge
+    needed to run that map.
+    
+* Dependency Injection - there's some ugly stuff especially with logging and global variables. Switch to a real logger (planning on monolog), wrapped
+in a simple class to manage things like muting certain messages, and switching between debug and normal logging. Then find
+a better way (DI container?) to have that one logger object shared between the places that want to use it. This also has some
+side benefits - monolog can log to lots of destinations (syslog etc), in lots of formats (json, text, pretty coloured text), and
+can automatically do things like tag on memory usage and function call info for debug logs. 
+
 * Move as much generic database-related stuff out of the Cacti plugin and into MapManager - MapManager is testable, whereas 
-the Cacti plugin is not (easily).  
+the Cacti plugin is not (easily). Also, MapManager is currently a literal collection of every query that was in the 0.8.8 plugin, 
+which turns out to be quite a few. Breaking that down into global, map, and group objects would be a good thing.  
 
 * Make an abstraction layer for things like `read_config_option` in the UI, so it doesn't depend on Cacti being underneath. When someone wants to make a plugin/integration for a new
 application, it'll be a lot 'thinner' this way, too.
+
 
 ## Normal README
 
@@ -77,19 +103,6 @@ I'm trying managing feature requests with FeatHub. You can add features here, an
 
 [![Feature Requests](http://feathub.com/howardjones/network-weathermap?format=svg)](http://feathub.com/howardjones/network-weathermap)
 
-## Using the dev version
-
-This git repo deliberately DOES NOT contain third party libraries (and if it does now, it won't soon).
-
-Dependencies are managed with bower. If you have never used it before, you will need to:
-
-* Install nodejs (and npm - which should come with it)
-* Install bower: `npm install -g bower`
-* Install [composer](https://getcomposer.org/)
-* Go to the weathermap checkout directory
-* `bower install` should install all the necessary javascript dependencies to the vendor/ directory.
-* `composer update` will grab the PHP dependencies for both the runtime and testing environments
-The release process collects up these files and puts them in the zip file, via the packing.list file(s). You only need to do this if you are working with the current development code.
 
 ## Credits
 

@@ -16,13 +16,19 @@
  */
 
 
+// No autoloader within the Cacti environment, so manually load all those nicely-separated classes
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti10-plugin-hooks.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/ApplicationInterface.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/CactiApplicationInterface.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/MapManager.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Poller/poller-common.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Core/MapUtility.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Core/StringUtility.php";
+require_once dirname(__FILE__) . "/lib/Weathermap/Core/Utility.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Core/constants.php";
+
 
 function plugin_weathermap_version()
 {

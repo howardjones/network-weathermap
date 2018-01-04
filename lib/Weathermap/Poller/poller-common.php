@@ -2,22 +2,15 @@
 
 namespace Weathermap\Poller;
 
-use Weathermap\Core\StringUtility;
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\Map;
+use Weathermap\Integrations\Cacti\CactiApplicationInterface;
 use Weathermap\Integrations\MapManager;
+use Weathermap\Core\Utility;
 
 // common code used by the poller, the manual-run from the Cacti UI, and from the command-line manual-run.
 // this is the easiest way to keep it all consistent!
 
-function memoryCheck($note = "MEM")
-{
-    if (function_exists("memory_get_usage")) {
-        $memUsed = StringUtility::formatNumberWithMetricSuffix(memory_get_usage());
-        $memAllowed = ini_get("memory_limit");
-        MapUtility::debug("$note: memory_get_usage() says " . $memUsed . "Bytes used. Limit is " . $memAllowed . "\n");
-    }
-}
 
 function testCronPart($value, $checkstring)
 {
@@ -81,24 +74,7 @@ function checkCronString($time, $string)
     return $matched;
 }
 
-function testDirectoryWritable($directoryPath)
-{
-    if (!is_dir($directoryPath)) {
-        MapUtility::warn("Output directory ($directoryPath) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
-        return false;
-    }
 
-    $testfile = $directoryPath . DIRECTORY_SEPARATOR . "weathermap.permissions.test";
-
-    $testfd = fopen($testfile, 'w');
-    if ($testfd) {
-        fclose($testfd);
-        unlink($testfile);
-        return true;
-    }
-    MapUtility::warn("Output directory ($directoryPath) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
-    return false;
-}
 
 function runMaps($mydir)
 {
@@ -115,12 +91,14 @@ function runMaps($mydir)
 
     $configDirectory = realpath($mydir . DIRECTORY_SEPARATOR . 'configs');
 
-    $manager = new MapManager(weathermap_get_pdo(), $configDirectory);
+    $app = new CactiApplicationInterface(weathermap_get_pdo());
+    $manager = new MapManager(weathermap_get_pdo(), $configDirectory, $app);
 
     $pluginName = "weathermap-cacti-plugin.php";
     if (substr($config['cacti_version'], 0, 3) == "0.8") {
         $pluginName = "weathermap-cacti88-plugin.php";
     }
+
     if (substr($config['cacti_version'], 0, 2) == "1.") {
         $pluginName = "weathermap-cacti10-plugin.php";
     }
@@ -155,17 +133,18 @@ function runMaps($mydir)
         MapUtility::warn("Required modules for PHP Weathermap " . WEATHERMAP_VERSION . " were not present. Not running. [WMPOLL08]\n");
         return;
     }
-    memoryCheck("MEM Initial");
+    Utility::memoryCheck("MEM Initial");
     // move to the weathermap folder so all those relatives paths don't *have* to be absolute
     $originalWorkingDir = getcwd();
     chdir($mydir);
 
-    $manager->setAppSetting("weathermap_last_start_time", time());
+    $manager->application->setAppSetting("weathermap_last_start_time", time());
 
     // first, see if the output directory even exists
     if (is_dir($outputDirectory)) {
         // next, make sure that we stand a chance of writing files
         //// $testfile = realpath($outdir."weathermap.permissions.test");
+        ///
         $testfile = $outputDirectory . DIRECTORY_SEPARATOR . "weathermap.permissions.test";
         $testfd = @fopen($testfile, 'w');
         if ($testfd) {
@@ -180,6 +159,8 @@ function runMaps($mydir)
                 $imageFormat = strtolower(\read_config_option("weathermap_output_format"));
                 $rrdtoolPath = \read_config_option("path_rrdtool");
 
+// TODO: From here, should all be in MapRuntime, as per-map processing
+//*********************
                 foreach ($queryrows as $mapSpec) {
                     // reset the warning counter
                     $weathermap_warncount = 0;
@@ -203,10 +184,10 @@ function runMaps($mydir)
                             if ($quietLogging == 0) {
                                 MapUtility::warn("Map: $mapFileName -> $htmlFileName & $imageFileName\n", true);
                             }
-                            $manager->setAppSetting("weathermap_last_started_file", $weathermap_map);
+                            $manager->application->setAppSetting("weathermap_last_started_file", $weathermap_map);
 
                             $mapStartTime = microtime(true);
-                            memoryCheck("MEM starting $mapCount");
+                            Utility::memoryCheck("MEM starting $mapCount");
                             $map = new Map;
                             $map->context = "cacti";
 
@@ -243,9 +224,9 @@ function runMaps($mydir)
                                 }
                             }
 
-                            memoryCheck("MEM postread $mapCount");
+                            Utility::memoryCheck("MEM postread $mapCount");
                             $map->readData();
-                            memoryCheck("MEM postdata $mapCount");
+                            Utility::memoryCheck("MEM postdata $mapCount");
 
                             // why did I change this before? It's useful...
                             // $wmap->imageuri = $config['url_path'].'/plugins/weathermap/output/weathermap_'.$map->id.".".$imageformat;
@@ -258,7 +239,7 @@ function runMaps($mydir)
                                     true
                                 );
                             }
-                            memoryCheck("MEM pre-render $mapCount");
+                            Utility::memoryCheck("MEM pre-render $mapCount");
 
                             // Write the image to a temporary file first - it turns out that libpng is not that fast
                             // and this way we avoid showing half a map
@@ -365,9 +346,9 @@ function runMaps($mydir)
                             }
                             unset($map);
 
-                            memoryCheck("MEM after $mapCount");
+                            Utility::memoryCheck("MEM after $mapCount");
                             $mapCount++;
-                            $manager->setAppSetting("weathermap_last_finished_file", $weathermap_map);
+                            $manager->application->setAppSetting("weathermap_last_finished_file", $weathermap_map);
                         } else {
                             MapUtility::warn("Mapfile $mapFileName is not readable or doesn't exist [WMPOLL04]\n");
                         }
@@ -386,6 +367,8 @@ function runMaps($mydir)
                         MapUtility::debug("Skipping " . $mapSpec->id . " (" . $mapSpec->configfile . ") due to schedule.\n");
                     }
                 }
+
+//*********************
                 MapUtility::debug("Iterated all $mapCount maps.\n");
             } else {
                 if ($quietLogging == 0) {
@@ -407,9 +390,9 @@ function runMaps($mydir)
     } else {
         MapUtility::warn("Output directory ($outputDirectory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
         $totalWarnings++;
-        $warningNotes .= " (Output directory problem prevents any maps running WMPOLL07)";
+        $warningNotes .= " (Output directory problem prevents any maps running [WMPOLL07])";
     }
-    memoryCheck("MEM Final");
+    Utility::memoryCheck("MEM Final");
     chdir($originalWorkingDir);
     $duration = microtime(true) - $startTime;
 
@@ -424,8 +407,8 @@ function runMaps($mydir)
     if ($quietLogging == 0) {
         MapUtility::warn("STATS: Weathermap " . WEATHERMAP_VERSION . " run complete - $statsString\n", true);
     }
-    $manager->setAppSetting("weathermap_last_stats", $statsString);
-    $manager->setAppSetting("weathermap_last_finish_time", time());
+    $manager->application->setAppSetting("weathermap_last_stats", $statsString);
+    $manager->application->setAppSetting("weathermap_last_finish_time", time());
 }
 
 // vim:ts=4:sw=4:

@@ -23,10 +23,10 @@ if (is_dir($cacti_base) && file_exists($cacti_base . "include/global.php")) {
 }
 
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "setup.php";
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "Weathermap" . DIRECTORY_SEPARATOR . "Poller" . DIRECTORY_SEPARATOR . "poller-common.php";
 
 weathermap_setup_table();
 
-weathermap_run_maps(dirname(__FILE__));
+Weathermap\Poller\runMaps(dirname(__FILE__));
 
 // vim:ts=4:sw=4:

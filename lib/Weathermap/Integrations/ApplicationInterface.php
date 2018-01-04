@@ -50,4 +50,19 @@ class ApplicationInterface
     {
         return false;
     }
+
+    public function getMapURL($mapId)
+    {
+        return sprintf("output/%s.html", $mapId);
+    }
+
+    public function getMapImageURL($mapId)
+    {
+        return sprintf("output/%s.png", $mapId);
+    }
+
+    public function buildLogger($log)
+    {
+        return $log;
+    }
 }

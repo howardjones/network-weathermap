@@ -92,7 +92,7 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | sudo mysql -u root mysql
 
 if [[ $CACTI_VERSION == 1.* ]]; then
     # Cacti 1.x also makes a few optional modules required.
-    sudo apt-get install -y php5.6-ldap php7.0-ldap php5.6-gmp php7.0-gmp
+    sudo apt-get install -y php5.6-ldap php7.0-ldap php5.6-gmp php7.0-gmp php7.1-gmp php7.1-ldap
 
 
     sudo mysql -uroot <<EOF
@@ -170,7 +170,7 @@ fi
 
 # create the 'last poll' log file
 sudo touch $WEBROOT/last-cacti-poll.txt
-sudo chown -R cacti ${WEBROOT}/last-cacti-poll.txt
+sudo chown cacti ${WEBROOT}/last-cacti-poll.txt
 
 # create the database content for the phpunit database tests, if there is now a weathermap installation with tests
 if [ -d ${WEBROOT}/cacti/plugins/weathermap/test-suite ]; then   

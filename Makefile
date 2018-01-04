@@ -41,7 +41,7 @@ release:
 	echo $(RELNAME) built in $(RELBASE)
 
 test:
-    echo "Linting for minimum and maximum PHP versions"
+	echo "Linting for minimum and maximum PHP versions"
 	vendor/bin/parallel-lint -p php5.6 --exclude app --exclude vendor .
 	vendor/bin/parallel-lint -p php7.1 --exclude app --exclude vendor .
 	php -d xdebug.profiler_enable=off vendor/bin/phpunit -c build/phpunit.xml

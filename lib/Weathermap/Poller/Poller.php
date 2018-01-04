@@ -16,6 +16,7 @@ class Poller
     public $imageFormat;
     public $rrdtoolPath;
     public $configDirectory;
+    /** @var MapManager $manager */
     public $manager;
     public $pluginName;
 
@@ -32,13 +33,18 @@ class Poller
 
     public $canRun;
 
-    public function __construct($mydir, $pollerStartTime = 0)
+    public function __construct($baseDirectory, $pollerStartTime = 0)
     {
-        $this->imageFormat = strtolower(\read_config_option("weathermap_output_format"));
-        $this->rrdtoolPath = \read_config_option("path_rrdtool");
-        $this->configDirectory = realpath($mydir . DIRECTORY_SEPARATOR . 'configs');
-        $this->outputDirectory = realpath($mydir . DIRECTORY_SEPARATOR . 'output');
+        $this->configDirectory = realpath($baseDirectory . DIRECTORY_SEPARATOR . 'configs');
+        $this->outputDirectory = realpath($baseDirectory . DIRECTORY_SEPARATOR . 'output');
+
+        // TODO: This needs the ApplicationInterface to be passed from outside (for, e.g. Cacti)
         $this->manager = new MapManager(weathermap_get_pdo(), $this->configDirectory);
+
+        $this->imageFormat = strtolower($this->manager->application->getAppSetting("weathermap_output_format", "png"));
+        $this->rrdtoolPath = $this->manager->application->getAppSetting("path_rrdtool", "rrdtool");
+
+        // TODO: this should be coming from somewhere else, too (the ApplicationInterface?)
         $this->pluginName = "weathermap-cacti-plugin.php";
 
         $this->totalWarnings = 0;
@@ -92,7 +98,7 @@ class Poller
             return;
         }
 
-        $this->manager->setAppSetting("weathermap_last_start_time", time());
+        $this->manager->application->setAppSetting("weathermap_last_start_time", time());
 
         // ???
         $maplist = $this->manager->getMapRunList();
@@ -110,7 +116,7 @@ class Poller
         }
 
         $this->calculateStats();
-        $this->manager->setAppSetting("weathermap_last_finish_time", time());
+        $this->manager->application->setAppSetting("weathermap_last_finish_time", time());
     }
 
     public function calculateStats()
@@ -126,7 +132,7 @@ class Poller
         if ($this->quietLogging == 0) {
             MapUtility::warn("STATS: Weathermap " . WEATHERMAP_VERSION . " run complete - $statsString\n", true);
         }
-        $this->manager->setAppSetting("weathermap_last_stats", $statsString);
+        $this->manager->application->setAppSetting("weathermap_last_stats", $statsString);
     }
 
     /**

@@ -72,4 +72,56 @@ class CactiApplicationInterface extends ApplicationInterface
     {
         return isset($_SESSION['sess_user_id']) ? intval($_SESSION['sess_user_id']) : 1;
     }
+
+    private function isOldCacti()
+    {
+        global $config;
+
+        if (substr($config['cacti_version'], 0, 3) == "0.8") {
+            return true;
+        }
+        return false;
+    }
+
+    private function isNewCacti()
+    {
+        global $config;
+
+        if (substr($config['cacti_version'], 0, 2) == "1.") {
+            return true;
+        }
+        return false;
+    }
+
+    public function getMapURL($mapId)
+    {
+        $pluginName = $this->getPluginName();
+
+        return sprintf("%s?action=viewmap&id=%s", $pluginName, $mapId);
+    }
+
+    public function getMapImageURL($mapId)
+    {
+        $pluginName = $this->getPluginName();
+
+        return sprintf("%s?action=viewimage&id=%s&time=%d", $pluginName, $mapId, time());
+    }
+
+    /**
+     * Figure out the name to be used in when constructing URLs in the currently running Cacti
+     *
+     * @return string
+     */
+    private function getPluginName()
+    {
+        if ($this->isNewCacti()) {
+            return "weathermap-cacti10-plugin.php";
+        }
+        
+        if ($this->isOldCacti()) {
+            return "weathermap-cacti88-plugin.php";
+        }
+
+        return "weathermap-cacti-plugin.php";
+    }
 }

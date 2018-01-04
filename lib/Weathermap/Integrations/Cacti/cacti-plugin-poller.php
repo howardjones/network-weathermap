@@ -145,7 +145,7 @@ function weathermap_poller_bottom()
     global $config;
 
     include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
-    include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php";
+//    include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php";
 
     $pdo = weathermap_get_pdo();
 
@@ -164,7 +164,8 @@ function weathermap_poller_bottom()
     } else {
         // if we're due, run the render updates
         if (($renderperiod == 0) || (($rendercounter % $renderperiod) == 0)) {
-            weathermap_run_maps(dirname(dirname(__FILE__)));
+            // TODO: This is horrible!
+            \Weathermap\Poller\runMaps(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
         } else {
             if ($quietlogging == 0) {
                 cacti_log(

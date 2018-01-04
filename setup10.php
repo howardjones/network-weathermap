@@ -17,6 +17,7 @@
 
 
 // No autoloader within the Cacti environment, so manually load all those nicely-separated classes
+
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti10-plugin-hooks.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php";

@@ -176,3 +176,12 @@ sudo chown cacti ${WEBROOT}/last-cacti-poll.txt
 if [ -d ${WEBROOT}/cacti/plugins/weathermap/test-suite ]; then   
   sudo mysql -uroot weathermaptest < ${WEBROOT}/cacti/plugins/weathermap/test-suite/data/weathermap-empty.sql
 fi 
+
+# so that the editor and poller don't immediately complain
+chown cacti /var/www/html/cacti/plugins/weathermap/output
+chown www-data /var/www/html/cacti/plugins/weathermap/configs
+
+# any local tweaks can be added to post-install.sh
+if [ -x /vagrant/post-install.sh ]; then
+    /vagrant/post-install.sh
+fi

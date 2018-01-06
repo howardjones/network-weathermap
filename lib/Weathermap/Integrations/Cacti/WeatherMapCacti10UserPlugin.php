@@ -9,9 +9,9 @@ require_once dirname(__FILE__) . "/WeatherMapCactiUserPlugin.php";
 class WeatherMapCacti10UserPlugin extends WeatherMapCactiUserPlugin
 {
 
-    public function __construct($config, $imageformat)
+    public function __construct($config, $imageformat, $basePath)
     {
-        parent::__construct($config, $imageformat);
+        parent::__construct($config, $imageformat, $basePath);
 
         $this->myURL = "weathermap-cacti10-plugin.php";
         $this->editorURL = "weathermap-cacti10-plugin-editor.php";
@@ -23,16 +23,16 @@ class WeatherMapCacti10UserPlugin extends WeatherMapCactiUserPlugin
 
     public function cactiHeader()
     {
-        top_header();
+        \top_header();
     }
 
     public function cactiFooter()
     {
-        bottom_footer();
+        \bottom_footer();
     }
 
     public function cactiRowStart($i)
     {
-        form_alternate_row();
+        \form_alternate_row();
     }
 }

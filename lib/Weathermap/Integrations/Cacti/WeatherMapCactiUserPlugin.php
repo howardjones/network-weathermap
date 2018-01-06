@@ -70,7 +70,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         )
     );
 
-    public function __construct($config, $imageFormat)
+    public function __construct($config, $imageFormat, $basePath)
     {
         parent::__construct();
 
@@ -80,8 +80,8 @@ class WeatherMapCactiUserPlugin extends UIBase
         $this->editorURL = "SHOULD-BE-OVERRIDDEN";
         $this->managementRealm = "SHOULD-BE-OVERRIDDEN";
         $this->editorRealm = "SHOULD-BE-OVERRIDDEN";
-        $this->configPath = realpath(dirname(__FILE__) . '/../configs');
-        $this->outputDirectory = realpath(dirname(__FILE__) . '/../output/');
+        $this->configPath = $basePath . '/configs';
+        $this->outputDirectory = $basePath . '/output/';
         $this->imageFormat = $imageFormat;
         $pdo = weathermap_get_pdo();
         $cactiInterface = new CactiApplicationInterface($pdo);
@@ -123,7 +123,7 @@ class WeatherMapCactiUserPlugin extends UIBase
     {
         header('Content-type: application/json');
 
-        $userId = $this->manager->getUserId();
+        $userId = $this->manager->application->getCurrentUserId();
         $mapList = $this->manager->getMapsForUser($userId);
         $groups = $this->manager->getGroups();
 
@@ -382,11 +382,11 @@ class WeatherMapCactiUserPlugin extends UIBase
                                         )
                                     );
                                     print '<a href = "' . $this->makeURL(
-                                        array(
+                                            array(
                                                 "action" => "viewcycle_filtered",
                                                 "group" => $limitingToGroup
                                             )
-                                    ) . '">within this group</a>, or ';
+                                        ) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)
@@ -553,7 +553,7 @@ class WeatherMapCactiUserPlugin extends UIBase
     private function outputMapImage($filehash, $fileNameInsert)
     {
         $mapId = $this->manager->translateFileHash($filehash);
-        $userId = $this->manager->getUserId();
+        $userId = $this->manager->application->getCurrentUserId();
 
         $map = $this->manager->getMapWithAccess($mapId, $userId);
 

@@ -11,7 +11,7 @@ include_once dirname(__FILE__) . '/lib/Weathermap/Integrations/Cacti/WeatherMapC
 
 use Weathermap\Integrations\Cacti\WeatherMapCacti10UserPlugin;
 
-$plugin = new WeatherMapCacti10UserPlugin($config, "png");
+$plugin = new WeatherMapCacti10UserPlugin($config, "png", realpath(dirname(__FILE__)));
 
 $plugin->main($_REQUEST);
 

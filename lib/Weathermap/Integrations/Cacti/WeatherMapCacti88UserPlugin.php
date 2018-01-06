@@ -10,9 +10,9 @@ class WeatherMapCacti88UserPlugin extends WeatherMapCactiUserPlugin
 {
     public $colours;
 
-    public function __construct($config, $colours, $imageformat)
+    public function __construct($config, $colours, $imageformat, $basePath)
     {
-        parent::__construct($config, $imageformat);
+        parent::__construct($config, $imageformat, $basePath);
 
         $this->colours = $colours;
         $this->myURL = "weathermap-cacti88-plugin.php";

@@ -75,7 +75,6 @@ function checkCronString($time, $string)
 }
 
 
-
 function runMaps($mydir)
 {
     global $config;
@@ -234,8 +233,9 @@ function runMaps($mydir)
                             $map->imageuri = $pluginName . '?action=viewimage&id=' . $mapSpec->filehash . "&time=" . time();
 
                             if ($quietLogging == 0) {
+                                $note = Utility::buildMemoryCheckString("");
                                 MapUtility::warn(
-                                    "About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",
+                                    "About to write image file. If this is the last message in your log, increase memory_limit in php.ini () [WMPOLL01] $note\n",
                                     true
                                 );
                             }

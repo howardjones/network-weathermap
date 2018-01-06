@@ -8,13 +8,16 @@ use Weathermap\Core\MapUtility;
 
 class Utility
 {
+    public static function buildMemoryCheckString($note)
+    {
+        $memUsed = StringUtility::formatNumberWithMetricSuffix(memory_get_usage());
+        $memAllowed = ini_get("memory_limit");
+        return "$note: memory_get_usage() says " . $memUsed . "Bytes used. Limit is " . $memAllowed . "\n";
+    }
+
     public static function memoryCheck($note = "MEM")
     {
-        if (function_exists("memory_get_usage")) {
-            $memUsed = StringUtility::formatNumberWithMetricSuffix(memory_get_usage());
-            $memAllowed = ini_get("memory_limit");
-            MapUtility::debug("$note: memory_get_usage() says " . $memUsed . "Bytes used. Limit is " . $memAllowed . "\n");
-        }
+        MapUtility::debug(Utility::buildMemoryCheckString($note));
     }
 
     public static function testDirectoryWritable($directoryPath)

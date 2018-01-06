@@ -1,9 +1,9 @@
 <?php
 
-// PHP Weathermap 0.98
-// Copyright Howard Jones, 2005-2016 howie@thingy.com
-// http://www.network-weathermap.com/
-// Released under the GNU Public License
+// Simple script to add some sample data into the database
+// (before all the UI is working again)
+
+// Needs to live in the Weathermap base directory
 
 use Weathermap\Integrations\Cacti\CactiApplicationInterface;
 use Weathermap\Integrations\MapManager;

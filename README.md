@@ -22,9 +22,9 @@ plugin does, too.
 
 ### Current Status/Usability
 
-* __Core__ - passing all tests (but one database-related). All code modified to use namespaces, one class per file, most PSR-2 standards.
+* __Core__ - passing all tests. All code modified to use namespaces and autoloader, one class per file, most PSR-2 standards.
 
-* __CLI__ - should be working OK
+* __CLI__ - should be working OK. Rewritten to avoid PEAR dependency. There's also a `weathermap-new` which needs testing, but is intended to replace the old `weathermap` (all the business is in a class, not the script)
 
 * __Editor__ - Partly (75%) implemented class/template-based version of editor (same UI) currently named `editor16.php`. Old `editor.php` is probably broken, since its files have been moved around. BUT PARTS THAT DON'T YET WORK CAN MANGLE YOUR MAP! (e.g. tidy recently deleted links) 
 
@@ -75,8 +75,8 @@ can automatically do things like tag on memory usage and function call info for 
 the Cacti plugin is not (easily). Also, MapManager is currently a literal collection of every query that was in the 0.8.8 plugin, 
 which turns out to be quite a few. Breaking that down into global, map, and group objects would be a good thing.  
 
-* Make an abstraction layer for things like `read_config_option` in the UI, so it doesn't depend on Cacti being underneath. When someone wants to make a plugin/integration for a new
-application, it'll be a lot 'thinner' this way, too.
+* ~~Make an abstraction layer for things like `read_config_option` in the UI, so it doesn't depend on Cacti being underneath. When someone wants to make a plugin/integration for a new
+application, it'll be a lot 'thinner' this way, too. This is done as Weathermap\Integration\ApplicationInterface~~
 
 
 ## Normal README

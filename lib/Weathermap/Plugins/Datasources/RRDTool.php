@@ -9,6 +9,7 @@
 namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
+use Weathermap\Core\Map;
 
 class RRDTool extends Base
 {
@@ -24,6 +25,10 @@ class RRDTool extends Base
         $this->name = "RRD";
     }
 
+    /**
+     * @param Map $map
+     * @return bool
+     */
     public function init(&$map)
     {
         global $config;
@@ -31,8 +36,8 @@ class RRDTool extends Base
         if ($map->context == 'cacti') {
             MapUtility::debug("RRD DS: path_rra is " . $config["rra_path"] . " - your rrd pathname must be exactly this to use poller_output\n");
             // save away a couple of useful global SET variables
-            $map->add_hint("cacti_path_rra", $config["rra_path"]);
-            $map->add_hint("cacti_url", $config['url_path']);
+            $map->addHint("cacti_path_rra", $config["rra_path"]);
+            $map->addHint("cacti_url", $config['url_path']);
         }
         if (file_exists($map->rrdtool)) {
             if ((function_exists('is_executable')) && (!is_executable($map->rrdtool))) {

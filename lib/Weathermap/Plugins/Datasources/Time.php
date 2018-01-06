@@ -46,12 +46,12 @@ class Time extends Base
             $timezone = $matches[1];
             $timezoneLowerCase = strtolower($timezone);
 
-            $allTimezones = DateTimeZone::listIdentifiers();
+            $allTimezones = \DateTimeZone::listIdentifiers();
 
             foreach ($allTimezones as $tz) {
                 if (strtolower($tz) == $timezoneLowerCase) {
                     MapUtility::debug("Time ReadData: Timezone exists: $tz\n");
-                    $dateTime = new DateTime("now", new DateTimeZone($tz));
+                    $dateTime = new \DateTime("now", new DateTimeZone($tz));
 
                     $item->addNote("time_time12", $dateTime->format("h:i"));
                     $item->addNote("time_time12ap", $dateTime->format("h:i A"));

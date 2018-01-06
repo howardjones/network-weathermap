@@ -33,16 +33,16 @@ class Runner
         $this->map->context = "cli";
 
         if ($this->makeMap()) {
-
             $this->postRun();
         }
     }
 
-    private function getOptions()
+    /**
+     * @param GetOpt $opt
+     */
+    private function addMainOptions($opt)
     {
-        $this->getOpt = new \GetOpt\GetOpt(null, [\GetOpt\GetOpt::SETTING_STRICT_OPERANDS => true]);
-
-        $this->getOpt->addOptions(array(
+        $opt->addOptions(array(
                 Option::create(null, 'version', GetOpt::NO_ARGUMENT)
                     ->setDescription('Show version info and quit'),
                 Option::create('h', 'help', GetOpt::NO_ARGUMENT)
@@ -60,44 +60,67 @@ class Runner
                     ->setDescription('filename to write HTML. Default weathermap.html')
                     ->setArgumentName('filename')
                     ->setDefaultValue('weathermap.html'),
-
                 Option::create(null, 'image-uri', GetOpt::REQUIRED_ARGUMENT)
                     ->setArgumentName('uri')
                     ->setDescription('URI to prefix <img> tags in HTML output'),
-
-                Option::create(null, 'define', GetOpt::MULTIPLE_ARGUMENT)
-                    ->setArgumentName('name=value')
-                    ->setDescription('Define internal variables (equivalent to global SET in config file)'),
-                Option::create(null, 'stats', GetOpt::NO_ARGUMENT)
-                    ->setDescription('produce statistics for map after completion'),
-
-                Option::create(null, 'bulge', GetOpt::NO_ARGUMENT)
-                    ->setDescription('Enable link-bulging mode. See manual.'),
-                Option::create(null, 'no-data', GetOpt::NO_ARGUMENT)
-                    ->setDescription('skip the data-reading process (just a \'grey\' map)'),
-                Option::create(null, 'randomdata', GetOpt::NO_ARGUMENT)
-                    ->setDescription('skip the data-reading process, generate random data'),
-
-                Option::create(null, 'debug', GetOpt::NO_ARGUMENT)
-                    ->setDescription('produce (LOTS) of debugging information during run'),
-                Option::create(null, 'no-warn', GetOpt::REQUIRED_ARGUMENT)
-                    ->setDescription('suppress warnings with listed errorcodes (comma-separated)')
-                    ->setArgumentName('WMxxx_errorcode'),
-                Option::create(null, 'dump-after', GetOpt::NO_ARGUMENT)
-                    ->setDescription('(development) dump all internal PHP structures (HUGE)'),
-                Option::create(null, 'uberdebug', GetOpt::NO_ARGUMENT)
-                    ->setDescription('produce even more debug information'),
-                Option::create(null, 'setdebug', GetOpt::NO_ARGUMENT)
-                    ->setDescription('produce debug information related to map variables (SET)'),
-
-                Option::create(null, 'dump-config', GetOpt::REQUIRED_ARGUMENT)
-                    ->setArgumentName('filename')
-                    ->setDescription('(development) dump config to a new file (testing editor)'),
-                Option::create(null, 'dump-json', GetOpt::REQUIRED_ARGUMENT)
-                    ->setArgumentName('filename')
-                    ->setDescription('(development) dump JSON config to a new file'),
             )
         );
+    }
+
+    /**
+     * @param GetOpt $opt
+     */
+    private function addExpertOptions($opt)
+    {
+        $opt->addOptions(array(
+            Option::create(null, 'define', GetOpt::MULTIPLE_ARGUMENT)
+                ->setArgumentName('name=value')
+                ->setDescription('Define internal variables (equivalent to global SET in config file)'),
+
+            Option::create(null, 'bulge', GetOpt::NO_ARGUMENT)
+                ->setDescription('Enable link-bulging mode. See manual.'),
+            Option::create(null, 'no-data', GetOpt::NO_ARGUMENT)
+                ->setDescription('skip the data-reading process (just a \'grey\' map)'),
+            Option::create(null, 'sizedebug', GetOpt::NO_ARGUMENT)
+                ->setDescription('show the maximum possible value instead of the current one'),
+
+            Option::create(null, 'debug', GetOpt::NO_ARGUMENT)
+                ->setDescription('produce (LOTS) of debugging information during run'),
+            Option::create(null, 'no-warn', GetOpt::REQUIRED_ARGUMENT)
+                ->setDescription('suppress warnings with listed errorcodes (comma-separated)')
+                ->setArgumentName('WMxxx_errorcode'),
+        ));
+    }
+
+    /**
+     * @param GetOpt $opt
+     */
+    private function addDevOptions($opt)
+    {
+        $opt->addOptions(array(
+            Option::create(null, 'randomdata', GetOpt::NO_ARGUMENT)
+                ->setDescription('skip the data-reading process, generate random data'),
+            Option::create(null, 'uberdebug', GetOpt::NO_ARGUMENT)
+                ->setDescription('produce even more debug information'),
+            Option::create(null, 'setdebug', GetOpt::NO_ARGUMENT)
+                ->setDescription('produce debug information related to map variables (SET)'),
+
+            Option::create(null, 'dump-config', GetOpt::REQUIRED_ARGUMENT)
+                ->setArgumentName('filename')
+                ->setDescription('(development) dump config to a new file (testing editor)'),
+            Option::create(null, 'dump-json', GetOpt::REQUIRED_ARGUMENT)
+                ->setArgumentName('filename')
+                ->setDescription('(development) dump JSON config to a new file'),
+        ));
+    }
+
+    private function getOptions()
+    {
+        $this->getOpt = new GetOpt(null, [GetOpt::SETTING_STRICT_OPERANDS => true]);
+
+        $this->addMainOptions($this->getOpt);
+        $this->addExpertOptions($this->getOpt);
+        $this->addDevOptions($this->getOpt);
 
         // process arguments and catch user errors
         try {
@@ -110,7 +133,7 @@ class Runner
 
         // show version and quit
         if ($this->getOpt->getOption('version')) {
-            echo sprintf('PHP Network Weathermap: %s' . PHP_EOL, \Weathermap\Core\WEATHERMAP_VERSION);
+            echo sprintf('PHP Network Weathermap %s' . PHP_EOL, WEATHERMAP_VERSION);
             exit;
         }
 
@@ -186,7 +209,7 @@ class Runner
             assert_options(ASSERT_CALLBACK, 'my_assert_handler');
 
             MapUtility::debug("------------------------------------\n");
-            MapUtility::debug("Starting PHP-Weathermap run, with config: $configfile\n");
+            MapUtility::debug("Starting PHP-Weathermap run, with config: $this->configfile\n");
             MapUtility::debug("------------------------------------\n");
         }
 
@@ -200,6 +223,7 @@ class Runner
         }
 
         if ($this->map->readConfig($this->configfile)) {
+            $this->mapFileSettings();
             $this->mapSettingsPostConfig();
             $this->getMapData();
 
@@ -215,7 +239,7 @@ class Runner
         return false;
     }
 
-    private function mapSettingsPostConfig()
+    private function mapFileSettings()
     {
         // allow command-lines to override the config file, but provide a default if neither are present
         if ($this->imagefile == '') {
@@ -231,10 +255,11 @@ class Runner
                 $this->htmlfile = $this->map->htmloutputfile;
             }
         }
+    }
 
+    private function mapSettingsPostConfig()
+    {
         // feed in any command-line defaults, so that they appear as if SET lines in the config
-
-        // XXX FIXME
         foreach ($this->defines as $hintname => $hint) {
             $this->map->addHint($hintname, $hint);
         }
@@ -248,13 +273,16 @@ class Runner
 
     private function getMapData()
     {
-        if ((isset($this->options_output['sizedebug']) && !$this->options_output['sizedebug']) || (!isset($this->options_output['sizedebug']))) {
-            if ($this->getOpt->getOption('randomdata') === 1) {
-                $this->map->randomData();
-            } else {
-                $this->map->ReadData();
-            }
+        if ($this->map->sizedebug) {
+            return;
         }
+
+        if ($this->getOpt->getOption('randomdata') === 1) {
+            $this->map->randomData();
+            return;
+        }
+
+        $this->map->ReadData();
     }
 
     private function outputHTML()
@@ -298,29 +326,26 @@ class Runner
             fclose($fd);
         }
 
-        if ($this->getOpt->getOption('stats') === 1) {
-            $this->map->DumpStats();
-        }
-
         if ($this->map->dataoutputfile != '') {
             $this->map->writeDataFile($this->map->dataoutputfile);
         }
 
-        if ($this->getOpt->getOption('dump-after') === 1) {
-            print_r($this->map);
-        }
-
         if ($this->getOpt->getOption('setdebug') === 1) {
-            foreach ($this->map->buildAllItemsList() as $item) {
-                print "$item->name :\n";
-                foreach ($item->hints as $n => $v) {
-                    print "  SET $n = $v\n";
-                }
-                foreach ($item->notes as $n => $v) {
-                    print "  -> $n = $v\n";
-                }
-                print "\n";
+            $this->dumpSetDebugInfo();
+        }
+    }
+
+    private function dumpSetDebugInfo()
+    {
+        foreach ($this->map->buildAllItemsList() as $item) {
+            print "$item->name :\n";
+            foreach ($item->hints as $n => $v) {
+                print "  SET $n = $v\n";
             }
+            foreach ($item->notes as $n => $v) {
+                print "  -> $n = $v\n";
+            }
+            print "\n";
         }
     }
 }

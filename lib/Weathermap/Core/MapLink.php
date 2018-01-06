@@ -316,9 +316,11 @@ class MapLink extends MapDataItem
 
             if ($this->owner->sizedebug) {
                 $bandwidth = $this->maxValues[$direction];
+                $this->absoluteUsages[$direction] = $this->maxValues[$direction];
             }
 
             $bwlabelText = $this->owner->processString($this->bwlabelformats[$direction], $this);
+
             if ($bwlabelText != '') {
                 MapUtility::debug('Bandwidth for label is ' . StringUtility::valueOrNull($bandwidth) . " (label is '$bwlabelText')\n");
                 $padding = intval($this->getHint('bwlabel_padding'));

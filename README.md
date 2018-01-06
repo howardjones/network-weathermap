@@ -28,9 +28,9 @@ plugin does, too.
 
 * __Editor__ - Partly (75%) implemented class/template-based version of editor (same UI) currently named `editor16.php`. Old `editor.php` is probably broken, since its files have been moved around. BUT PARTS THAT DON'T YET WORK CAN MANGLE YOUR MAP! (e.g. tidy recently deleted links) 
 
-* __Cacti 0.8 Plugin__ - broken UI, broken poller. Code has all been moved and not even run once yet.
+* __Cacti 0.8 Plugin__ - broken UI, working poller. Code has all been moved, poller run, UI not tested.
 
-* __Cacti 1.0 Plugin__ - broken UI, *working* poller. Code has all been moved and most has not even run once yet.
+* __Cacti 1.0 Plugin__ - broken UI, working poller. Code has all been moved, poller run, UI not tested.
 
 ### Using the dev version
 

@@ -2,7 +2,7 @@
 
 ~~MapScale should really be divided into MapScale and MapLegend.~~
 
-Also, a MapScaleEntry class with the testing for ColourFromValue
+~~Also, a MapScaleEntry class with the testing for ColourFromValue~~
 
 PSR-0/PSR-1/PSR-2 Stuff:
 - ~~namespaces (now we're in 5.3-land)~~

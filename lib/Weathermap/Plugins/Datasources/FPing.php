@@ -14,8 +14,6 @@ class FPing extends Base
 {
 
     private $addresscache = array();
-    private $donepings = false;
-    private $results = array();
     private $fpingCommand;
 
 
@@ -49,7 +47,7 @@ class FPing extends Base
      */
     public function register($targetstring, &$map, &$item)
     {
-        if (preg_match('/^fping:(\S+)$/', $targetstring, $matches)) {
+        if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             // save the address. This way, we can do ONE fping call for all the pings in the map.
             // fping does it all in parallel, so 10 hosts takes the same time as 1
             // TODO - actually implement that!
@@ -57,6 +55,12 @@ class FPing extends Base
         }
     }
 
+    /**
+     * @param string $targetString
+     * @param Map $map
+     * @param MapDataItem $item
+     * @return array
+     */
     public function readData($targetString, &$map, &$item)
     {
         $this->data[IN] = null;
@@ -64,77 +68,111 @@ class FPing extends Base
 
         $pingCount = intval($map->getHint("fping_ping_count", 5));
 
-        if (preg_match('/^fping:(\S+)$/', $targetString, $matches)) {
-            $target = $matches[1];
-
-            $resultPattern = '/^$target\s:';
-            for ($i = 0; $i < $pingCount; $i++) {
-                $resultPattern .= '\s(\S+)';
-            }
-            $resultPattern .= "/";
-
-            if (is_executable($this->fpingCommand)) {
-                $command = $this->fpingCommand . " -t100 -r1 -p20 -u -C $pingCount -i10 -q $target 2>&1";
-                MapUtility::debug("Running $command\n");
-
-                $pipe = popen($command, "r");
-
-                $count = 0;
-                $hitCount = 0;
-                if (isset($pipe)) {
-                    while (!feof($pipe)) {
-                        $line = fgets($pipe, 4096);
-                        $count++;
-                        MapUtility::debug("Output: $line");
-
-                        if (preg_match($resultPattern, $line, $matches)) {
-                            MapUtility::debug("Found output line for $target\n");
-                            $hitCount++;
-                            $loss = 0;
-                            $ave = 0;
-                            $total = 0;
-                            $cnt = 0;
-                            $min = 999999;
-                            $max = 0;
-                            for ($i = 1; $i <= $pingCount; $i++) {
-                                if ($matches[$i] == '-') {
-                                    $loss += (100 / $pingCount);
-                                } else {
-                                    $cnt++;
-                                    $total += $matches[$i];
-                                    $max = max($matches[$i], $max);
-                                    $min = min($matches[$i], $min);
-                                }
-                            }
-                            if ($cnt > 0) {
-                                $ave = $total / $cnt;
-                            }
-
-                            MapUtility::debug("Result: $cnt $min -> $max $ave $loss\n");
-                        }
-                    }
-                    pclose($pipe);
-
-                    if ($count == 0) {
-                        MapUtility::warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
-                    } else {
-                        if ($hitCount == 0) {
-                            MapUtility::warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
-                        } else {
-                            $this->data[IN] = $ave;
-                            $this->data[OUT] = $loss;
-                            $item->addNote("fping_min", $min);
-                            $item->addNote("fping_max", $max);
-                        }
-                    }
-                    $this->dataTime = time();
-                }
-            } else {
-                MapUtility::warn("FPing ReadData: Can't find fping executable. Check path at line 19 of FPing");
-            }
+        if (preg_match($this->regexpsHandled[0], $targetString, $matches)) {
+            $this->ping($item, $matches[1], $pingCount);
         }
 
         return $this->returnData();
+    }
+
+    /**
+     * @param MapDataItem $item
+     * @param integer $pingCount
+     * @param string $targetAddress
+     */
+    private function ping(&$item, $targetAddress, $pingCount)
+    {
+        if (!is_executable($this->fpingCommand)) {
+            MapUtility::warn("FPing ReadData: Can't find fping executable. Check path at line 36 of FPing");
+            return;
+        }
+
+        $resultPattern = '/^$target\s:';
+        for ($i = 0; $i < $pingCount; $i++) {
+            $resultPattern .= '\s(\S+)';
+        }
+        $resultPattern .= "/";
+
+        $lineCount = 0;
+        $hitCount = 0;
+
+        $command = sprintf("%s  -t100 -r1 -p20 -u -C %d -i100 -q %s 2>&1",
+            escapeshellcmd($this->fpingCommand),
+            $pingCount,
+            escapeshellarg($targetAddress)
+        );
+
+        MapUtility::debug("Running $command\n");
+
+        $pipe = popen($command, "r");
+
+        if (!isset($pipe)) {
+            MapUtility::warn("FPing ReadData: Failed to run fping command [WMFPING04]\n");
+            return;
+        }
+
+        while (!feof($pipe)) {
+            $line = fgets($pipe, 4096);
+            $lineCount++;
+            MapUtility::debug("Output: $line");
+
+            if (preg_match($resultPattern, $line, $matches)) {
+                MapUtility::debug("Found output line for $targetAddress\n");
+
+                $hitCount++;
+                list($loss, $ave, $cnt, $min, $max) = $this->processResultLine($pingCount, $matches);
+
+                MapUtility::debug("Result: $cnt $min -> $max $ave $loss\n");
+            }
+        }
+        pclose($pipe);
+
+        if ($lineCount == 0) {
+            MapUtility::warn("FPing ReadData: No lines read. Bad hostname? ($targetAddress) [WMFPING03]\n");
+            return;
+        }
+        if ($hitCount == 0) {
+            MapUtility::warn("FPing ReadData: $lineCount lines read. But nothing returned for target??? ($targetAddress) Try running with DEBUG to see output.  [WMFPING02]\n");
+            return;
+        }
+
+        $this->data[IN] = $ave;
+        $this->data[OUT] = $loss;
+        $item->addNote("fping_min", $min);
+        $item->addNote("fping_max", $max);
+
+        $this->dataTime = time();
+    }
+
+    /**
+     * @param $pingCount
+     * @param $matches
+     * @return array
+     */
+    private function processResultLine($pingCount, $matches)
+    {
+        $loss = 0;
+        $ave = 0;
+        $total = 0;
+        $cnt = 0;
+        $min = 999999;
+        $max = 0;
+
+        for ($i = 1; $i <= $pingCount; $i++) {
+            if ($matches[$i] == '-') {
+                $loss += (100 / $pingCount);
+            } else {
+                $cnt++;
+                $total += $matches[$i];
+                $max = max($matches[$i], $max);
+                $min = min($matches[$i], $min);
+            }
+        }
+
+        if ($cnt > 0) {
+            $ave = $total / $cnt;
+        }
+        return array($loss, $ave, $cnt, $min, $max);
     }
 }
 

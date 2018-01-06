@@ -77,8 +77,6 @@ class Map extends MapBase
     public $maximumDataTime;
     public $context;
 
-    // public $rrdtool_check;
-
     /** var  ImageLoader $imagecache */
     public $imagecache;
     public $selected;
@@ -422,9 +420,8 @@ class Map extends MapBase
             return $input;
         }
 
-        $theItem = null;
-
-        assert('is_scalar($input)');
+//        $theItem = null;
+//        assert('is_scalar($input)');
 
         $contextType = $this->getProcessStringContextName($context);
 
@@ -501,7 +498,6 @@ class Map extends MapBase
         }
 
         MapUtility::debug("ProcessString: Found appropriate item: $theItem\n");
-
 
         $value = $this->findItemValue($theItem, $args, $value, $includeNotes);
 
@@ -874,22 +870,20 @@ class Map extends MapBase
             return;
         }
 
-        foreach ($this->nodes as $node) {
-            if (!preg_match('/^::\s/', $node->name) && count($node->targets) > 0) {
+        // loop through everything. Figure out along the way if it's a node or a link
+        $allItems = $this->buildAllItemsList();
+
+        foreach ($allItems as $mapItem) {
+            if (!$mapItem->isTemplate() && count($mapItem->targets) > 0) {
+                $prefix = substr($mapItem->my_type(), 0, 1);
                 fputs(
                     $fileHandle,
-                    sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->absoluteUsages[IN], $node->absoluteUsages[OUT])
+                    sprintf("%s\t%f\t%f\r\n", $prefix, $mapItem->name, $mapItem->absoluteUsages[IN],
+                        $mapItem->absoluteUsages[OUT])
                 );
             }
         }
-        foreach ($this->links as $link) {
-            if (!preg_match('/^::\s/', $link->name) && count($link->targets) > 0) {
-                fputs(
-                    $fileHandle,
-                    sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->absoluteUsages[IN], $link->absoluteUsages[OUT])
-                );
-            }
-        }
+
         fclose($fileHandle);
     }
 
@@ -946,26 +940,8 @@ class Map extends MapBase
             if ($node->positionRelativeTo != '') {
                 $parentX = $this->nodes[$node->positionRelativeTo]->x;
                 $parentY = $this->nodes[$node->positionRelativeTo]->y;
-                imagearc(
-                    $imageRef,
-                    $node->x,
-                    $node->y,
-                    15,
-                    15,
-                    0,
-                    360,
-                    $overlayColor
-                );
-                imagearc(
-                    $imageRef,
-                    $node->x,
-                    $node->y,
-                    16,
-                    16,
-                    0,
-                    360,
-                    $overlayColor
-                );
+                imagearc($imageRef, $node->x, $node->y, 15, 15, 0, 360, $overlayColor);
+                imagearc($imageRef, $node->x, $node->y, 16, 16, 0, 360, $overlayColor);
 
                 imageline($imageRef, $node->x, $node->y, $parentX, $parentY, $overlayColor);
             }
@@ -1020,30 +996,35 @@ class Map extends MapBase
      */
     protected function writeImageFile($imageFileName, $imageRef)
     {
-        $result = false;
-        $functions = true;
-        if (function_exists('imagejpeg') && preg_match('/\.jpg/i', $imageFileName)) {
-            MapUtility::debug("Writing JPEG file to $imageFileName\n");
-            $result = imagejpeg($imageRef, $imageFileName);
-        } elseif (function_exists('imagegif') && preg_match('/\.gif/i', $imageFileName)) {
-            MapUtility::debug("Writing GIF file to $imageFileName\n");
-            $result = imagegif($imageRef, $imageFileName);
-        } elseif (function_exists('imagepng') && preg_match('/\.png/i', $imageFileName)) {
-            MapUtility::debug("Writing PNG file to $imageFileName\n");
-            $result = imagepng($imageRef, $imageFileName);
-        } else {
-            MapUtility::warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
-            $functions = false;
-        }
+        $extension = strtolower(substr($imageFileName, -4, 4));
 
-        if (($result == false) && ($functions == true)) {
+        $types = array(
+            '.png' => 'imagepng',
+            '.jpg' => 'imagejpeg',
+            '.gif' => 'imagegif'
+        );
+
+        if (array_key_exists($extension, $types) && function_exists($types[$extension])) {
+            MapUtility::debug("Writing $extension file to $imageFileName\n");
+            $function = $types[$extension];
+            $result = $function($imageRef, $imageFileName);
+
+            if ($result) {
+                return $result;
+            }
+
             if (file_exists($imageFileName)) {
                 MapUtility::warn("Failed to overwrite existing image file $imageFileName - permissions of existing file are wrong? [WMWARN13]");
             } else {
                 MapUtility::warn("Failed to create image file $imageFileName - permissions of output directory are wrong? [WMWARN14]");
             }
+
+            return $result;
         }
-        return $result;
+
+        MapUtility::warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
+        return false;
+
     }
 
     /**
@@ -1350,7 +1331,7 @@ class Map extends MapBase
      * @param $left
      * @param $above
      * @param $caption
-     * @return array
+     * @return string
      */
     private function buildOverlibHTML($mapItem, $dir, $imageExtraHTML, $left, $above, $caption)
     {
@@ -1358,21 +1339,15 @@ class Map extends MapBase
 
         $n = 0;
         if (count($mapItem->overliburl[$dir]) > 0) {
-            // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
             foreach ($mapItem->overliburl[$dir] as $url) {
                 if ($n > 0) {
                     $overlibhtml .= '&lt;br /&gt;';
                 }
-                $overlibhtml .= "&lt;img $imageExtraHTML src=";
-                $overlibhtml .= $this->processString(
-                    $url,
-                    $mapItem
-                );
-                $overlibhtml .= '&gt;';
+                $overlibhtml .= "&lt;img $imageExtraHTML src=" . $this->processString($url, $mapItem) . '&gt;';
                 $n++;
             }
         }
-        # print "Added $n for $dir\n";
+
         if (trim($mapItem->notestext[$dir]) != '') {
             # put in a linebreak if there was an image AND notes
             if ($n > 0) {
@@ -1384,8 +1359,7 @@ class Map extends MapBase
             $note = str_replace('"', '&quot;', $note);
             $overlibhtml .= $note;
         }
-        $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-            . "');\"  onmouseout=\"return nd();\"";
+        $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption . "');\"  onmouseout=\"return nd();\"";
 
         return $overlibhtml;
     }
@@ -1648,10 +1622,6 @@ class Map extends MapBase
         if (array_key_exists($name, $translations)) {
             return $translations[$name];
         }
-        // TODO - at some point, we can remove this bit, and limit access to ONLY the things listed above
-//        if (property_exists($this, $name)) {
-//            return $this->$name;
-//        }
 
         throw new WeathermapRuntimeWarning("NoSuchProperty");
     }
@@ -1843,44 +1813,24 @@ class Map extends MapBase
 
         $output .= "\n# End of global section\n\n";
 
-        foreach (array('template', 'normal') as $which) {
-            if ($which == 'template') {
-                $output .= "\n# TEMPLATE-only NODEs:\n";
-            }
-            if ($which == 'normal') {
-                $output .= "\n# regular NODEs:\n";
-            }
+        $permutations = array(
+            'NODE' => $this->nodes,
+            'LINK' => $this->links
+        );
 
-            foreach ($this->nodes as $node) {
-                if (!preg_match('/^::\s/', $node->name)) {
-                    if ($node->definedIn == $this->configfile) {
-                        if ($which == 'template' && $node->x === null) {
-                            MapUtility::debug("TEMPLATE\n");
-                            $output .= $node->getConfig();
-                        }
-                        if ($which == 'normal' && $node->x !== null) {
-                            $output .= $node->getConfig();
-                        }
-                    }
-                }
-            }
+        $type_perms = array(
+            'TEMPLATE-only' => true,
+            'regular' => false
+        );
 
-            if ($which == 'template') {
-                $output .= "\n# TEMPLATE-only LINKs:\n";
-            }
+        foreach ($permutations as $name => $items) {
+            foreach ($type_perms as $description => $template) {
+                $output .= "\n# ${description} ${name}s:\n";
 
-            if ($which == 'normal') {
-                $output .= "\n# regular LINKs:\n";
-            }
-
-            foreach ($this->links as $link) {
-                if (!preg_match('/^::\s/', $link->name)) {
-                    if ($link->definedIn == $this->configfile) {
-                        if ($which == 'template' && $link->isTemplate()) {
-                            $output .= $link->getConfig();
-                        }
-                        if ($which == 'normal' && !$link->isTemplate()) {
-                            $output .= $link->getConfig();
+                foreach ($items as $item) {
+                    if (substr($item->name, 0, 3) != ':: ' && ($item->definedIn == $this->configfile)) {
+                        if ($template == $item->isTemplate()) {
+                            $output .= $item->getConfig();
                         }
                     }
                 }

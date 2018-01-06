@@ -26,7 +26,8 @@ class Runner
         $rrdtool = "/usr/bin/rrdtool";
 
         $this->getOptions();
-        $this->translateOptionsToSettings();
+        $this->translateRuntimeOptionsToSettings();
+        $this->translateDebugOptionsToSettings();
 
         $this->map = new Map();
         $this->map->rrdtool = $rrdtool;
@@ -34,6 +35,36 @@ class Runner
 
         if ($this->makeMap()) {
             $this->postRun();
+        }
+    }
+
+    private function getOptions()
+    {
+        $this->getOpt = new GetOpt(null, [GetOpt::SETTING_STRICT_OPERANDS => true]);
+
+        $this->addMainOptions($this->getOpt);
+        $this->addExpertOptions($this->getOpt);
+        $this->addDevOptions($this->getOpt);
+
+        // process arguments and catch user errors
+        try {
+            $this->getOpt->process();
+        } catch (ArgumentException $exception) {
+            file_put_contents('php://stderr', $exception->getMessage() . PHP_EOL);
+            echo PHP_EOL . $this->getOpt->getHelpText();
+            exit;
+        }
+
+        // show version and quit
+        if ($this->getOpt->getOption('version')) {
+            echo sprintf('PHP Network Weathermap %s' . PHP_EOL, WEATHERMAP_VERSION);
+            exit;
+        }
+
+        // show help and quit
+        if ($this->getOpt->getOption('help')) {
+            echo $this->getOpt->getHelpText();
+            exit;
         }
     }
 
@@ -114,41 +145,9 @@ class Runner
         ));
     }
 
-    private function getOptions()
+    private function translateRuntimeOptionsToSettings()
     {
-        $this->getOpt = new GetOpt(null, [GetOpt::SETTING_STRICT_OPERANDS => true]);
-
-        $this->addMainOptions($this->getOpt);
-        $this->addExpertOptions($this->getOpt);
-        $this->addDevOptions($this->getOpt);
-
-        // process arguments and catch user errors
-        try {
-            $this->getOpt->process();
-        } catch (ArgumentException $exception) {
-            file_put_contents('php://stderr', $exception->getMessage() . PHP_EOL);
-            echo PHP_EOL . $this->getOpt->getHelpText();
-            exit;
-        }
-
-        // show version and quit
-        if ($this->getOpt->getOption('version')) {
-            echo sprintf('PHP Network Weathermap %s' . PHP_EOL, WEATHERMAP_VERSION);
-            exit;
-        }
-
-        // show help and quit
-        if ($this->getOpt->getOption('help')) {
-            echo $this->getOpt->getHelpText();
-            exit;
-        }
-    }
-
-    private function translateOptionsToSettings()
-    {
-        global $weathermap_debug_suppress;
         global $weathermap_error_suppress;
-        global $weathermap_debugging;
 
         $this->configfile = $this->getOpt->getOption('config');
         $this->htmlfile = $this->getOpt->getOption('htmloutput');
@@ -163,14 +162,6 @@ class Runner
         }
         if ($this->getOpt->getOption('no-data') === 1) {
             $this->options_output['sizedebug'] = true;
-        }
-        if ($this->getOpt->getOption('debug') === 1) {
-            $this->options_output['debugging'] = true;
-        }
-        if ($this->getOpt->getOption('uberdebug') === 1) {
-            $this->options_output['debugging'] = true;
-            // allow ALL trace messages (normally we block some of the chatty ones)
-            $weathermap_debug_suppress = array();
         }
 
         if ($this->getOpt->getOption('no-warn') != '') {
@@ -194,11 +185,24 @@ class Runner
                 print "WARNING: --define format is:  --define name=value\n";
             }
         }
+    }
+
+    private function translateDebugOptionsToSettings()
+    {
+        global $weathermap_debug_suppress;
+        global $weathermap_debugging;
+
+        if ($this->getOpt->getOption('debug') === 1) {
+            $this->options_output['debugging'] = true;
+        }
+        if ($this->getOpt->getOption('uberdebug') === 1) {
+            $this->options_output['debugging'] = true;
+            // allow ALL trace messages (normally we block some of the chatty ones)
+            $weathermap_debug_suppress = array();
+        }
 
         // set this BEFORE we create the map object, so we get the debug output from Reset(), as well
         if (isset($this->options_output['debugging']) && $this->options_output['debugging']) {
-            $weathermap_debugging = true;
-
             $weathermap_debugging = true;
             // enable assertion handling
             assert_options(ASSERT_ACTIVE, 1);
@@ -212,7 +216,6 @@ class Runner
             MapUtility::debug("Starting PHP-Weathermap run, with config: $this->configfile\n");
             MapUtility::debug("------------------------------------\n");
         }
-
     }
 
     private function makeMap()
@@ -226,6 +229,8 @@ class Runner
             $this->mapFileSettings();
             $this->mapSettingsPostConfig();
             $this->getMapData();
+
+            // TODO: it would be good if this used MapRuntime (would need a stub ApplicationInterface)
 
             if ($this->imagefile != '') {
                 $this->map->drawMap($this->imagefile);
@@ -242,7 +247,6 @@ class Runner
     private function mapFileSettings()
     {
         // allow command-lines to override the config file, but provide a default if neither are present
-
         $this->imagefile = $this->imagefile ?: $this->map->imageoutputfile ?: "weathermap.png";
         $this->htmlfile = $this->htmlfile ?: $this->map->htmloutputfile ?: "";
     }
@@ -256,7 +260,6 @@ class Runner
 
         // now stuff in all the others, that we got from getopts
         foreach ($this->options_output as $key => $value) {
-            // $map->$key = $value;
             $this->map->addHint($key, $value);
         }
     }

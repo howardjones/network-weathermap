@@ -180,9 +180,7 @@ function runMaps($mydir)
                         $mapDuration = 0;
 
                         if (file_exists($mapFileName)) {
-                            if ($quietLogging == 0) {
-                                MapUtility::warn("Map: $mapFileName -> $htmlFileName & $imageFileName\n", true);
-                            }
+                            MapUtility::notice("Map: $mapFileName -> $htmlFileName & $imageFileName\n", true);
                             $manager->application->setAppSetting("weathermap_last_started_file", $weathermap_map);
 
                             $mapStartTime = microtime(true);
@@ -232,13 +230,12 @@ function runMaps($mydir)
                             $configuredImageURI = $map->imageuri;
                             $map->imageuri = $pluginName . '?action=viewimage&id=' . $mapSpec->filehash . "&time=" . time();
 
-                            if ($quietLogging == 0) {
-                                $note = Utility::buildMemoryCheckString("");
-                                MapUtility::warn(
-                                    "About to write image file. If this is the last message in your log, increase memory_limit in php.ini () [WMPOLL01] $note\n",
-                                    true
-                                );
-                            }
+                            $note = Utility::buildMemoryCheckString("");
+                            MapUtility::notice(
+                                "About to write image file. If this is the last message in your log, increase memory_limit in php.ini () [WMPOLL01] $note\n",
+                                true
+                            );
+
                             Utility::memoryCheck("MEM pre-render $mapCount");
 
                             // Write the image to a temporary file first - it turns out that libpng is not that fast
@@ -258,9 +255,7 @@ function runMaps($mydir)
                                 rename($tempImageFile, $imageFileName);
                             }
 
-                            if ($quietLogging == 0) {
-                                MapUtility::warn("Wrote map to $imageFileName and $thumbnailFileName\n", true);
-                            }
+                            MapUtility::notice("Wrote map to $imageFileName and $thumbnailFileName\n", true);
                             $fd = @fopen($htmlFileName, 'w');
                             if ($fd != false) {
                                 fwrite($fd, $map->makeHTML('weathermap_' . $mapSpec->filehash . '_imap'));
@@ -341,9 +336,7 @@ function runMaps($mydir)
                             MapUtility::debug("TIME: $mapFileName took $mapDuration seconds.\n");
                             $map->stats->set("duration", $mapDuration);
                             $map->stats->set("warnings", $weathermap_warncount);
-                            if ($quietLogging == 0) {
-                                MapUtility::warn("MAPINFO: " . $map->stats->dump(), true);
-                            }
+                            MapUtility::notice("MAPINFO: " . $map->stats->dump(), true);
                             unset($map);
 
                             Utility::memoryCheck("MEM after $mapCount");
@@ -371,9 +364,7 @@ function runMaps($mydir)
 //*********************
                 MapUtility::debug("Iterated all $mapCount maps.\n");
             } else {
-                if ($quietLogging == 0) {
-                    MapUtility::warn("No activated maps found. [WMPOLL05]\n");
-                }
+                MapUtility::notice("No activated maps found. [WMPOLL05]\n");
             }
         } else {
             $NOTE = "";
@@ -404,9 +395,7 @@ function runMaps($mydir)
         $totalWarnings,
         $warningNotes
     );
-    if ($quietLogging == 0) {
-        MapUtility::warn("STATS: Weathermap " . WEATHERMAP_VERSION . " run complete - $statsString\n", true);
-    }
+    MapUtility::notice("STATS: Weathermap " . WEATHERMAP_VERSION . " run complete - $statsString\n", true);
     $manager->application->setAppSetting("weathermap_last_stats", $statsString);
     $manager->application->setAppSetting("weathermap_last_finish_time", time());
 }

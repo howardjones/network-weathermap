@@ -43,9 +43,9 @@ class MapUtility
                 $callingFunction = " [$function@$file:$line]";
 
                 if (is_array($weathermap_debug_suppress) && in_array(
-                    strtolower($function),
-                    $weathermap_debug_suppress
-                )) {
+                        strtolower($function),
+                        $weathermap_debug_suppress
+                    )) {
                     return;
                 }
             }
@@ -75,6 +75,16 @@ class MapUtility
                     fclose($log);
                 }
             }
+        }
+    }
+
+    public static function notice($string, $noticeOnly = false)
+    {
+        // TODO: This is ugly for now, but will be OK again once there's a logger object
+        // (the quietLogging check will just translate to loglevel=NOTICE or loglevel=WARN)
+        $quietLogging = \read_config_option("weathermap_quiet_logging");
+        if (!$quietLogging) {
+            MapUtility::warn($string, $noticeOnly);
         }
     }
 

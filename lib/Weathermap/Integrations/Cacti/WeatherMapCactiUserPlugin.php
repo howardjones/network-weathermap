@@ -2,21 +2,11 @@
 
 namespace Weathermap\Integrations\Cacti;
 
-require_once dirname(__FILE__) . "/../../UI/UIBase.php";
-require_once dirname(__FILE__) . "/../MapManager.php";
-require_once dirname(__FILE__) . "/../ApplicationInterface.php";
-require_once dirname(__FILE__) . "/CactiApplicationInterface.php";
 require_once dirname(__FILE__) . "/database.php";
-require_once dirname(__FILE__) . "/../../Core/constants.php";
 
 use Weathermap\UI\UIBase;
 use Weathermap\Integrations\MapManager;
 
-//require_once "database.php";
-//require_once "Map.php";
-//require_once "WeatherMap.functions.php";
-//require_once "WeatherMapUIBase.class.php";
-//include_once 'WeathermapManager.php';
 
 class WeatherMapCactiUserPlugin extends UIBase
 {

@@ -105,7 +105,7 @@ class MapManager
 
     public function getMapRunList()
     {
-        $statement = $this->pdo->query("select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on' order by sortorder,id");
+        $statement = $this->pdo->query("SELECT m.*, g.name AS groupname FROM weathermap_maps m,weathermap_groups g WHERE m.group_id=g.id AND active='on' ORDER BY sortorder,id");
         $statement->execute();
         $maps = $statement->fetchAll(PDO::FETCH_OBJ);
 
@@ -398,22 +398,25 @@ class MapManager
 
     public function getMapSettings($mapId)
     {
+        // globals
         if ($mapId == 0) {
             $statement = $this->pdo->query("SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0");
             $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_OBJ);
         }
+
+        // mapid is actually a group id
         if ($mapId < 0) {
             $statement = $this->pdo->prepare("SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=?");
             $statement->execute(array((-intval($mapId))));
-        }
-        if ($mapId > 0) {
-            $statement = $this->pdo->prepare("SELECT * FROM weathermap_settings WHERE mapid=?");
-            $statement->execute(array(intval($mapId)));
+            return $statement->fetchAll(PDO::FETCH_OBJ);
         }
 
-        $settings = $statement->fetchAll(PDO::FETCH_OBJ);
+        // default: just one map
+        $statement = $this->pdo->prepare("SELECT * FROM weathermap_settings WHERE mapid=?");
+        $statement->execute(array(intval($mapId)));
+        return $statement->fetchAll(PDO::FETCH_OBJ);
 
-        return $settings;
     }
 
     public function getMapSettingById($settingId)
@@ -531,6 +534,12 @@ class MapManager
         return $title;
     }
 
+    /**
+     * Add a map to the maplist
+     *
+     * @param string $mapFilename
+     * @throws \Exception
+     */
     public function addMap($mapFilename)
     {
         chdir($this->configDirectory);
@@ -584,6 +593,13 @@ class MapManager
         return $result;
     }
 
+    /**
+     * Convert a data_base_field_name to a DataBaseFieldName
+     *
+     * @param string $input
+     * @param string $separator
+     * @return string
+     */
     private function camelize($input, $separator = '_')
     {
         return str_replace($separator, '', ucwords($input, $separator));
@@ -642,9 +658,9 @@ class MapManager
                                 titlecache TEXT NOT NULL,
                                 filehash VARCHAR (40) NOT NULL DEFAULT '',
                                 warncount INT(11) NOT NULL DEFAULT 0,
-                                debug set('on','off','once') NOT NULL default 'off',
-                                runtime double NOT NULL default 0,
-                                lastrun datetime,
+                                debug SET('on','off','once') NOT NULL DEFAULT 'off',
+                                runtime DOUBLE NOT NULL DEFAULT 0,
+                                lastrun DATETIME,
                                 config TEXT NOT NULL,
                                 thumb_width INT(11) NOT NULL DEFAULT 0,
                                 thumb_height INT(11) NOT NULL DEFAULT 0,
@@ -711,24 +727,24 @@ class MapManager
             # There have been a number of changes over versions.
 
             $mapsFieldChanges = array(
-                'sortorder' => array("alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id"),
-                'filehash' => array("alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache"),
-                'warncount' => array("alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash"),
-                'config' => array("alter table weathermap_maps add config text NOT NULL after warncount"),
+                'sortorder' => array("ALTER TABLE weathermap_maps ADD sortorder INT(11) NOT NULL DEFAULT 0 AFTER id"),
+                'filehash' => array("ALTER TABLE weathermap_maps ADD filehash VARCHAR(40) NOT NULL DEFAULT '' AFTER titlecache"),
+                'warncount' => array("ALTER TABLE weathermap_maps ADD warncount INT(11) NOT NULL DEFAULT 0 AFTER filehash"),
+                'config' => array("ALTER TABLE weathermap_maps ADD config TEXT NOT NULL AFTER warncount"),
                 'thumb_width' => array(
-                    "alter table weathermap_maps add thumb_width int(11) NOT NULL default 0 after config",
-                    "alter table weathermap_maps add thumb_height int(11) NOT NULL default 0 after thumb_width",
-                    "alter table weathermap_maps add schedule varchar(32) NOT NULL default '*' after thumb_height",
-                    "alter table weathermap_maps add archiving set('on','off') NOT NULL default 'off' after schedule"
+                    "ALTER TABLE weathermap_maps ADD thumb_width INT(11) NOT NULL DEFAULT 0 AFTER config",
+                    "ALTER TABLE weathermap_maps ADD thumb_height INT(11) NOT NULL DEFAULT 0 AFTER thumb_width",
+                    "ALTER TABLE weathermap_maps ADD schedule VARCHAR(32) NOT NULL DEFAULT '*' AFTER thumb_height",
+                    "ALTER TABLE weathermap_maps ADD archiving SET('on','off') NOT NULL DEFAULT 'off' AFTER schedule"
                 ),
                 'group_id' => array(
-                    "alter table weathermap_maps add group_id int(11) NOT NULL default 1 after sortorder",
+                    "ALTER TABLE weathermap_maps ADD group_id INT(11) NOT NULL DEFAULT 1 AFTER sortorder",
                     "ALTER TABLE `weathermap_settings` ADD `groupid` INT NOT NULL DEFAULT '0' AFTER `mapid`"
                 ),
                 'debug' => array(
-                    "alter table weathermap_maps add runtime double NOT NULL default 0 after warncount",
-                    "alter table weathermap_maps add lastrun datetime after runtime",
-                    "alter table weathermap_maps add debug set('on','off','once') NOT NULL default 'off' after warncount;"
+                    "ALTER TABLE weathermap_maps ADD runtime DOUBLE NOT NULL DEFAULT 0 AFTER warncount",
+                    "ALTER TABLE weathermap_maps ADD lastrun DATETIME AFTER runtime",
+                    "ALTER TABLE weathermap_maps ADD debug SET('on','off','once') NOT NULL DEFAULT 'off' AFTER warncount;"
                 )
             );
 

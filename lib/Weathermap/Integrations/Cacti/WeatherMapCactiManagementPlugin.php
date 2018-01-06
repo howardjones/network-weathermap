@@ -2,19 +2,7 @@
 
 namespace Weathermap\Integrations\Cacti;
 
-require_once dirname(__FILE__) . "/../../UI/UIBase.php";
-require_once dirname(__FILE__) . "/../MapManager.php";
-require_once dirname(__FILE__) . "/../ApplicationInterface.php";
-require_once dirname(__FILE__) . "/CactiApplicationInterface.php";
 require_once dirname(__FILE__) . "/database.php";
-require_once dirname(__FILE__) . "/../../Core/MapUtility.php";
-require_once dirname(__FILE__) . "/../../Core/constants.php";
-
-//require_once "database.php";
-//require_once "Map.php";
-//require_once "WeatherMap.functions.php";
-//require_once "WeatherMapUIBase.class.php";
-//include_once 'WeathermapManager.php';
 
 use Weathermap\Integrations\MapManager;
 use Weathermap\UI\UIBase;
@@ -30,6 +18,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     public $cactiConfig;
     public $myURL;
     public $editorURL;
+    public $basePath;
 
     public $commands = array(
         'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id", "int"))),
@@ -106,14 +95,15 @@ class WeatherMapCactiManagementPlugin extends UIBase
         ':: DEFAULT ::' => array('handler' => 'handleManagementMainScreen', 'args' => array())
     );
 
-    public function __construct($config)
+    public function __construct($config, $basePath)
     {
         parent::__construct();
 
+        $this->basePath = $basePath;
         $this->myURL = "SHOULD-BE-OVERRIDDEN";
         $this->editorURL = "SHOULD-BE-OVERRIDDEN";
         $this->cactiConfig = $config;
-        $this->configPath = realpath(dirname(__FILE__) . '/../configs');
+        $this->configPath = $basePath . '/configs';
         $this->cactiBasePath = $config["base_path"];
         $pdo = weathermap_get_pdo();
         $cactiInterface = new CactiApplicationInterface($pdo);

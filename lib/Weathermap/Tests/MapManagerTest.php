@@ -542,4 +542,5 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
 
         $this->assertEquals(array(), $columnList);
     }
+
 }

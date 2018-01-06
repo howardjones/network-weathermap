@@ -2,15 +2,13 @@
 
 namespace Weathermap\Integrations\Cacti;
 
-require_once dirname(__FILE__) . "/WeatherMapCactiManagementPlugin.php";
-
 class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
 {
     public $colours;
 
-    public function __construct($config)
+    public function __construct($config, $basePath)
     {
-        parent::__construct($config);
+        parent::__construct($config, $basePath);
         $this->myURL = "weathermap-cacti10-plugin-mgmt.php";
         $this->editorURL = "weathermap-cacti10-plugin-editor.php";
     }

@@ -17,12 +17,24 @@
  */
 
 
+// Load our autoloader
+require_once dirname(__FILE__) . "/lib/all.php";
+
+// These four are not classes which can be autoloaded. They're the global functions that Cacti is looking
+// for to use as plugin hook functions
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti88-plugin-hooks.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php";
-require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/CactiApplicationInterface.php";
-require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/MapManager.php";
-require_once dirname(__FILE__) . "/lib/Weathermap/Core/constants.php";
+// and the old (to be replaced) Giant Function Of Everything for drawing maps
+require_once dirname(__FILE__) . "/lib/Weathermap/Poller/poller-common.php";
+
+
+//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
+//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti88-plugin-hooks.php";
+//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php";
+//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/CactiApplicationInterface.php";
+//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/MapManager.php";
+//require_once dirname(__FILE__) . "/lib/Weathermap/Core/constants.php";
 
 function plugin_weathermap_version()
 {
@@ -41,20 +53,20 @@ function plugin_weathermap_version()
 
 function plugin_weathermap_install()
 {
-    api_plugin_register_hook('weathermap', 'config_arrays', 'weathermap_config_arrays', 'setup88.php');
-    api_plugin_register_hook('weathermap', 'config_settings', 'weathermap_config_settings', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'config_arrays', 'weathermap_config_arrays', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'config_settings', 'weathermap_config_settings', 'setup88.php');
 
-    api_plugin_register_hook('weathermap', 'top_header_tabs', 'weathermap_show_tab', 'setup88.php');
-    api_plugin_register_hook('weathermap', 'top_graph_header_tabs', 'weathermap_show_tab', 'setup88.php');
-    api_plugin_register_hook('weathermap', 'draw_navigation_text', 'weathermap_draw_navigation_text', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'top_header_tabs', 'weathermap_show_tab', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'top_graph_header_tabs', 'weathermap_show_tab', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'draw_navigation_text', 'weathermap_draw_navigation_text', 'setup88.php');
 
-    api_plugin_register_hook('weathermap', 'top_graph_refresh', 'weathermap_top_graph_refresh', 'setup88.php');
-    api_plugin_register_hook('weathermap', 'page_title', 'weathermap_page_title', 'setup88.php');
-    api_plugin_register_hook('weathermap', 'page_head', 'weathermap_page_head', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'top_graph_refresh', 'weathermap_top_graph_refresh', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'page_title', 'weathermap_page_title', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'page_head', 'weathermap_page_head', 'setup88.php');
 
-    api_plugin_register_hook('weathermap', 'poller_top', 'weathermap_poller_top', 'setup88.php');
-    api_plugin_register_hook('weathermap', 'poller_output', 'weathermap_poller_output', 'setup88.php');
-    api_plugin_register_hook('weathermap', 'poller_bottom', 'weathermap_poller_bottom', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'poller_top', 'weathermap_poller_top', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'poller_output', 'weathermap_poller_output', 'setup88.php');
+    \api_plugin_register_hook('weathermap', 'poller_bottom', 'weathermap_poller_bottom', 'setup88.php');
 
     weathermap_setup_table();
 }

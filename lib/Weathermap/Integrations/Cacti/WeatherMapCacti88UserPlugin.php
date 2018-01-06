@@ -2,9 +2,8 @@
 
 namespace Weathermap\Integrations\Cacti;
 
+// replacements for functions in Cacti 1.x, so more code can be shared
 require_once dirname(__FILE__) . '/weathermap-cacti88-plugin-compat.php';
-require_once dirname(__FILE__) . "/WeatherMapCactiUserPlugin.php";
-
 
 class WeatherMapCacti88UserPlugin extends WeatherMapCactiUserPlugin
 {

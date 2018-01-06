@@ -30,7 +30,7 @@ plugin does, too.
 
 * __Cacti 0.8 Plugin__ - broken UI, broken poller. Code has all been moved and not even run once yet.
 
-* __Cacti 1.0 Plugin__ - broken UI, broken poller. Code has all been moved and not even run once yet.
+* __Cacti 1.0 Plugin__ - broken UI, *working* poller. Code has all been moved and most has not even run once yet.
 
 ### Using the dev version
 

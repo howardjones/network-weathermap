@@ -1,4 +1,20 @@
 <?php
+function weathermap_setup_table()
+{
+    $dbversion = \read_config_option('weathermap_db_version');
+
+    $myversioninfo = weathermap_version();
+    $myversion = $myversioninfo['version'];
+
+    $pdo = weathermap_get_pdo();
+    $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface($pdo);
+    $manager = new Weathermap\Integrations\MapManager($pdo, "", $cactiInterface);
+
+    if (($dbversion == '') || (preg_match('/dev$/', $myversion)) || ($dbversion != $myversion)) {
+        $manager->initializeDatabase();
+        $manager->initializeAppSettings();
+    }
+}
 
 function weathermap_page_head()
 {
@@ -19,7 +35,7 @@ function weathermap_page_title($t)
         )) {
             $mapid = $matches[1];
             $pdo = weathermap_get_pdo();
-            $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface();
+            $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface($pdo);
             $manager = new Weathermap\Integrations\MapManager($pdo, "", $cactiInterface);
 
             // TODO: Should numeric ID ever happen?
@@ -142,22 +158,6 @@ function weathermap_config_settings()
     }
 }
 
-function weathermap_setup_table()
-{
-    $dbversion = read_config_option('weathermap_db_version');
-
-    $myversioninfo = weathermap_version();
-    $myversion = $myversioninfo['version'];
-
-    $pdo = weathermap_get_pdo();
-    $cactiInterface = new Weathermap\Integrations\Cacti\CactiApplicationInterface();
-    $manager = new Weathermap\Integrations\MapManager($pdo, "", $cactiInterface);
-
-    if (($dbversion == '') || (preg_match('/dev$/', $myversion)) || ($dbversion != $myversion)) {
-        $manager->initializeDatabase();
-        $manager->initializeAppSettings();
-    }
-}
 
 function weathermap_config_arrays()
 {
@@ -196,11 +196,11 @@ function weathermap_show_tab()
         $realmID = $user_auth_realm_filenames[basename('weathermap-cacti88-plugin.php')];
     }
 
-    $tabstyle = intval(read_config_option("superlinks_tabstyle"));
+    $tabstyle = intval(\read_config_option("superlinks_tabstyle"));
     $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 
     $pdo = weathermap_get_pdo();
-    $stmt = $pdo->prepare("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id=? and user_auth_realm.realm_id=?");
+    $stmt = $pdo->prepare("SELECT user_auth_realm.realm_id FROM user_auth_realm WHERE user_auth_realm.user_id=? AND user_auth_realm.realm_id=?");
     $stmt->execute(array($userid, $realmID));
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

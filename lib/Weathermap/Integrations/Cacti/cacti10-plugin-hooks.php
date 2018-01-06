@@ -2,7 +2,7 @@
 
 function weathermap_setup_table()
 {
-    $dbversion = read_config_option('weathermap_db_version');
+    $dbversion = \read_config_option('weathermap_db_version');
 
     $myversioninfo = weathermap_version();
     $myversion = $myversioninfo['version'];

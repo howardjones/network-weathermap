@@ -11,7 +11,7 @@ class Cacti88ManagementTest extends \PHPUnit_Framework_TestCase
     {
         $dummyConfig = array("base_path" => "/tmp");
         $dummyColors = array();
-        $this->object = new WeatherMapCacti88ManagementPlugin($dummyConfig, $dummyColors);
+        $this->object = new WeatherMapCacti88ManagementPlugin($dummyConfig, $dummyColors, $dummyConfig['base_path']."/plugins/weathermap");
     }
 
     public function testValidCommandMap()

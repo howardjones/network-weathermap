@@ -62,8 +62,8 @@ The release process collects up these files and puts them in the zip file, via t
 * Break down 'monster methods' into simpler ones. Identify groups within the larger classes for refactoring (e.g. plugin-related stuff in Map)
 
     * Poller - a single runMaps() function currently does almost everything. Replace with Poller class for general environment setup, which
-    asks MapManager for the maps to run. Use a Runtime class per-map to contain all the knowledge
-    needed to run that map.
+    asks MapManager for the maps to run. ~~Use a MapRuntime class per-map to contain all the knowledge
+    needed to run that map.~~
     
 * Dependency Injection - there's some ugly stuff especially with logging and global variables. Switch to a real logger (planning on monolog), wrapped
 in a simple class to manage things like muting certain messages, and switching between debug and normal logging. Then find
@@ -78,6 +78,37 @@ which turns out to be quite a few. Breaking that down into global, map, and grou
 * ~~Make an abstraction layer for things like `read_config_option` in the UI, so it doesn't depend on Cacti being underneath. When someone wants to make a plugin/integration for a new
 application, it'll be a lot 'thinner' this way, too. This is done as Weathermap\Integration\ApplicationInterface~~
 
+* Map object: really, this is several different things:
+
+    1. A container for the nodes, links, & scales, and some management functions used by the editor mainly to access them (addNode, getNode etc). Also
+    processString, which lives here because it looks inside everything else (*does it still?*).
+    
+    2. For no particular reason, the home of title and timestamps (which should be their own objects with their draw() method)
+    
+    3. A manager for the map drawing and data collection process - there could definitely be a DataManager for
+    readData(), preprocessTargets() etc.
+    
+    4. Global data for the map
+    
+    5. The imagemap and z-layer information, which are just another couple of managed lists used for draw.
+    
+    6. Some functions to draw overlays that are only used by the editor. There should be some mechanism to 
+    provide a delegate to draw these, supplied by the editor.
+
+* Create a MapTitle and MapTimestamp class (from #2 above)
+
+* Create a MapDataManager class (#3 above)
+
+* As much as possible make the draw function in Map generically call the draw()
+functions in each map item.
+
+* Other map items: These have a mix of concerns between the drawing off the item, and the data
+related to it. Most of the data stuff is in MapDataItem these days though.
+
+* In all cases, the way configs are built up for getConfig() (aka the editor) is
+quite cumbersome, and adds a lot of complexity to the classes, as it effectively
+reverse-engineers the config from scratch. Some kind of DOM-style structure produced
+by readConfig(), and simply read back by getConfig() would make the world a lot simpler.
 
 ## Normal README
 

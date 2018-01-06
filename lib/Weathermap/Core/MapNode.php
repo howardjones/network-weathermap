@@ -1298,6 +1298,11 @@ class MapNode extends MapDataItem
     {
         return sprintf("[NODE %s]", $this->name);
     }
+
+    public function getOverlibCentre()
+    {
+        return array($this->x, $this->y);
+    }
 }
 
 // vim:ts=4:sw=4:

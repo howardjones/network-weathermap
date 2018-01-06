@@ -197,9 +197,7 @@ class MapDataItem extends MapItem
         }
     }
 
-
-    public
-    function zeroData()
+    public function zeroData()
     {
         $channels = $this->getChannelList();
 
@@ -208,8 +206,7 @@ class MapDataItem extends MapItem
         }
     }
 
-    public
-    function performDataCollection()
+    public function performDataCollection()
     {
         $channels = $this->getChannelList();
 
@@ -234,12 +231,6 @@ class MapDataItem extends MapItem
             }
         }
 
-        // copy to the old named variables, for now. XXX - remove these
-//        foreach ($channels as $channelName => $channel) {
-//            $bwvar = 'bandwidth_' . $channelName;
-//            $this->$bwvar = $this->absoluteUsages[$channel];
-//        }
-
         MapUtility::debug("ReadData complete for %s: %s\n", $this, join(' ', $this->absoluteUsages));
         MapUtility::debug(
             "ReadData: Setting %s,%s for %s\n",
@@ -253,10 +244,8 @@ class MapDataItem extends MapItem
      * @param $channels
      * @return array
      */
-    private
-    function collectDataFromTargets(
-        $channels
-    ) {
+    private function collectDataFromTargets($channels)
+    {
         $nFails = 0;
         $dataTime = 0;
 
@@ -286,8 +275,7 @@ class MapDataItem extends MapItem
         return array($nFails);
     }
 
-    public
-    function aggregateDataResults()
+    public function aggregateDataResults()
     {
         $channels = $this->getChannelList();
 
@@ -309,8 +297,7 @@ class MapDataItem extends MapItem
         }
     }
 
-    public
-    function calculateScaleColours()
+    public function calculateScaleColours()
     {
         $channels = $this->getChannelList();
 
@@ -368,12 +355,8 @@ class MapDataItem extends MapItem
      * @param string $fieldName
      * @return string
      */
-    protected
-    function getConfigInOutOrBoth(
-        $comparison,
-        $configKeyword,
-        $fieldName
-    ) {
+    protected function getConfigInOutOrBoth($comparison, $configKeyword, $fieldName)
+    {
         $output = '';
         $myArray = $this->$fieldName;
         $theirArray = $comparison->$fieldName;
@@ -401,11 +384,8 @@ class MapDataItem extends MapItem
      * @param $comparison
      * @return string
      */
-    protected
-    function getConfigSimple(
-        $simpleParameters,
-        $comparison
-    ) {
+    protected function getConfigSimple($simpleParameters, $comparison)
+    {
         $output = '';
 
         # TEMPLATE must come first. DEFAULT
@@ -429,11 +409,8 @@ class MapDataItem extends MapItem
         return $output;
     }
 
-    protected
-    function getMaxValueConfig(
-        $comparison,
-        $keyword = 'MAXVALUE'
-    ) {
+    protected function getMaxValueConfig($comparison, $keyword = 'MAXVALUE')
+    {
         $output = '';
 
         if (($this->maxValues[IN] != $comparison->maxValues[IN])
@@ -450,14 +427,35 @@ class MapDataItem extends MapItem
         return $output;
     }
 
-    private
-    function getDirectionList()
+//    private function getDirectionList()
+//    {
+//        return array('in' => IN, 'out' => OUT);
+//    }
+
+    public function getOverlibCentre()
     {
-        return array('in' => IN, 'out' => OUT);
+        return array(0, 0);
     }
 
-    public
-    function asConfigData()
+    public function getOverlibDataKey()
+    {
+        // skip all this if it's a template node
+        if ($this->isTemplate()) {
+            return '';
+        }
+
+        // check to see if any of the relevant things have a value
+        $key = '';
+        $dirs = $this->getChannelList();
+        foreach ($dirs as $name => $index) {
+            $key .= join('', $this->overliburl[$index]);
+            $key .= $this->notestext[$index];
+        }
+
+        return $key;
+    }
+
+    public function asConfigData()
     {
         $config = parent::asConfigData();
 
@@ -466,10 +464,8 @@ class MapDataItem extends MapItem
         return $config;
     }
 
-    public
-    function getProperty(
-        $name
-    ) {
+    public function getProperty($name)
+    {
         MapUtility::debug("MDI Fetching %s\n", $name);
 
         $translations = array();

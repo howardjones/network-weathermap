@@ -860,6 +860,20 @@ class MapLink extends MapDataItem
         }
         return array($angle, $edge);
     }
+
+    public function getOverlibCentre()
+    {
+        $aX = $this->endpoints[0]->node->x;
+        $aY = $this->endpoints[0]->node->y;
+
+        $bX = $this->endpoints[1]->node->x;
+        $bY = $this->endpoints[0]->node->y;
+
+        $midX = ($aX + $bX) / 2;
+        $midY = ($aY + $bY) / 2;
+
+        return array($midX, $midY);
+    }
 }
 
 // vim:ts=4:sw=4:

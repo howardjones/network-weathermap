@@ -55,8 +55,6 @@ class Map extends MapBase
     public $mintimey;
     public $maxtimey;
 
-//    public $min_ds_time;
-//    public $max_ds_time;
     public $minstamptext;
     public $maxstamptext;
     public $stamptext;
@@ -89,8 +87,6 @@ class Map extends MapBase
     public $thumbHeight;
     public $hasIncludes;
     public $hasOverlibs;
-//    public $node_template_tree;
-//    public $link_template_tree;
     public $dsinfocache = array();
 
     public $pluginManager;
@@ -170,9 +166,6 @@ class Map extends MapBase
             'name' => 'MAP'
         );
 
-//        $this->min_ds_time = null;
-//        $this->max_ds_time = null;
-
         $this->scales = array();
 
         $this->colourtable = array();
@@ -210,20 +203,11 @@ class Map extends MapBase
             $this->$fld = $this->inheritedFieldList[$fld];
         }
 
-//        $this->min_ds_time = null;
-//        $this->max_ds_time = null;
-
         $this->nodes = array(); // an array of MapNodes
         $this->links = array(); // an array of MapLinks
 
         $this->createDefaultLinks();
         $this->createDefaultNodes();
-
-//        $this->node_template_tree = array();
-//        $this->link_template_tree = array();
-
-//        $this->node_template_tree['DEFAULT'] = array();
-//        $this->link_template_tree['DEFAULT'] = array();
 
         assert('is_object($this->nodes[":: DEFAULT ::"])');
         assert('is_object($this->links[":: DEFAULT ::"])');
@@ -246,7 +230,32 @@ class Map extends MapBase
         MapUtility::debug("WeatherMap class Reset() complete\n");
     }
 
+    // START OF ITEM MANAGER
+
     // Simple accessors to stop the editor from reaching inside objects quite so much
+
+    public function createDefaultNodes()
+    {
+        MapUtility::debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
+        $this->addNode(new MapNode(':: DEFAULT ::', ':: DEFAULT ::', $this));
+
+        MapUtility::debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
+        $this->addNode(new MapNode('DEFAULT', ':: DEFAULT ::', $this));
+    }
+
+    public function createDefaultLinks()
+    {
+        // these are the default defaults
+        // by putting them into a normal object, we can use the
+        // same code for writing out LINK DEFAULT as any other link.
+        MapUtility::debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
+        // these two are used for default settings
+        $this->addLink(new MapLink(':: DEFAULT ::', ':: DEFAULT ::', $this));
+
+        MapUtility::debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
+        $this->addLink(new MapLink('DEFAULT', ':: DEFAULT ::', $this));
+    }
+
 
     public function getRealNodes()
     {
@@ -306,6 +315,73 @@ class Map extends MapBase
         return $this->scales['DEFAULT'];
     }
 
+    public function nodeExists($nodeName)
+    {
+        return array_key_exists($nodeName, $this->nodes);
+    }
+
+    public function linkExists($linkName)
+    {
+        return array_key_exists($linkName, $this->links);
+    }
+
+    /**
+     * Create an array of all the nodes and links, mixed together.
+     * readData() makes several passes through this list.
+     *
+     * @return MapDataItem[]
+     */
+    public function buildAllItemsList()
+    {
+        // TODO - this should probably be a static, or otherwise cached
+        $allItems = array();
+
+        $listOfItemLists = array(&$this->nodes, &$this->links);
+        reset($listOfItemLists);
+
+        while (list($outerListCount,) = each($listOfItemLists)) {
+            unset($itemList);
+            $itemList = &$listOfItemLists[$outerListCount];
+
+            reset($itemList);
+            while (list($innerListCount,) = each($itemList)) {
+                unset($oneMapItem);
+                $oneMapItem = &$itemList[$innerListCount];
+                $allItems [] = $oneMapItem;
+            }
+        }
+        return $allItems;
+    }
+
+    // END OF ITEM MANAGER
+
+    // START OF LAYER MANAGER
+
+
+    private function buildZLayers()
+    {
+        MapUtility::debug("Building cache of z-layers.\n");
+
+        $allItems = $this->buildAllItemsList();
+
+        foreach ($allItems as $item) {
+            $zIndex = $item->getZIndex();
+            $this->addItemToZLayer($item, $zIndex);
+        }
+        MapUtility::debug('Found ' . count($this->seenZLayers) . " z-layers including builtins (0,100).\n");
+    }
+
+    private function addItemToZLayer($item, $zIndex)
+    {
+        if (!isset($this->seenZLayers[$zIndex]) || !is_array($this->seenZLayers[$zIndex])) {
+            $this->seenZLayers[$zIndex] = array();
+        }
+        array_push($this->seenZLayers[$zIndex], $item);
+    }
+
+
+    // END OF LAYER MANAGER
+
 
     private function populateDefaultColours()
     {
@@ -323,6 +399,10 @@ class Map extends MapBase
             $this->colourtable[$key] = new Colour($def['red'], $def['green'], $def['blue']);
         }
     }
+
+
+    // *************************************************************************88
+    // processString
 
     /**
      * @param string $input
@@ -512,6 +592,41 @@ class Map extends MapBase
 
 
     /**
+     * @param $context
+     * @return string
+     */
+    public function getProcessStringContextName(&$context)
+    {
+        $contextDescription = strtolower($context->myType());
+        if ($contextDescription != 'map') {
+            $contextDescription .= ':' . $context->name;
+        }
+        return $contextDescription;
+    }
+
+    /**
+     * @param $input
+     * @param $context
+     * @param $contextType
+     * @return mixed
+     */
+    public function applyProcessStringShortcuts($input, &$context, $contextType)
+    {
+        if ($contextType === 'node') {
+            $input = str_replace('{node:this:graph_id}', $context->getHint('graph_id'), $input);
+            $input = str_replace('{node:this:name}', $context->name, $input);
+        }
+
+        if ($contextType === 'link') {
+            $input = str_replace('{link:this:graph_id}', $context->getHint('graph_id'), $input);
+        }
+        return $input;
+    }
+
+    // *************************************************************************88
+
+
+    /**
      * @param resource $imageRef
      * @param int $font
      * @param Colour $colour
@@ -556,6 +671,22 @@ class Map extends MapBase
         $this->imap->addArea('Rectangle', $areaName, '', array($x, $y, $x + $boxWidth, $y - $boxHeight));
         $this->imagemapAreas[] = $areaName;
     }
+
+    protected function calculateDatestamp()
+    {
+        // if we're running tests, we force the time to a particular value,
+        // so the output can be compared to a reference image more easily
+        $testmode = intval($this->getHint('testmode'));
+
+        if ($testmode == 1) {
+            $maptime = 1270813792;
+            date_default_timezone_set('UTC');
+        } else {
+            $maptime = time();
+        }
+        $this->datestamp = strftime($this->stamptext, $maptime);
+    }
+
 
     /**
      * @param resource $imageRef
@@ -679,38 +810,6 @@ class Map extends MapBase
     }
 
 
-    private function buildZLayers()
-    {
-        MapUtility::debug("Building cache of z-layers.\n");
-
-        $allItems = $this->buildAllItemsList();
-
-        foreach ($allItems as $item) {
-            $zIndex = $item->getZIndex();
-            $this->addItemToZLayer($item, $zIndex);
-        }
-        MapUtility::debug('Found ' . count($this->seenZLayers) . " z-layers including builtins (0,100).\n");
-    }
-
-    private function addItemToZLayer($item, $zIndex)
-    {
-        if (!isset($this->seenZLayers[$zIndex]) || !is_array($this->seenZLayers[$zIndex])) {
-            $this->seenZLayers[$zIndex] = array();
-        }
-        array_push($this->seenZLayers[$zIndex], $item);
-    }
-
-    private function updateMaxValues()
-    {
-        MapUtility::debug("Finalising bandwidth.\n");
-
-        $allItems = $this->buildAllItemsList();
-
-        foreach ($allItems as $item) {
-            $item->updateMaxValues($this->kilo);
-        }
-    }
-
     private function resolveRelativePositions()
     {
         // calculate any relative positions here - that way, nothing else
@@ -794,179 +893,6 @@ class Map extends MapBase
         fclose($fileHandle);
     }
 
-    private function getConfigForPosition($keyword, $fieldnames, $object1, $object2)
-    {
-        $write = false;
-        $string = $keyword;
-
-        for ($i = 0; $i < count($fieldnames); $i++) {
-            $string .= ' ' . $object1->{$fieldnames[$i]};
-
-            if ($object1->{$fieldnames[$i]} != $object2[$fieldnames[$i]]) {
-                $write = true;
-            }
-        }
-        $string .= "\n";
-
-        if (!$write) {
-            return '';
-        }
-        return $string;
-    }
-
-
-    public function getConfig()
-    {
-        $output = '';
-
-        $output .= "# Automatically generated by php-weathermap v" . WEATHERMAP_VERSION . "\n\n";
-
-        $output .= $this->fonts->getConfig();
-        $output .= "\n";
-
-        $simpleParameters = array(
-            array('title', 'TITLE', self::CONFIG_TYPE_LITERAL),
-            array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
-            array('height', 'HEIGHT', self::CONFIG_TYPE_LITERAL),
-            array('background', 'BACKGROUND', self::CONFIG_TYPE_LITERAL),
-            array('htmlstyle', 'HTMLSTYLE', self::CONFIG_TYPE_LITERAL),
-            array('kilo', 'KILO', self::CONFIG_TYPE_LITERAL),
-            array('keyfont', 'KEYFONT', self::CONFIG_TYPE_LITERAL),
-            array('timefont', 'TIMEFONT', self::CONFIG_TYPE_LITERAL),
-            array('titlefont', 'TITLEFONT', self::CONFIG_TYPE_LITERAL),
-            array('htmloutputfile', 'HTMLOUTPUTFILE', self::CONFIG_TYPE_LITERAL),
-            array('dataoutputfile', 'DATAOUTPUTFILE', self::CONFIG_TYPE_LITERAL),
-            array('htmlstylesheet', 'HTMLSTYLESHEET', self::CONFIG_TYPE_LITERAL),
-            array('imageuri', 'IMAGEURI', self::CONFIG_TYPE_LITERAL),
-            array('imageoutputfile', 'IMAGEOUTPUTFILE', self::CONFIG_TYPE_LITERAL)
-        );
-
-        foreach ($simpleParameters as $param) {
-            $field = $param[0];
-            $keyword = $param[1];
-
-            if ($this->$field != $this->inheritedFieldList[$field]) {
-                if ($param[2] == self::CONFIG_TYPE_COLOR) {
-                    $output .= "$keyword " . $this->$field->asConfig() . "\n";
-                }
-                if ($param[2] == self::CONFIG_TYPE_LITERAL) {
-                    $output .= "$keyword " . $this->$field . "\n";
-                }
-            }
-        }
-
-        $output .= $this->getConfigForPosition(
-            'TIMEPOS',
-            array('timex', 'timey', 'stamptext'),
-            $this,
-            $this->inheritedFieldList
-        );
-        $output .= $this->getConfigForPosition(
-            'MINTIMEPOS',
-            array('mintimex', 'mintimey', 'minstamptext'),
-            $this,
-            $this->inheritedFieldList
-        );
-        $output .= $this->getConfigForPosition(
-            'MAXTIMEPOS',
-            array('maxtimex', 'maxtimey', 'maxstamptext'),
-            $this,
-            $this->inheritedFieldList
-        );
-        $output .= $this->getConfigForPosition('TITLEPOS', array('titlex', 'titley'), $this, $this->inheritedFieldList);
-
-        $output .= "\n";
-
-        foreach ($this->colourtable as $k => $colour) {
-            $output .= sprintf("%sCOLOR %s\n", $k, $colour->asConfig());
-        }
-        $output .= "\n";
-
-        foreach ($this->scales as $scaleName => $scale) {
-            $output .= $scale->getConfig();
-            $output .= $this->legends[$scaleName]->getConfig();
-        }
-        $output .= "\n";
-
-        foreach ($this->hints as $hintname => $hint) {
-            $output .= "SET $hintname $hint\n";
-        }
-
-        // this doesn't really work right, but let's try anyway
-        if ($this->hasIncludes) {
-            $output .= "\n# Included files\n";
-            foreach ($this->includedFiles as $ifile) {
-                $output .= "INCLUDE $ifile\n";
-            }
-        }
-
-        $output .= "\n# End of global section\n\n";
-
-        foreach (array('template', 'normal') as $which) {
-            if ($which == 'template') {
-                $output .= "\n# TEMPLATE-only NODEs:\n";
-            }
-            if ($which == 'normal') {
-                $output .= "\n# regular NODEs:\n";
-            }
-
-            foreach ($this->nodes as $node) {
-                if (!preg_match('/^::\s/', $node->name)) {
-                    if ($node->definedIn == $this->configfile) {
-                        if ($which == 'template' && $node->x === null) {
-                            MapUtility::debug("TEMPLATE\n");
-                            $output .= $node->getConfig();
-                        }
-                        if ($which == 'normal' && $node->x !== null) {
-                            $output .= $node->getConfig();
-                        }
-                    }
-                }
-            }
-
-            if ($which == 'template') {
-                $output .= "\n# TEMPLATE-only LINKs:\n";
-            }
-
-            if ($which == 'normal') {
-                $output .= "\n# regular LINKs:\n";
-            }
-
-            foreach ($this->links as $link) {
-                if (!preg_match('/^::\s/', $link->name)) {
-                    if ($link->definedIn == $this->configfile) {
-                        if ($which == 'template' && $link->isTemplate()) {
-                            $output .= $link->getConfig();
-                        }
-                        if ($which == 'normal' && !$link->isTemplate()) {
-                            $output .= $link->getConfig();
-                        }
-                    }
-                }
-            }
-        }
-
-        $output .= "\n\n# That's All Folks!\n";
-
-        return $output;
-    }
-
-    public function writeConfig($filename)
-    {
-        $fileHandle = fopen($filename, 'w');
-
-        if ($fileHandle) {
-            $output = $this->getConfig();
-            fwrite($fileHandle, $output);
-            fclose($fileHandle);
-        } else {
-            MapUtility::warn("Couldn't open config file $filename for writing");
-            return false;
-        }
-
-        return true;
-    }
-
     /**
      * @return resource
      */
@@ -978,35 +904,37 @@ class Map extends MapBase
 
         if (!$imageRef) {
             MapUtility::warn("Couldn't create output image in memory (" . $this->width . 'x' . $this->height . ').');
-        } else {
-            imagealphablending($imageRef, true);
-            if ($this->getHint('antialias') == 1) {
-                // Turn on anti-aliasing if it exists and it was requested
-                if (function_exists('imageantialias')) {
-                    imageantialias($imageRef, true);
-                }
-            }
-
-            // by here, we should have a valid image handle
-            $this->selected = ImageUtility::myImageColorAllocate($imageRef, 255, 0, 0); // for selections in the editor
-
-            if ($bgImageRef) {
-                imagecopy($imageRef, $bgImageRef, 0, 0, 0, 0, $this->width, $this->height);
-                imagedestroy($bgImageRef);
-            } else {
-                // fill with background colour anyway, in case the background image failed to load
-                imagefilledrectangle(
-                    $imageRef,
-                    0,
-                    0,
-                    $this->width,
-                    $this->height,
-                    $this->colourtable['BG']->gdAllocate($imageRef)
-                );
-            }
+            return $imageRef;
         }
+
+        imagealphablending($imageRef, true);
+
+        // Turn on anti-aliasing if it exists and it was requested
+        if ($this->getHint('antialias') == 1 and function_exists('imageantialias')) {
+            imageantialias($imageRef, true);
+        }
+
+        // by here, we should have a valid image handle
+        $this->selected = ImageUtility::myImageColorAllocate($imageRef, 255, 0, 0); // for selections in the editor
+
+        if ($bgImageRef) {
+            imagecopy($imageRef, $bgImageRef, 0, 0, 0, 0, $this->width, $this->height);
+            imagedestroy($bgImageRef);
+        } else {
+            // fill with background colour
+            imagefilledrectangle(
+                $imageRef,
+                0,
+                0,
+                $this->width,
+                $this->height,
+                $this->colourtable['BG']->gdAllocate($imageRef)
+            );
+        }
+
         return $imageRef;
     }
+
 
     /**
      * @param $imageRef
@@ -1063,21 +991,6 @@ class Map extends MapBase
                 imagearc($imageRef, $x, $y, 12, 12, 0, 360, $overlayColor);
             }
         }
-    }
-
-    protected function calculateDatestamp()
-    {
-        // if we're running tests, we force the time to a particular value,
-        // so the output can be compared to a reference image more easily
-        $testmode = intval($this->getHint('testmode'));
-
-        if ($testmode == 1) {
-            $maptime = 1270813792;
-            date_default_timezone_set('UTC');
-        } else {
-            $maptime = time();
-        }
-        $this->datestamp = strftime($this->stamptext, $maptime);
     }
 
     /**
@@ -1309,150 +1222,6 @@ class Map extends MapBase
         $weathermap_error_suppress = array();
     }
 
-    public function calculateImagemap()
-    {
-        MapUtility::debug("Trace: calculateImagemap()\n");
-
-        // loop through everything. Figure out along the way if it's a node or a link
-        $allItems = $this->buildAllItemsList();
-
-        foreach ($allItems as $mapItem) {
-            $type = $mapItem->myType();
-
-            $dirs = array();
-            if ($type == 'LINK') {
-                $dirs = array(IN => array(0, 2), OUT => array(1, 3));
-            }
-            if ($type == 'NODE') {
-                $dirs = array(IN => array(0, 1, 2, 3));
-            }
-
-            // check to see if any of the relevant things have a value
-            $change = '';
-            foreach ($dirs as $d => $parts) {
-                $change .= join('', $mapItem->overliburl[$d]);
-                $change .= $mapItem->notestext[$d];
-            }
-            // skip all this if it's a template node
-            if ($mapItem->isTemplate()) {
-                $change = '';
-            }
-
-            if ($this->htmlstyle == 'overlib') {
-                if ($change != '') {
-                    // find the middle of the map
-                    $mapCenterX = $this->width / 2;
-                    $mapCenterY = $this->height / 2;
-
-                    $type = $mapItem->myType();
-
-                    if ($type == 'NODE') {
-                        $midX = $mapItem->x;
-                        $midY = $mapItem->y;
-                    }
-                    if ($type == 'LINK') {
-                        $aX = $mapItem->endpoints[0]->node->x;
-                        $aY = $mapItem->endpoints[0]->node->y;
-
-                        $bX = $mapItem->endpoints[1]->node->x;
-                        $bY = $mapItem->endpoints[0]->node->y;
-
-                        $midX = ($aX + $bX) / 2;
-                        $midY = ($aY + $bY) / 2;
-                    }
-                    $left = '';
-                    $above = '';
-                    $imageExtraHTML = '';
-
-                    if ($mapItem->overlibwidth != 0) {
-                        $left = 'WIDTH,' . $mapItem->overlibwidth . ',';
-                        $imageExtraHTML .= " WIDTH=$mapItem->overlibwidth";
-
-                        if ($midX > $mapCenterX) {
-                            $left .= 'LEFT,';
-                        }
-                    }
-
-                    if ($mapItem->overlibheight != 0) {
-                        $above = 'HEIGHT,' . $mapItem->overlibheight . ',';
-                        $imageExtraHTML .= " HEIGHT=$mapItem->overlibheight";
-
-                        if ($midY > $mapCenterY) {
-                            $above .= 'ABOVE,';
-                        }
-                    }
-
-                    foreach ($dirs as $dir => $parts) {
-                        $caption = ($mapItem->overlibcaption[$dir] != '' ? $mapItem->overlibcaption[$dir] : $mapItem->name);
-                        $caption = $this->processString($caption, $mapItem);
-
-                        $overlibhtml = "onmouseover=\"return overlib('";
-
-                        $n = 0;
-                        if (count($mapItem->overliburl[$dir]) > 0) {
-                            // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-                            foreach ($mapItem->overliburl[$dir] as $url) {
-                                if ($n > 0) {
-                                    $overlibhtml .= '&lt;br /&gt;';
-                                }
-                                $overlibhtml .= "&lt;img $imageExtraHTML src=";
-                                $overlibhtml .= $this->processString(
-                                    $url,
-                                    $mapItem
-                                );
-                                $overlibhtml .= '&gt;';
-                                $n++;
-                            }
-                        }
-                        # print "Added $n for $dir\n";
-                        if (trim($mapItem->notestext[$dir]) != '') {
-                            # put in a linebreak if there was an image AND notes
-                            if ($n > 0) {
-                                $overlibhtml .= '&lt;br /&gt;';
-                            }
-                            $note = $this->processString($mapItem->notestext[$dir], $mapItem);
-                            $note = htmlspecialchars($note, ENT_NOQUOTES);
-                            $note = str_replace("'", '\\&apos;', $note);
-                            $note = str_replace('"', '&quot;', $note);
-                            $overlibhtml .= $note;
-                        }
-                        $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-                            . "');\"  onmouseout=\"return nd();\"";
-
-                        foreach ($mapItem->imagemapAreas as $area) {
-                            $area->extrahtml = $overlibhtml;
-                        }
-                    }
-                } // if change
-            } // overlib?
-
-            // now look at infourls
-            foreach ($dirs as $dir => $parts) {
-                foreach ($parts as $part) {
-                    if (($this->htmlstyle != 'editor') && ($mapItem->infourl[$dir] != '')) {
-                        foreach ($mapItem->imagemapAreas as $area) {
-                            $area->href = $this->processString($mapItem->infourl[$dir], $mapItem);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public function asJS()
-    {
-        $newOutput = array("Nodes" => array(), "Links" => array(), "Areas" => array());
-
-        foreach ($this->links as $link) {
-            $newOutput['Links'][$link->name] = $link->editorData();
-        }
-
-        foreach ($this->nodes as $node) {
-            $newOutput['Nodes'][$node->name] = $node->editorData();
-        }
-
-        return "var mapdata = " . json_encode($newOutput) . ";";
-    }
 
 
     // This method MUST run *after* DrawMap. It relies on DrawMap to call the map-drawing bits
@@ -1465,33 +1234,160 @@ class Map extends MapBase
         // PreloadMapHTML fills in the Imagemap info, ready for the HTML to be created.
         $this->calculateImagemap();
 
-        $html = '';
+        $html = '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: ' . $this->width . 'px;" >';
 
-        $html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: ' . $this->width . 'px;" >';
-        if ($this->imageuri != '') {
-            $html .= sprintf(
-                '<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
-                $this->imageuri,
-                $this->width,
-                $this->height,
-                $imagemapname
-            );
-            $html .= '/>';
-        } else {
-            $html .= sprintf(
-                '<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
-                $this->imagefile,
-                $this->width,
-                $this->height,
-                $imagemapname
-            );
-            $html .= '/>';
-        }
+        $image = $this->imageuri ?: $this->imagefile;
+
+        $html .= sprintf(
+            '<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s" />',
+            $image,
+            $this->width,
+            $this->height,
+            $imagemapname
+        );
+
         $html .= '</div>';
 
         $html .= $this->generateSortedImagemap($imagemapname);
 
         return $html;
+    }
+
+    // *********************************************
+    // imagemap
+
+    public function calculateImagemap()
+    {
+        MapUtility::debug("Trace: calculateImagemap()\n");
+
+        // loop through everything. Figure out along the way if it's a node or a link
+        $allItems = $this->buildAllItemsList();
+
+        // find the middle of the map
+        $mapCentreX = $this->width / 2;
+        $mapCentreY = $this->height / 2;
+
+        foreach ($allItems as $mapItem) {
+            $dirs = array_values($mapItem->getChannelList());
+
+            // check to see if any of the relevant things have a value
+            $key = $mapItem->getOverlibDataKey();
+
+            if ($this->htmlstyle == 'overlib' && $key != '' && count($dirs) > 0) {
+
+                list($midX, $midY) = $mapItem->getOverlibCentre();
+
+                list($left, $above, $imageExtraHTML) = $this->buildOverlibPositioning($mapItem, $midX, $mapCentreX,
+                    $midY, $mapCentreY);
+
+                // TODO - does this even work for IN vs OUT OVERLIB?? (seems to just overwrite one with other)
+                foreach ($dirs as $dir) {
+                    $caption = ($mapItem->overlibcaption[$dir] != '' ? $mapItem->overlibcaption[$dir] : $mapItem->name);
+                    $caption = $this->processString($caption, $mapItem);
+
+                    $overlibhtml = $this->buildOverlibHTML($mapItem, $dir, $imageExtraHTML, $left, $above,
+                        $caption);
+
+                    foreach ($mapItem->imagemapAreas as $area) {
+                        $area->extrahtml = $overlibhtml;
+                    }
+                }
+            } // overlib?
+
+            // now look at infourls
+            // TODO - same here overwrites one with other
+            // don't use infourl in editor (we add our own click handler to edit link)
+            if ($this->htmlstyle != 'editor') {
+                foreach ($dirs as $dir) {
+                    if ($mapItem->infourl[$dir] != '') {
+                        foreach ($mapItem->imagemapAreas as $area) {
+                            $area->href = $this->processString($mapItem->infourl[$dir], $mapItem);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $mapItem
+     * @param $midX
+     * @param $mapCenterX
+     * @param $midY
+     * @param $mapCenterY
+     * @return array
+     */
+    private function buildOverlibPositioning($mapItem, $midX, $mapCenterX, $midY, $mapCenterY)
+    {
+        $left = '';
+        $above = '';
+        $imageExtraHTML = '';
+
+        if ($mapItem->overlibwidth != 0) {
+            $left = 'WIDTH,' . $mapItem->overlibwidth . ',';
+            $imageExtraHTML .= " WIDTH=$mapItem->overlibwidth";
+
+            if ($midX > $mapCenterX) {
+                $left .= 'LEFT,';
+            }
+        }
+
+        if ($mapItem->overlibheight != 0) {
+            $above = 'HEIGHT,' . $mapItem->overlibheight . ',';
+            $imageExtraHTML .= " HEIGHT=$mapItem->overlibheight";
+
+            if ($midY > $mapCenterY) {
+                $above .= 'ABOVE,';
+            }
+        }
+        return array($left, $above, $imageExtraHTML);
+    }
+
+    /**
+     * @param $mapItem
+     * @param $dir
+     * @param $imageExtraHTML
+     * @param $left
+     * @param $above
+     * @param $caption
+     * @return array
+     */
+    private function buildOverlibHTML($mapItem, $dir, $imageExtraHTML, $left, $above, $caption)
+    {
+        $overlibhtml = "onmouseover=\"return overlib('";
+
+        $n = 0;
+        if (count($mapItem->overliburl[$dir]) > 0) {
+            // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+            foreach ($mapItem->overliburl[$dir] as $url) {
+                if ($n > 0) {
+                    $overlibhtml .= '&lt;br /&gt;';
+                }
+                $overlibhtml .= "&lt;img $imageExtraHTML src=";
+                $overlibhtml .= $this->processString(
+                    $url,
+                    $mapItem
+                );
+                $overlibhtml .= '&gt;';
+                $n++;
+            }
+        }
+        # print "Added $n for $dir\n";
+        if (trim($mapItem->notestext[$dir]) != '') {
+            # put in a linebreak if there was an image AND notes
+            if ($n > 0) {
+                $overlibhtml .= '&lt;br /&gt;';
+            }
+            $note = $this->processString($mapItem->notestext[$dir], $mapItem);
+            $note = htmlspecialchars($note, ENT_NOQUOTES);
+            $note = str_replace("'", '\\&apos;', $note);
+            $note = str_replace('"', '&quot;', $note);
+            $overlibhtml .= $note;
+        }
+        $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
+            . "');\"  onmouseout=\"return nd();\"";
+
+        return $overlibhtml;
     }
 
     public function generateSortedImagemap($imagemapname)
@@ -1524,7 +1420,6 @@ class Map extends MapBase
                     foreach ($this->scales as $it) {
                         foreach ($it->getImagemapAreas() as $area) {
                             MapUtility::debug("$area\n");
-                            // skip the linkless areas if we are in the editor - they're redundant
                             $html .= "\t" . $area->asHTML();
                             $html .= "\n";
                         }
@@ -1554,42 +1449,22 @@ class Map extends MapBase
         return $html;
     }
 
-    public function nodeExists($nodeName)
+// *********************************************
+
+
+// ***************************************************
+// Data Management
+
+
+    private function updateMaxValues()
     {
-        return array_key_exists($nodeName, $this->nodes);
-    }
+        MapUtility::debug("Finalising bandwidth.\n");
 
-    public function linkExists($linkName)
-    {
-        return array_key_exists($linkName, $this->links);
-    }
+        $allItems = $this->buildAllItemsList();
 
-    /**
-     * Create an array of all the nodes and links, mixed together.
-     * readData() makes several passes through this list.
-     *
-     * @return MapDataItem[]
-     */
-    public function buildAllItemsList()
-    {
-        // TODO - this should probably be a static, or otherwise cached
-        $allItems = array();
-
-        $listOfItemLists = array(&$this->nodes, &$this->links);
-        reset($listOfItemLists);
-
-        while (list($outerListCount,) = each($listOfItemLists)) {
-            unset($itemList);
-            $itemList = &$listOfItemLists[$outerListCount];
-
-            reset($itemList);
-            while (list($innerListCount,) = each($itemList)) {
-                unset($oneMapItem);
-                $oneMapItem = &$itemList[$innerListCount];
-                $allItems [] = $oneMapItem;
-            }
+        foreach ($allItems as $item) {
+            $item->updateMaxValues($this->kilo);
         }
-        return $allItems;
     }
 
 
@@ -1713,36 +1588,7 @@ class Map extends MapBase
         MapUtility::debug("------------------------------\n");
     }
 
-    public function createDefaultNodes()
-    {
-        MapUtility::debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
-        $this->addNode(new MapNode(':: DEFAULT ::', ':: DEFAULT ::', $this));
-
-        MapUtility::debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
-        $this->addNode(new MapNode('DEFAULT', ':: DEFAULT ::', $this));
-    }
-
-    public function createDefaultLinks()
-    {
-        // these are the default defaults
-        // by putting them into a normal object, we can use the
-        // same code for writing out LINK DEFAULT as any other link.
-        MapUtility::debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
-        // these two are used for default settings
-        $this->addLink(new MapLink(':: DEFAULT ::', ':: DEFAULT ::', $this));
-
-        MapUtility::debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
-        $this->addLink(new MapLink('DEFAULT', ':: DEFAULT ::', $this));
-    }
-
-    public function getValue($name)
-    {
-        MapUtility::debug("Fetching %s\n", $name);
-        if (property_exists($this, $name)) {
-            return $this->$name;
-        }
-        throw new WeathermapInternalFail('NoSuchProperty');
-    }
+// ***************************************************
 
     /**
      * @return null|resource
@@ -1778,6 +1624,42 @@ class Map extends MapBase
         return $bgImageRef;
     }
 
+
+//    public function getValue($name)
+//    {
+//        MapUtility::debug("Fetching %s\n", $name);
+//        if (property_exists($this, $name)) {
+//            return $this->$name;
+//        }
+//        throw new WeathermapInternalFail('NoSuchProperty');
+//    }
+
+
+    public function getProperty($name)
+    {
+        MapUtility::debug("Map Fetching %s\n", $name);
+
+        $translations = array(
+            'max_data_time' => $this->maximumDataTime,
+            'min_data_time' => $this->minimumDataTime,
+            'title' => $this->title
+        );
+
+        if (array_key_exists($name, $translations)) {
+            return $translations[$name];
+        }
+        // TODO - at some point, we can remove this bit, and limit access to ONLY the things listed above
+//        if (property_exists($this, $name)) {
+//            return $this->$name;
+//        }
+
+        throw new WeathermapRuntimeWarning("NoSuchProperty");
+    }
+
+
+// ********************************************************
+// Config and config mgmt stuff below here
+
     public function asConfigData()
     {
         $conf = array();
@@ -1808,6 +1690,24 @@ class Map extends MapBase
         return $conf;
     }
 
+
+    public function asJS()
+    {
+        $newOutput = array("Nodes" => array(), "Links" => array(), "Areas" => array());
+
+        foreach ($this->links as $link) {
+            $newOutput['Links'][$link->name] = $link->editorData();
+        }
+
+        foreach ($this->nodes as $node) {
+            $newOutput['Nodes'][$node->name] = $node->editorData();
+        }
+
+        return "var mapdata = " . json_encode($newOutput) . ";";
+    }
+
+
+    // This is for the entire map. asConfigData() is for the 'map' object specifically :-P
     public function getJSONConfig()
     {
         $conf = array(
@@ -1834,57 +1734,180 @@ class Map extends MapBase
         return json_encode($conf);
     }
 
-    public function getProperty($name)
-    {
-        MapUtility::debug("Map Fetching %s\n", $name);
 
-        $translations = array(
-            'max_data_time' => $this->maximumDataTime,
-            'min_data_time' => $this->minimumDataTime,
-            'title' => $this->title
+    private function getConfigForPosition($keyword, $fieldnames, $object1, $object2)
+    {
+        $write = false;
+        $string = $keyword;
+
+        for ($i = 0; $i < count($fieldnames); $i++) {
+            $string .= ' ' . $object1->{$fieldnames[$i]};
+
+            if ($object1->{$fieldnames[$i]} != $object2[$fieldnames[$i]]) {
+                $write = true;
+            }
+        }
+        $string .= "\n";
+
+        if (!$write) {
+            return '';
+        }
+        return $string;
+    }
+
+
+    public function getConfig()
+    {
+        $output = '';
+
+        $output .= "# Automatically generated by php-weathermap v" . WEATHERMAP_VERSION . "\n\n";
+
+        $output .= $this->fonts->getConfig();
+        $output .= "\n";
+
+        $simpleParameters = array(
+            array('title', 'TITLE', self::CONFIG_TYPE_LITERAL),
+            array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
+            array('height', 'HEIGHT', self::CONFIG_TYPE_LITERAL),
+            array('background', 'BACKGROUND', self::CONFIG_TYPE_LITERAL),
+            array('htmlstyle', 'HTMLSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('kilo', 'KILO', self::CONFIG_TYPE_LITERAL),
+            array('keyfont', 'KEYFONT', self::CONFIG_TYPE_LITERAL),
+            array('timefont', 'TIMEFONT', self::CONFIG_TYPE_LITERAL),
+            array('titlefont', 'TITLEFONT', self::CONFIG_TYPE_LITERAL),
+            array('htmloutputfile', 'HTMLOUTPUTFILE', self::CONFIG_TYPE_LITERAL),
+            array('dataoutputfile', 'DATAOUTPUTFILE', self::CONFIG_TYPE_LITERAL),
+            array('htmlstylesheet', 'HTMLSTYLESHEET', self::CONFIG_TYPE_LITERAL),
+            array('imageuri', 'IMAGEURI', self::CONFIG_TYPE_LITERAL),
+            array('imageoutputfile', 'IMAGEOUTPUTFILE', self::CONFIG_TYPE_LITERAL)
         );
 
-        if (array_key_exists($name, $translations)) {
-            return $translations[$name];
-        }
-        // TODO - at some point, we can remove this bit, and limit access to ONLY the things listed above
-//        if (property_exists($this, $name)) {
-//            return $this->$name;
-//        }
+        foreach ($simpleParameters as $param) {
+            $field = $param[0];
+            $keyword = $param[1];
 
-        throw new WeathermapRuntimeWarning("NoSuchProperty");
+            if ($this->$field != $this->inheritedFieldList[$field]) {
+                if ($param[2] == self::CONFIG_TYPE_COLOR) {
+                    $output .= "$keyword " . $this->$field->asConfig() . "\n";
+                }
+                if ($param[2] == self::CONFIG_TYPE_LITERAL) {
+                    $output .= "$keyword " . $this->$field . "\n";
+                }
+            }
+        }
+
+        $output .= $this->getConfigForPosition(
+            'TIMEPOS',
+            array('timex', 'timey', 'stamptext'),
+            $this,
+            $this->inheritedFieldList
+        );
+        $output .= $this->getConfigForPosition(
+            'MINTIMEPOS',
+            array('mintimex', 'mintimey', 'minstamptext'),
+            $this,
+            $this->inheritedFieldList
+        );
+        $output .= $this->getConfigForPosition(
+            'MAXTIMEPOS',
+            array('maxtimex', 'maxtimey', 'maxstamptext'),
+            $this,
+            $this->inheritedFieldList
+        );
+        $output .= $this->getConfigForPosition('TITLEPOS', array('titlex', 'titley'), $this, $this->inheritedFieldList);
+
+        $output .= "\n";
+
+        foreach ($this->colourtable as $k => $colour) {
+            $output .= sprintf("%sCOLOR %s\n", $k, $colour->asConfig());
+        }
+        $output .= "\n";
+
+        foreach ($this->scales as $scaleName => $scale) {
+            $output .= $scale->getConfig();
+            $output .= $this->legends[$scaleName]->getConfig();
+        }
+        $output .= "\n";
+
+        foreach ($this->hints as $hintname => $hint) {
+            $output .= "SET $hintname $hint\n";
+        }
+
+        // this doesn't really work right, but let's try anyway
+        if ($this->hasIncludes) {
+            $output .= "\n# Included files\n";
+            foreach ($this->includedFiles as $ifile) {
+                $output .= "INCLUDE $ifile\n";
+            }
+        }
+
+        $output .= "\n# End of global section\n\n";
+
+        foreach (array('template', 'normal') as $which) {
+            if ($which == 'template') {
+                $output .= "\n# TEMPLATE-only NODEs:\n";
+            }
+            if ($which == 'normal') {
+                $output .= "\n# regular NODEs:\n";
+            }
+
+            foreach ($this->nodes as $node) {
+                if (!preg_match('/^::\s/', $node->name)) {
+                    if ($node->definedIn == $this->configfile) {
+                        if ($which == 'template' && $node->x === null) {
+                            MapUtility::debug("TEMPLATE\n");
+                            $output .= $node->getConfig();
+                        }
+                        if ($which == 'normal' && $node->x !== null) {
+                            $output .= $node->getConfig();
+                        }
+                    }
+                }
+            }
+
+            if ($which == 'template') {
+                $output .= "\n# TEMPLATE-only LINKs:\n";
+            }
+
+            if ($which == 'normal') {
+                $output .= "\n# regular LINKs:\n";
+            }
+
+            foreach ($this->links as $link) {
+                if (!preg_match('/^::\s/', $link->name)) {
+                    if ($link->definedIn == $this->configfile) {
+                        if ($which == 'template' && $link->isTemplate()) {
+                            $output .= $link->getConfig();
+                        }
+                        if ($which == 'normal' && !$link->isTemplate()) {
+                            $output .= $link->getConfig();
+                        }
+                    }
+                }
+            }
+        }
+
+        $output .= "\n\n# That's All Folks!\n";
+
+        return $output;
     }
 
-    /**
-     * @param $context
-     * @return string
-     */
-    public function getProcessStringContextName(&$context)
+    public function writeConfig($filename)
     {
-        $contextDescription = strtolower($context->myType());
-        if ($contextDescription != 'map') {
-            $contextDescription .= ':' . $context->name;
-        }
-        return $contextDescription;
-    }
+        $fileHandle = fopen($filename, 'w');
 
-    /**
-     * @param $input
-     * @param $context
-     * @param $contextType
-     * @return mixed
-     */
-    public function applyProcessStringShortcuts($input, &$context, $contextType)
-    {
-        if ($contextType === 'node') {
-            $input = str_replace('{node:this:graph_id}', $context->getHint('graph_id'), $input);
-            $input = str_replace('{node:this:name}', $context->name, $input);
+        if ($fileHandle) {
+            $output = $this->getConfig();
+            fwrite($fileHandle, $output);
+            fclose($fileHandle);
+        } else {
+            MapUtility::warn("Couldn't open config file $filename for writing");
+            return false;
         }
 
-        if ($contextType === 'link') {
-            $input = str_replace('{link:this:graph_id}', $context->getHint('graph_id'), $input);
-        }
-        return $input;
+        return true;
     }
+
+
 }
 // vim:ts=4:sw=4:

@@ -80,7 +80,7 @@ class MapProcessor
         $this->getOptions();
 
         $this->map = new Map;
-        $this->map->context = 'cacti';
+//        $this->map->context = 'cacti';
 
         $this->map->ReadConfig($this->getOpt->getOption('input_filename'));
         $this->processMap();

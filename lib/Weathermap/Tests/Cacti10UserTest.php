@@ -10,7 +10,7 @@ class Cacti10UserTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $dummyConfig = array("base_path" => "/tmp");
-        $this->object = new WeatherMapCacti10UserPlugin($dummyConfig, "png");
+        $this->object = new WeatherMapCacti10UserPlugin($dummyConfig, "png", $dummyConfig['base_path']."/plugins/weathermap");
     }
 
     public function testValidCommandMap()

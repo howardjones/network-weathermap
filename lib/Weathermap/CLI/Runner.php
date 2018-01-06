@@ -18,8 +18,8 @@ class Runner
     /** @var Map $map */
     private $map;
     private $configfile;
-    private $imagefile;
-    private $htmlfile;
+    private $imagefile = "";
+    private $htmlfile = "";
 
     public function run()
     {
@@ -55,11 +55,11 @@ class Runner
                 Option::create(null, 'output', GetOpt::REQUIRED_ARGUMENT)
                     ->setDescription('filename to write image. Default weathermap.png')
                     ->setArgumentName('filename')
-                    ->setDefaultValue('weathermap.png'),
+                    ->setDefaultValue(''),
                 Option::create(null, 'htmloutput', GetOpt::REQUIRED_ARGUMENT)
                     ->setDescription('filename to write HTML. Default weathermap.html')
                     ->setArgumentName('filename')
-                    ->setDefaultValue('weathermap.html'),
+                    ->setDefaultValue(''),
                 Option::create(null, 'image-uri', GetOpt::REQUIRED_ARGUMENT)
                     ->setArgumentName('uri')
                     ->setDescription('URI to prefix <img> tags in HTML output'),
@@ -242,19 +242,9 @@ class Runner
     private function mapFileSettings()
     {
         // allow command-lines to override the config file, but provide a default if neither are present
-        if ($this->imagefile == '') {
-            if ($this->map->imageoutputfile == '') {
-                $this->imagefile = "weathermap.png";
-            } else {
-                $this->imagefile = $this->map->imageoutputfile;
-            }
-        }
 
-        if ($this->htmlfile == '') {
-            if ($this->map->htmloutputfile != '') {
-                $this->htmlfile = $this->map->htmloutputfile;
-            }
-        }
+        $this->imagefile = $this->imagefile ?: $this->map->imageoutputfile ?: "weathermap.png";
+        $this->htmlfile = $this->htmlfile ?: $this->map->htmloutputfile ?: "";
     }
 
     private function mapSettingsPostConfig()

@@ -4,6 +4,7 @@ namespace Weathermap\Poller;
 
 use Weathermap\Integrations\MapManager;
 use Weathermap\Core\MapUtility;
+use Weathermap\Poller\PollerConfig;
 
 /**
  *
@@ -18,7 +19,6 @@ class Poller
     public $configDirectory;
     /** @var MapManager $manager */
     public $manager;
-    public $pluginName;
 
     public $totalWarnings;
     public $warningNotes;
@@ -31,24 +31,26 @@ class Poller
 
     public $outputDirectory;
 
+    public $config;
+
     public $canRun;
 
-    public function __construct($baseDirectory, $pollerStartTime = 0)
+    public function __construct($baseDirectory, $applicationInterface, $pollerStartTime = 0)
     {
+        $this->config = new PollerConfig();
+        // TODO: fill in the pollerConfig
+
         $this->configDirectory = realpath($baseDirectory . DIRECTORY_SEPARATOR . 'configs');
         $this->outputDirectory = realpath($baseDirectory . DIRECTORY_SEPARATOR . 'output');
 
-        // TODO: This needs the ApplicationInterface to be passed from outside (for, e.g. Cacti)
-        $this->manager = new MapManager(weathermap_get_pdo(), $this->configDirectory);
+        $this->manager = new MapManager(weathermap_get_pdo(), $this->configDirectory, $applicationInterface);
 
         $this->imageFormat = strtolower($this->manager->application->getAppSetting("weathermap_output_format", "png"));
         $this->rrdtoolPath = $this->manager->application->getAppSetting("path_rrdtool", "rrdtool");
 
-        // TODO: this should be coming from somewhere else, too (the ApplicationInterface?)
-        $this->pluginName = "weathermap-cacti-plugin.php";
-
         $this->totalWarnings = 0;
         $this->warningNotes = "";
+        $this->mapCount = 0;
         $this->canRun = false;
 
         $this->startTime = microtime(true);
@@ -61,6 +63,8 @@ class Poller
 
     public function preFlight()
     {
+        MapUtility::debug("Poller preflight checks running.");
+
         if (!MapUtility::moduleChecks()) {
             MapUtility::warn("Required modules for PHP Weathermap " . WEATHERMAP_VERSION . " were not present. Not running. [WMPOLL08]\n");
 
@@ -89,6 +93,8 @@ class Poller
 
             return;
         }
+
+        MapUtility::debug("Poller preflight checks passed.");
         $this->canRun = true;
     }
 
@@ -109,10 +115,14 @@ class Poller
         MapUtility::debug("Iterating all maps.");
 
         foreach ($maplist as $map) {
-            $runner = new MapRuntime($this->configDirectory, $this->outputDirectory, $map, $this->imageFormat);
-            $runner->run();
+            $runtime = new MapRuntime($this->config, $map, $this->manager);
+            $ran = $runtime->run();
+            if ($ran) {
+                MapUtility::notice(json_encode($runtime->getStats()));
+                $this->mapCount++;
+            }
 
-            $this->totalWarnings += $runner->warncount;
+            $this->totalWarnings += $runtime->warncount;
         }
 
         $this->calculateStats();

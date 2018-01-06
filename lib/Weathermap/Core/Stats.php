@@ -1,9 +1,10 @@
 <?php
+
 namespace Weathermap\Core;
 
 class Stats
 {
-    /** @var integer[] $counters*/
+    /** @var integer[] $counters */
     private $counters = array();
 
     public function increment($name, $amount = 1)
@@ -22,5 +23,10 @@ class Stats
     public function dump()
     {
         return json_encode($this->counters);
+    }
+
+    public function get()
+    {
+        return $this->counters;
     }
 }

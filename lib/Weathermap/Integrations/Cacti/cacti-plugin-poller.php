@@ -143,11 +143,12 @@ function weathermap_poller_output($rrdUpdateArray)
 function weathermap_poller_bottom()
 {
     global $config;
+    global $weathermapPollerStartTime;
 
     include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
-//    include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php";
 
     $pdo = weathermap_get_pdo();
+    $app = new \Weathermap\Integrations\Cacti\CactiApplicationInterface($pdo);
 
     weathermap_setup_table();
 
@@ -165,7 +166,14 @@ function weathermap_poller_bottom()
         // if we're due, run the render updates
         if (($renderperiod == 0) || (($rendercounter % $renderperiod) == 0)) {
             // TODO: This is horrible!
-            \Weathermap\Poller\runMaps(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
+            $baseDir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+
+            // TODO: this will replace poller-common/runMaps
+            $poller = new \Weathermap\Poller\Poller($baseDir, $app, $weathermapPollerStartTime);
+            $poller->preFlight();
+//            $poller->run();
+
+            \Weathermap\Poller\runMaps($baseDir);
         } else {
             if ($quietlogging == 0) {
                 \cacti_log(

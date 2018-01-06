@@ -8,10 +8,10 @@ function weathermap_poller_output($rrdUpdateArray)
 
     $dataUpdateSQL = $pdo->prepare("UPDATE weathermap_data SET last_time=?, last_calc=?, last_value=?,sequence=sequence+1  where id = ?");
 
-    $logVerbosity = read_config_option("log_verbosity");
+    $logVerbosity = \read_config_option("log_verbosity");
 
     if ($logVerbosity >= POLLER_VERBOSITY_DEBUG) {
-        cacti_log("WM poller_output: STARTING\n", true, "WEATHERMAP");
+        \cacti_log("WM poller_output: STARTING\n", true, "WEATHERMAP");
     }
 
     // partially borrowed from Jimmy Conner's THold plugin.
@@ -57,7 +57,7 @@ function weathermap_poller_output($rrdUpdateArray)
         }
 
         if ($logVerbosity >= POLLER_VERBOSITY_DEBUG) {
-            cacti_log(
+            \cacti_log(
                 "WM poller_output: Looking for $file ($localDataID) (" . $required['data_source_path'] . ")\n",
                 true,
                 "WEATHERMAP"
@@ -68,7 +68,7 @@ function weathermap_poller_output($rrdUpdateArray)
             $value = $rrdUpdateArray{$file}['times'][key($rrdUpdateArray[$file]['times'])]{$dsname};
             $time = key($rrdUpdateArray[$file]['times']);
             if ($logVerbosity >= POLLER_VERBOSITY_MEDIUM) {
-                cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n", true, "WEATHERMAP");
+                \cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n", true, "WEATHERMAP");
             }
 
             $period = $time - $required['last_time'];
@@ -124,7 +124,7 @@ function weathermap_poller_output($rrdUpdateArray)
 
             $dataUpdateSQL->execute(array($newtime, $newvalue, $newlastvalue, $required['id']));
             if ($logVerbosity >= POLLER_VERBOSITY_DEBUG) {
-                cacti_log(
+                \cacti_log(
                     "WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n",
                     true,
                     "WEATHERMAP"
@@ -134,7 +134,7 @@ function weathermap_poller_output($rrdUpdateArray)
     }
 
     if ($logVerbosity >= POLLER_VERBOSITY_DEBUG) {
-        cacti_log("WM poller_output: ENDING\n", true, "WEATHERMAP");
+        \cacti_log("WM poller_output: ENDING\n", true, "WEATHERMAP");
     }
 
     return $rrdUpdateArray;
@@ -151,14 +151,14 @@ function weathermap_poller_bottom()
 
     weathermap_setup_table();
 
-    $renderperiod = read_config_option("weathermap_render_period");
-    $rendercounter = read_config_option("weathermap_render_counter");
-    $quietlogging = read_config_option("weathermap_quiet_logging");
+    $renderperiod = \read_config_option("weathermap_render_period");
+    $rendercounter = \read_config_option("weathermap_render_counter");
+    $quietlogging = \read_config_option("weathermap_quiet_logging");
 
     if ($renderperiod < 0) {
         // manual updates only
         if ($quietlogging == 0) {
-            cacti_log("Weathermap " . WEATHERMAP_VERSION . " - no updates ever", true, "WEATHERMAP");
+            \cacti_log("Weathermap " . WEATHERMAP_VERSION . " - no updates ever", true, "WEATHERMAP");
         }
         return;
     } else {
@@ -168,7 +168,7 @@ function weathermap_poller_bottom()
             \Weathermap\Poller\runMaps(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
         } else {
             if ($quietlogging == 0) {
-                cacti_log(
+                \cacti_log(
                     "Weathermap " . WEATHERMAP_VERSION . " - no update in this cycle ($rendercounter)",
                     true,
                     "WEATHERMAP"

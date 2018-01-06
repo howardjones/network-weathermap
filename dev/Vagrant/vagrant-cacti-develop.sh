@@ -116,9 +116,12 @@ EOF
     sudo service mysql restart
     sudo service apache2 restart    
 
-    sudo chown -R www-data.cacti $WEBROOT/cacti/resource/ $WEBROOT/cacti/scripts $WEBROOT/cacti/log $WEBROOT/cacti/cache
     # this isn't in the recommendations, but otherwise you get no logs!
     sudo chmod g+wrx $WEBROOT/cacti/log
+    sudo touch $WEBROOT/cacti/log/cacti.log
+    sudo chmod g+wr $WEBROOT/cacti/log/cacti.log
+
+    sudo chown -R www-data.cacti $WEBROOT/cacti/resource/ $WEBROOT/cacti/scripts $WEBROOT/cacti/log $WEBROOT/cacti/cache
 fi
 
 # optionally seed database with "pre-installed" data instead of empty - can skip the install steps
@@ -178,10 +181,10 @@ if [ -d ${WEBROOT}/cacti/plugins/weathermap/test-suite ]; then
 fi 
 
 # so that the editor and poller don't immediately complain
-chown cacti /var/www/html/cacti/plugins/weathermap/output
-chown www-data /var/www/html/cacti/plugins/weathermap/configs
+sudo chown cacti /var/www/html/cacti/plugins/weathermap/output
+sudo chown www-data /var/www/html/cacti/plugins/weathermap/configs
 
-# any local tweaks can be added to post-install.sh
+# any local tweaks can be added to post-install.sh (which needs to be marked executable)
 if [ -x /vagrant/post-install.sh ]; then
     /vagrant/post-install.sh
 fi

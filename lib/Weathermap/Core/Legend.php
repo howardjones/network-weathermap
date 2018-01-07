@@ -31,6 +31,8 @@ class Legend extends MapItem
         $this->scale = $scale;
         $this->owner = $owner;
 
+        $this->zorder = 1000;
+
         $this->inheritedFieldList = array(
             'scaleType' => 'percent',
             'keystyle' => 'classic',
@@ -134,7 +136,9 @@ class Legend extends MapItem
             $areaName,
             ''
         );
-        $this->owner->imap->addArea($newArea);
+
+        // TODO: this shouldn't be necessary if these are added to the ZLayers
+//        $this->owner->imap->addArea($newArea);
 
         // TODO: stop tracking z-order separately. addArea() should take the z layer
         $this->imagemapAreas[] = $newArea;
@@ -230,13 +234,11 @@ class Legend extends MapItem
 
     public function draw($gdTargetImage)
     {
-        MapUtility::debug("New scale\n");
         // don't draw if the position is the default -1,-1
         if (null === $this->keypos || $this->keypos->x == -1 && $this->keypos->y == -1) {
             return;
         }
 
-        MapUtility::debug("New scale - still drawing\n");
         $this->scale->sort();
 
         $gdScaleImage = $this->drawLegend();
@@ -607,5 +609,9 @@ class Legend extends MapItem
         return $gdScaleImage;
     }
 
+    public function isTemplate()
+    {
+        return false;
+    }
 
 }

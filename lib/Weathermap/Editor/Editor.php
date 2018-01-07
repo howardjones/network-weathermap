@@ -1009,7 +1009,7 @@ class Editor
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        $this->map->scales[$scaleName]->setPosition(new Point($x, $y));
+        $this->map->legends[$scaleName]->setPosition(new Point($x, $y));
     }
 
     public function placeTitle($x, $y)

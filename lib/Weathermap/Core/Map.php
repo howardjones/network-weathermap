@@ -366,6 +366,12 @@ class Map extends MapBase
             $zIndex = $item->getZIndex();
             $this->addItemToZLayer($item, $zIndex);
         }
+
+        foreach ($this->legends as $name => $item) {
+            $zIndex = $item->getZIndex();
+            $this->addItemToZLayer($item, $zIndex);
+        }
+
         MapUtility::debug('Found ' . count($this->seenZLayers) . " z-layers including builtins (0,100).\n");
     }
 
@@ -1125,11 +1131,6 @@ class Map extends MapBase
         $allLayers = array_keys($this->seenZLayers);
         sort($allLayers);
 
-        // stuff the scales into the seen-items list, so they are rendered along with everything else
-        foreach ($this->legends as $scaleName => $legendObject) {
-            array_push($this->seenZLayers[1000], $legendObject);
-        }
-
         foreach ($allLayers as $z) {
             $zItems = $this->seenZLayers[$z];
             MapUtility::debug("Drawing layer $z\n");
@@ -1146,7 +1147,7 @@ class Map extends MapBase
             if (is_array($zItems)) {
                 /** @var MapDataItem $it */
                 foreach ($zItems as $it) {
-                    MapUtility::debug('Drawing ' . $it->myType() . ' ' . $it->name . "\n");
+                    MapUtility::debug('Drawing ' . $it . "\n");
                     $it->draw($imageRef);
                 }
             }
@@ -1382,6 +1383,7 @@ class Map extends MapBase
                 if ($z == 1000) {
                     MapUtility::debug("     Builtins fit here.\n");
 
+                    // TODO: This is for timestamp and title ONLY - they could be just added like the others once they are objects
                     foreach ($this->imagemapAreas as $areaname) {
                         // skip the linkless areas if we are in the editor - they're redundant
                         $html .= $this->imap->exactHTML(
@@ -1391,30 +1393,37 @@ class Map extends MapBase
                         $html .= "\n";
                     }
 
-                    foreach ($this->scales as $it) {
-                        foreach ($it->getImagemapAreas() as $area) {
-                            MapUtility::debug("$area\n");
-                            $html .= "\t" . $area->asHTML();
-                            $html .= "\n";
-                        }
-                        $html .= "\n";
-                    }
+                    // TODO: Same for Legends - add them to the zItems
+//                    foreach ($this->scales as $it) {
+//                        foreach ($it->getImagemapAreas() as $area) {
+//                            MapUtility::debug("$area\n");
+//                            $html .= "\t" . $area->asHTML();
+//                            $html .= "\n";
+//                        }
+//                        $html .= "\n";
+//                    }
+
                 }
+
 
                 // we reverse the array for each zlayer so that the imagemap order
                 // will match up with the draw order (last drawn should be first hit)
                 /** @var MapDataItem $it */
                 foreach (array_reverse($zItems) as $it) {
-                    if ($it->name != 'DEFAULT' && $it->name != ':: DEFAULT ::') {
+                    if (!$it->isTemplate()) {
                         foreach ($it->getImagemapAreas() as $area) {
                             MapUtility::debug("$area\n");
                             // skip the linkless areas if we are in the editor - they're redundant
                             $html .= "\t" . $area->asHTML();
                             $html .= "\n";
+                            $html .= "<!-- end of area $area -->";
                         }
+                        $html .= "<!-- end of item $it -->";
                         $html .= "\n";
                     }
                 }
+
+                $html .= "<!-- end of $z -->";
             }
         }
 

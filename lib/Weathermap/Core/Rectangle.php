@@ -1,6 +1,11 @@
 <?php
 namespace Weathermap\Core;
 
+/**
+ * Simple geometry class to allow rectangles to be a single unit
+ *
+ * @package Weathermap\Core
+ */
 class Rectangle
 {
     public $topLeft;

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 31/12/17
- * Time: 12:47
- */
 
 namespace Weathermap\Core;
 
@@ -13,6 +7,11 @@ use Weathermap\Core\Target;
 use Weathermap\Core\MapDataItem;
 use Weathermap\Core\Plugin;
 
+/**
+ * Handle everything related to the various plugin types, including finding and loading them, and calling their methods.
+ *
+ * @package Weathermap\Core
+ */
 class PluginManager
 {
     private $plugins = array();

@@ -7,6 +7,11 @@ use Weathermap\Core\MapUtility;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
+/**
+ * Get data from Cacti's dsstats plugin database
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class CactiDSStats extends Base
 {
 

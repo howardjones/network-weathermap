@@ -2,6 +2,11 @@
 
 namespace Weathermap\Core;
 
+/**
+ * A simple container for stats counters as a map runs, and to dump them afterwards
+ *
+ * @package Weathermap\Core
+ */
 class Stats
 {
     /** @var integer[] $counters */

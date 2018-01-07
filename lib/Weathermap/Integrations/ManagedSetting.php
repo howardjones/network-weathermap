@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 22/10/17
- * Time: 12:26
- */
 
 namespace Weathermap\Integrations;
 
+/**
+ * UNUSED - a per-map or per-group or global setting
+ *
+ * @package Weathermap\Integrations
+ */
 class ManagedSetting
 {
     public $mapId;

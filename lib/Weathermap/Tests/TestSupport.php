@@ -5,6 +5,11 @@ namespace Weathermap\Tests;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapUtility;
 
+/**
+ * Utility functions used by other tests.
+ *
+ * @package Weathermap\Tests
+ */
 class TestSupport
 {
 

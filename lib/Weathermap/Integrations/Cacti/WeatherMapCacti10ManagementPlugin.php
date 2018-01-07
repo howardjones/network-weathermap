@@ -2,6 +2,11 @@
 
 namespace Weathermap\Integrations\Cacti;
 
+/**
+ * The 1.x specific parts of the Cacti 'management' plugin
+ *
+ * @package Weathermap\Integrations\Cacti
+ */
 class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
 {
     public $colours;

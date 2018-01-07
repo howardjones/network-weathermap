@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:12
- */
 
 namespace Weathermap\Core;
 
+/**
+ * A manager for loading fonts, and also producing their config for getConfig()
+ *
+ * @package Weathermap\Core
+ */
 class FontTable
 {
     /** @var Font[] $table  */

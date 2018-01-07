@@ -2,8 +2,13 @@
 
 namespace Weathermap\UI;
 
-// Originally grabbed from here: http://www.massassi.com/php/articles/template_engines/
-
+/**
+ * A simple template class, to keep presentation and code apart.
+ *
+ * taken from http://www.massassi.com/php/articles/template_engines/
+ *
+ * @package Weathermap\UI
+ */
 class SimpleTemplate
 {
     private $vars; /// Holds all the template variables

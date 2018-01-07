@@ -5,6 +5,11 @@ namespace Weathermap\Integrations;
 use PDOException;
 use PDO;
 
+/**
+ * All the database-access functions extracted from the old Cacti plugin.
+ *
+ * @package Weathermap\Integrations
+ */
 class MapManager
 {
 

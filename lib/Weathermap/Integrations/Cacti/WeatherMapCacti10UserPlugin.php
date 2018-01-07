@@ -2,6 +2,11 @@
 
 namespace Weathermap\Integrations\Cacti;
 
+/**
+ * The 1.x specific parts of the Cacti 'user' plugin (map display)
+ *
+ * @package Weathermap\Integrations\Cacti
+ */
 class WeatherMapCacti10UserPlugin extends WeatherMapCactiUserPlugin
 {
 

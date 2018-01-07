@@ -9,10 +9,9 @@
 namespace Weathermap\Core;
 
 /**
- * Class MapLinkEndpoint
+ * Class to package up a bunch of random data related to the endpoints of the node, and their positions.
  * @package Weathermap\Core
  *
- * Class to package up a bunch of random data related to the endpoints of the node, and their positions.
  */
 class MapLinkEndpoint
 {

@@ -5,6 +5,13 @@ namespace Weathermap\Plugins\Datasources;
 use Weathermap\Core\MapDataItem;
 use Weathermap\Core\MapUtility;
 
+/**
+ * Utility functions used by several plugins.
+ *
+ * (formerly ds-common)
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class Utility
 {
 

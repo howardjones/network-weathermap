@@ -18,6 +18,11 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 
+/**
+ * SNMPv2c data collection
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class SNMP2C extends Base
 {
     protected $downCache;

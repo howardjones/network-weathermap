@@ -8,6 +8,11 @@ use GetOpt\ArgumentException;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapUtility;
 
+/**
+ * The CLI map-creation tool
+ *
+ * @package Weathermap\CLI
+ */
 class Runner
 {
     /** @var GetOpt $getOpt */

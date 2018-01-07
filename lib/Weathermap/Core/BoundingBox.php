@@ -1,6 +1,11 @@
 <?php
 namespace Weathermap\Core;
 
+/**
+ * Given a series of points or rectangles, keep track of the minimum-sized rectangle that will contain them.
+ *
+ * @package Weathermap\Core
+ */
 class BoundingBox
 {
     private $minimumX;

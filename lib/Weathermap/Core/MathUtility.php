@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 17:51
- */
 
 namespace Weathermap\Core;
 
+/**
+ * Maths functions that aren't directly related to geometry primitives
+ *
+ * @package Weathermap\Core
+ */
 class MathUtility
 {
     /**

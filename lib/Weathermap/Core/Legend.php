@@ -4,6 +4,11 @@ namespace Weathermap\Core;
 
 use Weathermap\Core\MapScale;
 
+/**
+ * The in-map display of a scale
+ *
+ * @package Weathermap\Core
+ */
 class Legend extends MapItem
 {
     /** @var MapScale $scale */

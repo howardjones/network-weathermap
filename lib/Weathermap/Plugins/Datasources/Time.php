@@ -6,6 +6,11 @@ use Weathermap\Core\MapDataItem;
 use Weathermap\Core\MapUtility;
 use DateTimeZone;
 
+/**
+ * Get the current time, in various formats and timezones
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class Time extends Base
 {
 

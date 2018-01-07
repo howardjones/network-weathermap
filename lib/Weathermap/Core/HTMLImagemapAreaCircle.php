@@ -1,13 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:15
- */
 
 namespace Weathermap\Core;
 
+/**
+ * A circle for HTMLImagemap (not used by Weathermap)
+ * @package Weathermap\Core
+ */
 class HTMLImagemapAreaCircle extends HTMLImagemapArea
 {
     public $centx;

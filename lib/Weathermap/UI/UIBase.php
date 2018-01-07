@@ -5,6 +5,12 @@ namespace Weathermap\UI;
 use Weathermap\Core\WeathermapInternalFail;
 use Weathermap\Core\MapUtility;
 
+/**
+ * A simple base class for all the web UI tools (editor, cacti plugin parts, picker), containing a standard
+ * dispatch table, and input validation
+ *
+ * @package Weathermap\UI
+ */
 class UIBase
 {
     const ARG_OPTIONAL = 2;

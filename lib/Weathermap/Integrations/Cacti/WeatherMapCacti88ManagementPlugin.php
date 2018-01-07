@@ -4,7 +4,11 @@ namespace Weathermap\Integrations\Cacti;
 
 require_once dirname(__FILE__) . '/weathermap-cacti88-plugin-compat.php';
 //require_once dirname(__FILE__) . "/WeatherMapCactiManagementPlugin.php";
-
+/**
+ * The 0.8.8x specific parts of the Cacti 'management' plugin
+ *
+ * @package Weathermap\Integrations\Cacti
+ */
 class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
 {
     public $colours;

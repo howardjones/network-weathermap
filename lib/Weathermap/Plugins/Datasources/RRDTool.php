@@ -11,6 +11,11 @@ namespace Weathermap\Plugins\Datasources;
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\Map;
 
+/**
+ * Get data from rrdtool files (also aggregate data, and also from Cacti's rrd poller cache)
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class RRDTool extends Base
 {
 

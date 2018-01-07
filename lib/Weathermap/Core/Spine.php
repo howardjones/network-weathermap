@@ -5,6 +5,11 @@ namespace Weathermap\Core;
 
 // TODO - use SpineSearchResult to make results array meaning explicit
 
+/**
+ * The basic data structure used to draw links, keeping track of the path, distance along it, and tangents.
+ *
+ * @package Weathermap\Core
+ */
 class Spine
 {
     /** @var  SpineElement[] $elements */

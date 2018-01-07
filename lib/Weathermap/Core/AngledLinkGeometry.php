@@ -2,6 +2,11 @@
 
 namespace Weathermap\Core;
 
+/**
+ * All the parts of LinkGeometry that are specific to angled links
+ *
+ * @package Weathermap\Core
+ */
 class AngledLinkGeometry extends LinkGeometry
 {
 

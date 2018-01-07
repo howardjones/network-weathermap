@@ -8,6 +8,11 @@ namespace Weathermap\Core;
 
 use Weathermap\Core\Point;
 
+/**
+ * A single link on a map. Handles drawing, creation and generating config for getConfig()
+ *
+ * @package Weathermap\Core
+ */
 class MapLink extends MapDataItem
 {
     const FMT_BITS_IN = '{link:this:bandwidth_in:%2k}';

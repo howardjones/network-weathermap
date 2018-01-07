@@ -8,6 +8,9 @@ use GetOpt\ArgumentException;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapUtility;
 
+/**
+ * A base class for various command-line tools that take in a map config file, process it, and spit out a new one.
+ */
 class MapProcessor
 {
     /** @var GetOpt $getOpt */

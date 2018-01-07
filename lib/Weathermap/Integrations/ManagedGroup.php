@@ -1,13 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 22/10/17
- * Time: 12:21
- */
 
 namespace Weathermap\Integrations;
-
+/**
+ * Some day we'll migrate to using this for the managed maps, and the various mutators below will be
+ * methods here instead.
+ */
 class ManagedGroup
 {
     public $id;

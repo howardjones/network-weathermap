@@ -28,6 +28,11 @@ use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 use PDO;
 
+/**
+ * Get data from Cacti's Thold plugin
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class CactiTholdStatus extends Base
 {
 

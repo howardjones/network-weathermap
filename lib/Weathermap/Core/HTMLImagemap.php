@@ -17,6 +17,11 @@ namespace Weathermap\Core;
 
 use Weathermap\Core\HTMLImagemapArea;
 
+/**
+ * The base class that contains the ImagemapArea objects, and produces the map HTML. (UNUSED?)
+ *
+ * @package Weathermap\Core
+ */
 class HTMLImagemap
 {
     /** @var HTMLImagemapArea[] $shapes */

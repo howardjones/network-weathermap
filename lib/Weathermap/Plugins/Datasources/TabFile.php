@@ -6,6 +6,11 @@ use Weathermap\Core\StringUtility;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
+/**
+ * Read data from a tab-separated text file
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class TabFile extends Base
 {
     public function __construct()

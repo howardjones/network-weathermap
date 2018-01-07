@@ -1,18 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:22
- */
 
 namespace Weathermap\Plugins\Post;
 
 use Weathermap\Core\Map;
 
 /**
- * Class WeatherMapPostProcessor
- *
  * Base class for post-processing plugins.
  */
 class Base

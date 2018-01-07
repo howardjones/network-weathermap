@@ -5,6 +5,11 @@ namespace Weathermap\Plugins\Pre;
 
 use Weathermap\Core\MapUtility;
 
+/**
+ * Do-nothing example
+ *
+ * @package Weathermap\Plugins\Pre
+ */
 class CactiHosts extends Base
 {
     public function run()

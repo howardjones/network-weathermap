@@ -1,6 +1,11 @@
 <?php
 namespace Weathermap\Core;
 
+/**
+ * All the parts of LinkGeometry that are specific to curved links
+ *
+ * @package Weathermap\Core
+ */
 class CurvedLinkGeometry extends LinkGeometry
 {
     protected function calculateSpine($pointsPerSpan = 32)

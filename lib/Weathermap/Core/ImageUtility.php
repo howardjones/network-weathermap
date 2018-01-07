@@ -2,6 +2,11 @@
 
 namespace Weathermap\Core;
 
+/**
+ * Utility functions related to manipulating GD images
+ *
+ * @package Weathermap\Core
+ */
 class ImageUtility
 {
     /**

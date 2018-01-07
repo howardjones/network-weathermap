@@ -2,8 +2,11 @@
 
 namespace Weathermap\Core;
 
-// TODO: This stuff should be in some kind of App/Runtime object
+/**
+ * Remaining global variables - mostly to do with logging
+ */
 
+// TODO: This stuff should be in some kind of App/Runtime object
 // (and it's mostly to do with logging, so a proper logging class would take the rest)
 
 $weathermap_debugging = false;

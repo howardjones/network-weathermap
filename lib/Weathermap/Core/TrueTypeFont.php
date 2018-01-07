@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:13
- */
 
 namespace Weathermap\Core;
 
+/**
+ * FontTable member representing a Truetype font
+ *
+ * @package Weathermap\Core
+ */
 class TrueTypeFont extends Font
 {
     public $file;

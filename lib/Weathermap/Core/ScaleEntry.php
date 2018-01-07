@@ -2,7 +2,11 @@
 
 namespace Weathermap\Core;
 
-
+/**
+ * A single entry in a Scale
+ *
+ * @package Weathermap\Core
+ */
 class ScaleEntry
 {
     public $top;

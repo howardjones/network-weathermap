@@ -5,7 +5,9 @@ namespace Weathermap\Core;
 
 use Weathermap\Core\StringUtility;
 use Weathermap\Core\MapUtility;
-
+/**
+ * utility functions, mainly for poller
+ */
 class Utility
 {
     public static function buildMemoryCheckString($note)

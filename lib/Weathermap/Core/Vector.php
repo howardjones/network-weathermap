@@ -2,8 +2,7 @@
 namespace Weathermap\Core;
 
 /**
- * Utility class for 2D vectors.
- * Mostly used in the VIA calculations
+ * Utility class for 2D vectors. Mostly used in the VIA calculations
  */
 class Vector
 {

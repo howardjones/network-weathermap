@@ -2,16 +2,12 @@
 
 namespace Weathermap\Core;
 
-/*
- * Refactoring of all the ReadConfig code out of the giant Weathermap class
- *
+/**
  * A ConfigReader holds state for parsing through a config file. Includes are done by
  * creating a new ConfigReader and passing it the state of the current one. Shared state
  * reduces the amount of junk passed to HANDLE_* functions.
  *
  */
-
-
 class ConfigReader
 {
     private $lineCount = 0;

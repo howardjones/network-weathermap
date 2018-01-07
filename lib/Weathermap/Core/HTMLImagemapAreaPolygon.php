@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:14
- */
 
 namespace Weathermap\Core;
 
+/**
+ * A polygon for HTMLImagemap (used for link arrows)
+ *
+ * @package Weathermap\Core
+ */
 class HTMLImagemapAreaPolygon extends HTMLImagemapArea
 {
     public $points = array();

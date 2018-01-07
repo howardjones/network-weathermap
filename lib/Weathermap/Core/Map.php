@@ -11,6 +11,11 @@ use Weathermap\Core\HTMLImagemap;
 use Weathermap\Core\PluginManager;
 use Weathermap\Core\Legend;
 
+/**
+ * The top-level Weathermap object. Does way more than it should.
+ *
+ * @package Weathermap\Core
+ */
 class Map extends MapBase
 {
     /** @var MapNode[] $nodes */
@@ -556,9 +561,9 @@ class Map extends MapBase
 
 
     /**
-     * @param $context
-     * @param $itemname
-     * @param $type
+     * @param MapDataItem $context
+     * @param string $itemname
+     * @param string $type
      * @return Map|MapDataItem
      */
     private function processStringFindReferredObject(&$context, $itemname, $type)
@@ -579,15 +584,15 @@ class Map extends MapBase
         }
 
         if (($itemname == "parent") && ($type == "node") && ($context->myType() == 'NODE') && ($context->isRelativePositioned())) {
-            return $this->nodes[$context->getRelativeAnchor()];
+            return $this->getNode($context->getRelativeAnchor());
         }
 
-        if (($type == 'link') && isset($this->links[$itemname])) {
-            return $this->links[$itemname];
+        if (($type == 'link') && $this->LinkExists($itemname)) {
+            return $this->getLink($itemname);
         }
 
-        if (($type == 'node') && isset($this->nodes[$itemname])) {
-            return $this->nodes[$itemname];
+        if (($type == 'node') && $this->nodeExists($itemname)) {
+            return $this->getNode($itemname);
         }
         return null;
     }

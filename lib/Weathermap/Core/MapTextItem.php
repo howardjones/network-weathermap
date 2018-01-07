@@ -4,7 +4,7 @@ namespace Weathermap\Core;
 
 /**
  * Class WeatherMapTextItem replaces the random attributes for Title, Timestamp, min/max timestamp in the
- * main Weathermap class. Now they can all be drawn like a node or link with a draw method.
+ * main Weathermap class. Now they can all be drawn like a node or link with a draw method. (UNUSED SO FAR)
  */
 class MapTextItem extends MapItem
 {

@@ -2,8 +2,8 @@
 
 namespace Weathermap\Core;
 
-/***
- * Class WMLinkGeometry - everything needed to draw a link
+/**
+ * everything needed to draw a link
  *
  * Actually collect all the link-drawing code into an object!
  *

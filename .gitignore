@@ -12,6 +12,7 @@ composer.lock
 !build/network-weathermap.doxy
 vendor/*
 dev/generated/
+dev/docs/
 dev/phpcs/
 dev/vagrant-testers/*.zip
 node_modules/

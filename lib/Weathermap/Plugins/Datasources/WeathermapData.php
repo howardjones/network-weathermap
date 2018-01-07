@@ -4,6 +4,11 @@ namespace Weathermap\Plugins\Datasources;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
+/**
+ * Read data from Weathermap's own data dump files
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class WeathermapData extends Base
 {
 

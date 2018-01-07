@@ -8,6 +8,12 @@ namespace Weathermap\Integrations\Cacti;
 use Weathermap\UI\UIBase;
 use Weathermap\UI\SimpleTemplate;
 
+/**
+ * Data/Graph picker for the Editor, looking inside the Cacti database
+ *
+ * @package Weathermap\Integrations\Cacti
+ *
+ */
 class EditorDataPicker extends UIBase
 {
     public $commands = array(

@@ -7,8 +7,8 @@ use Weathermap\Core\StringUtility;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
-// template class for data sources. All data sources extend this class.
-// I really wish PHP4 would just die overnight
+/** base class for data source plugins. All data sources extend this class. */
+
 class Base
 {
     protected $owner;

@@ -6,6 +6,11 @@ namespace Weathermap\Plugins\Pre;
 
 use Weathermap\Core\MapUtility;
 
+/**
+ * Another do-very-little example
+ *
+ * @package Weathermap\Plugins\Pre
+ */
 class ExamplePre extends Base
 {
     public function run()

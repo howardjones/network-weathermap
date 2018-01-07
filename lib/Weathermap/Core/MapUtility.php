@@ -8,6 +8,12 @@
 
 namespace Weathermap\Core;
 
+/**
+ * Utility Functions that were in Map but don't need to be methods
+ * Quite a random collection that should probably be elsewhere.
+ *
+ * @package Weathermap\Core
+ */
 class MapUtility
 {
 

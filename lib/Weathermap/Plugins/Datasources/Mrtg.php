@@ -8,6 +8,11 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 
+/**
+ * Get data from old-style MRTG HTML output where the data is in HTML comments
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class Mrtg extends Base
 {
 

@@ -5,6 +5,11 @@ namespace Weathermap\Integrations\Cacti;
 // replacements for functions in Cacti 1.x, so more code can be shared
 require_once dirname(__FILE__) . '/weathermap-cacti88-plugin-compat.php';
 
+/**
+ * The 0.8.8x specific parts of the Cacti 'user' plugin (map display)
+ *
+ * @package Weathermap\Integrations\Cacti
+ */
 class WeatherMapCacti88UserPlugin extends WeatherMapCactiUserPlugin
 {
     public $colours;

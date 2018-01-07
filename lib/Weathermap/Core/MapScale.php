@@ -4,9 +4,7 @@ namespace Weathermap\Core;
 
 
 /**
- * Collect together everything scale-related
- *
- * Probably should separate out the legend-drawing from the CFV stuff.
+ * A collection of ScaleEntries, maps a value to a colour (and tag)
  *
  */
 class MapScale extends MapItem

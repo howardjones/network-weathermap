@@ -2,16 +2,14 @@
 
 namespace Weathermap\Core;
 
+
+use Weathermap\Plugins\Datasources\Base;
+
 /**
- * Class WMTarget
- *
  * A small class to keep together all the processing for targets (data sources).
  * This is to replace an ugly array that gets passed around with mysterious fields.
  *
  */
-
-use Weathermap\Plugins\Datasources\Base;
-
 class Target
 {
     public $finalTargetString;

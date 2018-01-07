@@ -1,6 +1,11 @@
 <?php
 namespace Weathermap\Core;
 
+/**
+ * Given the link style, return an appropriate LinkGeometry object to draw it
+ *
+ * @package Weathermap\Core
+ */
 class LinkGeometryFactory
 {
     /**

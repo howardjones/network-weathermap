@@ -11,7 +11,7 @@ namespace Weathermap\Core;
 use Weathermap\Core\Point;
 
 /**
- * Class WMSpineElement - a single item in a spine.
+ * Class SpineElement - a single item in a spine.
  *
  * Previously this was an array with a WMPoint and a number. This
  * is nicer to read, and actually works properly with type inference.

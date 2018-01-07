@@ -17,6 +17,11 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 
+/**
+ * SNMPv1 data collection
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class SNMP1 extends Base
 {
     protected $downCache;
@@ -54,7 +59,6 @@ class SNMP1 extends Base
             $this->downCache[$host] = 0;
         }
     }
-
 
     public function readData($targetString, &$map, &$item)
     {

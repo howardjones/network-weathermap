@@ -9,6 +9,11 @@ use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 use PDO;
 
+/**
+ * Get data from Cacti's host table
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class CactiHostStatus extends Base
 {
     public function __construct()

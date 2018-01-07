@@ -1,6 +1,13 @@
 <?php
 namespace Weathermap\Core;
 
+/**
+ * A handler for loading images required by the map (e.g. backgrounds and icons). It also
+ * is responsible for any colorizing and resizing necessary. It maintains a cache, to try and speed up
+ * maps with many resized icons, in particular.
+ *
+ * @package Weathermap\Core
+ */
 class ImageLoader
 {
     private $cache = array();

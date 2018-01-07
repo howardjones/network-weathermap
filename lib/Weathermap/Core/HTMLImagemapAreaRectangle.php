@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:14
- */
 
 namespace Weathermap\Core;
 
+/**
+ * A rectangle for HTMLImagemap
+ *
+ * @package Weathermap\Core
+ */
 class HTMLImagemapAreaRectangle extends HTMLImagemapArea
 {
     public $x1;

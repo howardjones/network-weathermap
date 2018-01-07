@@ -2,7 +2,7 @@
 
 namespace Weathermap\Core;
 
-// XXX - unused
+/** XXX - unused */
 
 class ConfigItem
 {

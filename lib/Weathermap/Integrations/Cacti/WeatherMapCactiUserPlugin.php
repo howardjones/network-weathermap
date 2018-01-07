@@ -7,7 +7,11 @@ require_once dirname(__FILE__) . "/database.php";
 use Weathermap\UI\UIBase;
 use Weathermap\Integrations\MapManager;
 
-
+/**
+ * The common parts of the Cacti 'user' plugin (map display)
+ *
+ * @package Weathermap\Integrations\Cacti
+ */
 class WeatherMapCactiUserPlugin extends UIBase
 {
     /** @var MapManager $manager */

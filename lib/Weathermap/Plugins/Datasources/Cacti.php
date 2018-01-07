@@ -9,6 +9,11 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 
+/**
+ * Get data directly from Cacti local_data_id (INCOMPLETE?)
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class Cacti extends Base
 {
     protected $name = "Cacti";

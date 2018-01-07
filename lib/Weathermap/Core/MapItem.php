@@ -2,7 +2,10 @@
 
 namespace Weathermap\Core;
 
-// The 'things on the map' class. More common code (mainly variables, actually)
+/**
+ * The 'things on the map' class.
+ */
+
 class MapItem extends MapBase
 {
     /** @var  Map $owner */

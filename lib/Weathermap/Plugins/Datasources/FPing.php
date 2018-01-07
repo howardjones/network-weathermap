@@ -10,6 +10,11 @@ use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 use Weathermap\Core\MapUtility;
 
+/**
+ * Use fping to ping remote hosts
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class FPing extends Base
 {
 

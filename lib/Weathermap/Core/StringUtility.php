@@ -2,7 +2,7 @@
 namespace Weathermap\Core;
 
 /**
- * Class WMUtility - string-handling/formatting utility functions
+ * string-handling/formatting utility functions
  */
 class StringUtility
 {

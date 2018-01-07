@@ -1,13 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:16
- */
 
 namespace Weathermap\Core;
 
+/**
+ * A LineSegment is a Line that only exists between two points (UNUSED?)
+ * @package Weathermap\Core
+ */
 class LineSegment
 {
     public $point1;

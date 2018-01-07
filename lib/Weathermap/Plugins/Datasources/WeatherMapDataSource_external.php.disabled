@@ -17,7 +17,9 @@
 //       If you want to allow only one command, consider making
 //       your own datasource plugin which only runs that one command.
 
-
+/**
+  * Get data from an external script. Disabled by default.
+  */
 class WeatherMapDataSource_external extends WeatherMapDataSource
 {
 

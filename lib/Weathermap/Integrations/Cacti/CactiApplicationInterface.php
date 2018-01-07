@@ -5,6 +5,11 @@ namespace Weathermap\Integrations\Cacti;
 use \PDO;
 use Weathermap\Integrations\ApplicationInterface;
 
+/**
+ * The Cacti implementation of ApplicationInterface
+ *
+ * @package Weathermap\Integrations\Cacti
+ */
 class CactiApplicationInterface extends ApplicationInterface
 {
     public function getAppSetting($name, $defaultValue = "")

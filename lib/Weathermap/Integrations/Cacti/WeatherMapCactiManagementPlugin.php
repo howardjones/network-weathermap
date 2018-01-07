@@ -8,6 +8,11 @@ use Weathermap\Integrations\MapManager;
 use Weathermap\UI\UIBase;
 use Weathermap\Core\MapUtility;
 
+/**
+ * The common parts of the Cacti 'management' plugin
+ *
+ * @package Weathermap\Integrations\Cacti
+ */
 class WeatherMapCactiManagementPlugin extends UIBase
 {
 

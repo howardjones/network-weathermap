@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:12
- */
 
 namespace Weathermap\Core;
 
+/**
+ * FontTable member representing a GD format bitmap font
+ *
+ * @package Weathermap\Core
+ */
 class GDFont extends Font
 {
     public $gdnumber;

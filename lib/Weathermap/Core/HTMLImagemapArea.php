@@ -1,13 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 23/09/17
- * Time: 11:14
- */
 
 namespace Weathermap\Core;
 
+/**
+ * Base class for the other ImagemapArea classes - just the common stuff
+ * @package Weathermap\Core
+ */
 class HTMLImagemapArea
 {
     public $href;

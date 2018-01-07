@@ -2,6 +2,10 @@
 
 namespace Weathermap\Core;
 
+/**
+ * Base class for a font in the FontTable
+ * @package Weathermap\Core
+ */
 class Font
 {
     public $type;

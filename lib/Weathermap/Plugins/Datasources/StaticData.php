@@ -10,6 +10,11 @@ use Weathermap\Core\StringUtility;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
+/**
+ * Handwire a value. Useful for testing.
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class StaticData extends Base
 {
 

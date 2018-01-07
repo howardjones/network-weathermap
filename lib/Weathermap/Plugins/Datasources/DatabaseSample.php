@@ -12,6 +12,11 @@ use Weathermap\Core\MapDataItem;
 use PDO;
 use PDOException;
 
+/**
+ * Example of collecting data from a SQL database
+ *
+ * @package Weathermap\Plugins\Datasources
+ */
 class DatabaseSample extends Base
 {
 

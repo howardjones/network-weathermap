@@ -1,14 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 31/12/17
- * Time: 13:28
- */
 
 namespace Weathermap\Core;
 
-
+/**
+ * A plugin. Managed by PluginManager.
+ *
+ * @package Weathermap\Core
+ */
 class Plugin
 {
     public $name;

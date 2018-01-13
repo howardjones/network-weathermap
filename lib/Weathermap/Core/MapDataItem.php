@@ -77,6 +77,16 @@ class MapDataItem extends MapItem
         $this->reset($owner);
     }
 
+    /**
+     * Is this item a template or a 'real' one?
+     *
+     * @return bool
+     */
+    public function isTemplate()
+    {
+        return true;
+    }
+
     public function draw($imageRef)
     {
     }

@@ -886,7 +886,7 @@ class Map extends MapBase
 
         foreach ($allItems as $mapItem) {
             if (!$mapItem->isTemplate() && count($mapItem->targets) > 0) {
-                $prefix = substr($mapItem->my_type(), 0, 1);
+                $prefix = substr($mapItem->myType(), 0, 1);
                 fputs(
                     $fileHandle,
                     sprintf("%s\t%f\t%f\r\n", $prefix, $mapItem->name, $mapItem->absoluteUsages[IN],

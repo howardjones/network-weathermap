@@ -1,14 +1,13 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 
 import {viewAllFull, viewFirstFull, viewThumbs} from '../actions';
 
-class ModeSelector extends Component
-{
+class ModeSelector extends React.Component {
     constructor(props) {
         super(props);
         this.clickedFirstFull = this.clickedFirstFull.bind(this);
-        this.clickedFull= this.clickedFull.bind(this);
+        this.clickedFull = this.clickedFull.bind(this);
         this.clickedThumbs = this.clickedThumbs.bind(this);
     }
 
@@ -34,11 +33,12 @@ class ModeSelector extends Component
                 Temporary mode-selector:
                 <a onClick={this.clickedThumbs}>Thumbs</a> |
                 <a onClick={this.clickedFull}>Full</a> |
-                <a onclick={this.clickedFirstFull} >Full (first only)</a>
+                <a onClick={this.clickedFirstFull}>Full (first only)</a>
             </div>
         )
     }
 }
+
 function mapStateToProps(state) {
     return {settings: state.settings}
 }

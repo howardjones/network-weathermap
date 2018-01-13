@@ -1,11 +1,16 @@
+import {SET_GROUP_DATA} from "../actions";
 
-const INITIAL_STATE = [
-  {"id":"1","name":"Weathermaps","sortorder":"1"},
-  {"id":"2","name":"g2","sortorder":"2"}
-];
+const INITIAL_STATE = [];
 
 export default function (state = INITIAL_STATE, action) {
 
-    // No actions yet!
+    switch (action.type) {
+        case SET_GROUP_DATA:
+            state = action.groups;
+            break;
+        default:
+            break;
+    }
+
     return state;
 };

@@ -1,29 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-// import App from './App';
-import registerServiceWorker from './registerServiceWorker';
-
-import {createStore, applyMiddleware} from 'redux';
+import {applyMiddleware, createStore} from 'redux';
 import {Provider} from 'react-redux';
+import thunk from 'redux-thunk';
+import logger from 'redux-logger';
 
 import reducers from './reducers';
 
-import {
-    HashRouter as Router,
-    Route,
-    Redirect,
-    Link
-} from 'react-router-dom'
+import {HashRouter as Router, Redirect, Route} from 'react-router-dom'
 
 
 import WMUserApp from './WMUserApp';
 import SingleMap from './components/SingleMap';
 import MapGroup from './components/MapGroup';
 
-import './index.css';
-
-const createStoreWithMiddleware = applyMiddleware()(createStore);
+const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
 const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 const AppRoutes = () => (
@@ -40,4 +32,4 @@ const AppRoutes = () => (
 
 ReactDOM.render(<Provider store={store}><AppRoutes/></Provider>, document.getElementById('root'));
 
-registerServiceWorker();
+

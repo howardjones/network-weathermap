@@ -1,5 +1,3 @@
-import immutable from 'object-path-immutable';
-
 import {VIEW_ALL_FULL, VIEW_FIRST_FULL, VIEW_THUMBS} from '../actions';
 
 const INITIAL_STATE = {

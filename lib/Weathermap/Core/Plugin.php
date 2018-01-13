@@ -44,4 +44,10 @@ class Plugin
             $this->active = false;
         }
     }
+
+    public function __toString()
+    {
+        return sprintf("[PLUGIN %s %s%s]", $this->type, $this->name, $this->active ? "" : " (disabled)");
+    }
+
 }

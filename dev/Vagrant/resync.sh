@@ -7,6 +7,6 @@ WEBROOT="/var/www/html"
 
 if [ "X$WEATHERMAP_VERSION" = "Xrsync" ]; then
   echo "rsyncing weathermap from local dir"
-  sudo rsync -a --exclude=composer.lock --exclude=vendor/ /network-weathermap/ $WEBROOT/cacti/plugins/weathermap/
+  sudo rsync -av --exclude=composer.lock --exclude=vendor/ /network-weathermap/ $WEBROOT/cacti/plugins/weathermap/
   sudo chown -R cacti ${WEBROOT}/cacti/plugins/weathermap
 fi

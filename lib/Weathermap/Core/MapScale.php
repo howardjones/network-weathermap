@@ -236,4 +236,9 @@ class MapScale extends MapItem
         return $lower;
     }
 
+    public function __toString()
+    {
+        return sprintf("[SCALE %s]", $this->name);
+    }
+
 }

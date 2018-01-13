@@ -6,7 +6,11 @@ export default function (state = INITIAL_STATE, action) {
 
     switch (action.type) {
         case SET_MAP_DATA:
-            state = action.maps;
+            if (action.maps !== undefined) {
+                state = action.maps;
+            } else {
+                console.log("Got undefined maps in SET_MAP_DATA");
+            }
             break;
         default:
             break;

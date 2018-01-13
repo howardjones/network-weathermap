@@ -6,7 +6,11 @@ export default function (state = INITIAL_STATE, action) {
 
     switch (action.type) {
         case SET_GROUP_DATA:
-            state = action.groups;
+            if (action.groups !== undefined) {
+                state = action.groups;
+            } else {
+                console.log("Got undefined maps in SET_GROUP_DATA");
+            }
             break;
         default:
             break;

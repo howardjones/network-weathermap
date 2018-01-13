@@ -248,6 +248,13 @@ class WeatherMapCactiUserPlugin extends UIBase
         if ($mapCount == 0) {
             print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
         }
+
+        print "<h3>This is the React UI below here</h3>";
+        print "<div id='root'></div>";
+        print '<script type="text/javascript" src="cacti-resources/user-main.js"></script>';
+
+        print "<hr />";
+
         $this->outputVersionBox();
 
         $this->cactiFooter();

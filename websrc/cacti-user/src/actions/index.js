@@ -12,6 +12,7 @@ export function loadMaps() {
 
     return (dispatch) => {
         axios.get(url).then((response) => {
+            console.log(response.data);
             dispatch(setGroups(response.data.groups));
             dispatch(setMaps(response.data.maps));
         })
@@ -19,6 +20,7 @@ export function loadMaps() {
 }
 
 export function setMaps(map_data) {
+    console.log(map_data);
     return {
         type: SET_MAP_DATA,
         maps: map_data
@@ -26,6 +28,7 @@ export function setMaps(map_data) {
 }
 
 export function setGroups(group_data) {
+    console.log(group_data);
     return {
         type: SET_GROUP_DATA,
         groups: group_data

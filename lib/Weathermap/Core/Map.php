@@ -195,7 +195,7 @@ class Map extends MapBase
 
     public function __toString()
     {
-        return 'MAP';
+        return '[MAP]';
     }
 
     private function reset()

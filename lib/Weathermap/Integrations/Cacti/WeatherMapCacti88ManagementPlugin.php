@@ -32,6 +32,12 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
         $this->maplistWarnings();
         $this->maplist();
         $this->footerLinks();
+
+        print "<h3>This is the React UI below here</h3>";
+        print '<style src="cacti-resources/mgmt/main.css"></style>';
+        print "<div id='weathermap-mgmt-root'></div>";
+        print '<script type="text/javascript" src="cacti-resources/mgmt/main.js"></script>';
+        
         $this->cactiFooter();
     }
 

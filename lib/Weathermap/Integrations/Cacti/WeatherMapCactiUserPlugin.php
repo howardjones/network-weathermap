@@ -250,8 +250,9 @@ class WeatherMapCactiUserPlugin extends UIBase
         }
 
         print "<h3>This is the React UI below here</h3>";
-        print "<div id='root'></div>";
-        print '<script type="text/javascript" src="cacti-resources/user-main.js"></script>';
+        print '<style src="cacti-resources/user/main.css"></style>';
+        print "<div id='weathermap-user-root'></div>";
+        print '<script type="text/javascript" src="cacti-resources/user/main.js"></script>';
 
         print "<hr />";
 

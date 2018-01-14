@@ -30,6 +30,6 @@ const AppRoutes = () => (
 );
 
 
-ReactDOM.render(<Provider store={store}><AppRoutes/></Provider>, document.getElementById('root'));
+ReactDOM.render(<Provider store={store}><AppRoutes/></Provider>, document.getElementById('weathermap-user-root'));
 
 

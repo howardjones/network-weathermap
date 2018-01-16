@@ -28,6 +28,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
     public $commands = array(
         'settings' => array('handler' => 'handleSettingsAPI', 'args' => array()),
         'dumpmaps' => array('handler' => 'handleDumpMapsAPI', 'args' => array()),
+        'map_disable' => array('handler' => 'handleMapDisableAPI', 'args' => array(array("id", "int"))),
+        'map_enable' => array('handler' => 'handleMapEnableAPI', 'args' => array(array("id", "int"))),
+
 
         'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id", "int"))),
         'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
@@ -176,8 +179,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             'image_url' => $this->makeURL(array("action" => "viewimage")),
             'editor_url' => $this->editorURL,
             'maps_url' => $this->makeURL(array("action" => "dumpmaps")),
-            'docs_url' => 'docs/',
-            'management_url' => $this->managementURL
+            'docs_url' => 'docs/'
         );
 
         print json_encode($data);
@@ -195,7 +197,29 @@ class WeatherMapCactiManagementPlugin extends UIBase
         print json_encode($data);
     }
 
+    protected function handleMapEnableAPI($request, $appObject)
+    {
+        $data = array("success" => false);
 
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            $this->manager->activateMap($request['id']);
+            $data = array("success" => true);
+        }
+        header('Content-type: application/json');
+        print json_encode($data);
+    }
+
+    protected function handleMapDisableAPI($request, $appObject)
+    {
+        $data = array("success" => false);
+
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            $this->manager->disableMap($request['id']);
+            $data = array("success" => true);
+        }
+        header('Content-type: application/json');
+        print json_encode($data);
+    }
 
     // ******************************************************
 

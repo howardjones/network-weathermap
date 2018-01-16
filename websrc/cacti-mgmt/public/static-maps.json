@@ -1,0 +1,91 @@
+{
+  "maps": [
+    {
+      "id": "4",
+      "sortorder": "1",
+      "group_id": "1",
+      "active": "on",
+      "configfile": "weathermap.conf",
+      "imagefile": "",
+      "htmlfile": "",
+      "titlecache": "Network Weathermap",
+      "filehash": "6d601b15298b3c76f632",
+      "warncount": "0",
+      "debug": "off",
+      "runtime": "0.2412440776825",
+      "lastrun": null,
+      "config": "",
+      "thumb_width": "250",
+      "thumb_height": "187",
+      "schedule": "*",
+      "archiving": "off"
+    },
+    {
+      "id": "3",
+      "sortorder": "2",
+      "group_id": "1",
+      "active": "on",
+      "configfile": "simple.conf",
+      "imagefile": "",
+      "htmlfile": "",
+      "titlecache": "Simple Map",
+      "filehash": "8cdedb512caf26110fb4",
+      "warncount": "0",
+      "debug": "off",
+      "runtime": "0.17647695541382",
+      "lastrun": null,
+      "config": "",
+      "thumb_width": "250",
+      "thumb_height": "164",
+      "schedule": "*",
+      "archiving": "off"
+    },
+    {
+      "id": "2",
+      "sortorder": "3",
+      "group_id": "1",
+      "active": "on",
+      "configfile": "096-test.conf",
+      "imagefile": "",
+      "htmlfile": "",
+      "titlecache": "0.96 Test Map -",
+      "filehash": "b065e3b11c5e2813d39d",
+      "warncount": "0",
+      "debug": "off",
+      "runtime": "0.23335886001587",
+      "lastrun": null,
+      "config": "",
+      "thumb_width": "250",
+      "thumb_height": "162",
+      "schedule": "*",
+      "archiving": "off"
+    },
+    {
+      "id": "1",
+      "sortorder": "4",
+      "group_id": "1",
+      "active": "on",
+      "configfile": "simple.conf",
+      "imagefile": "",
+      "htmlfile": "",
+      "titlecache": "Simple Map",
+      "filehash": "901636b56f9733647884",
+      "warncount": "0",
+      "debug": "off",
+      "runtime": "0.17433094978333",
+      "lastrun": null,
+      "config": "",
+      "thumb_width": "250",
+      "thumb_height": "164",
+      "schedule": "*",
+      "archiving": "off"
+    }
+  ],
+  "groups": [
+    {
+      "id": "1",
+      "name": "Weathermaps",
+      "sortorder": "1"
+    }
+  ]
+}

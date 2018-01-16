@@ -15,6 +15,7 @@ class App extends Component {
 
         const ll = this.props.maps.map((item) => {
             return (<tr>
+                <td>{item.id}</td>
                 <td>{item.configfile}</td>
                 <td>{item.titlecache}</td>
                 <td>group{item.group_id}</td>
@@ -30,6 +31,7 @@ class App extends Component {
                 <table border={1}>
                     <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Config File</th>
                         <th>Title</th>
                         <th>Group</th>

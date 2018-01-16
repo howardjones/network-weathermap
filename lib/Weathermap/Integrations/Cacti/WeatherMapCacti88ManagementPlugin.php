@@ -27,17 +27,21 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
      */
     public function handleManagementMainScreen($request, $appObject)
     {
+        global $wm_showOldUI;
+
         $this->cactiHeader();
-        print "This will all be replaced.";
-        $this->maplistWarnings();
-        $this->maplist();
-        $this->footerLinks();
+        if ($wm_showOldUI) {
+            print "This will all be replaced.";
+            $this->maplistWarnings();
+            $this->maplist();
+            $this->footerLinks();
+        }
 
         print "<h3>This is the React UI below here</h3>";
         print '<style src="cacti-resources/mgmt/main.css"></style>';
         print "<div id='weathermap-mgmt-root'></div>";
         print '<script type="text/javascript" src="cacti-resources/mgmt/main.js"></script>';
-        
+
         $this->cactiFooter();
     }
 

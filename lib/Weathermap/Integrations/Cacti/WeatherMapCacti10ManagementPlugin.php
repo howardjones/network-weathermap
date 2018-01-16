@@ -24,31 +24,36 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
      */
     public function handleManagementMainScreen($request, $appObject)
     {
+        global $wm_showOldUI;
+
         $this->cactiHeader();
-        print "This will all be replaced.";
-        $this->maplistWarnings();
-        $this->maplist();
-        $this->footerLinks();
-        ?>
-        <script type='text/javascript'>
-            $(function () {
-                $('#settings').click(function () {
-                    document.location = urlPath + 'settings.php?tab=maps';
-                });
 
-                $('#edit').click(function (event) {
-                    event.preventDefault();
-                    loadPageNoHeader('weathermap-cacti10-plugin-mgmt.php?action=groupadmin&header=false');
-                });
+        if ($wm_showOldUI) {
 
-                $('.remover').click(function () {
-                    var href = $(this).attr('href');
-                    loadPageNoHeader(href);
-                });
-            });
-        </script>
-        <?php
+            print "This will all be replaced.";
+            $this->maplistWarnings();
+            $this->maplist();
+            $this->footerLinks();
+            ?>
+            <script type='text/javascript'>
+                $(function () {
+                    $('#settings').click(function () {
+                        document.location = urlPath + 'settings.php?tab=maps';
+                    });
 
+                    $('#edit').click(function (event) {
+                        event.preventDefault();
+                        loadPageNoHeader('weathermap-cacti10-plugin-mgmt.php?action=groupadmin&header=false');
+                    });
+
+                    $('.remover').click(function () {
+                        var href = $(this).attr('href');
+                        loadPageNoHeader(href);
+                    });
+                });
+            </script>
+            <?php
+        }
 
         print "<h3>This is the React UI below here</h3>";
         print '<style src="cacti-resources/mgmt/main.css"></style>';

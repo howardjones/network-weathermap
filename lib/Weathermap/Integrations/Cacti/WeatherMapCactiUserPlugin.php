@@ -27,8 +27,8 @@ class WeatherMapCactiUserPlugin extends UIBase
     public $editorRealm;
 
     public $commands = array(
-        'maplist' => array('handler' => 'handleMapList', 'args' => array()),
-        'settings' => array('handler' => 'handleSettings', 'args' => array()),
+        'maplist' => array('handler' => 'handleMapListAPI', 'args' => array()),
+        'settings' => array('handler' => 'handleSettingsAPI', 'args' => array()),
 
         'viewthumb' => array(
             'handler' => 'handleBigThumb',
@@ -113,7 +113,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         return $url;
     }
 
-    public function handleMapList($request, $appObject)
+    public function handleMapListAPI($request, $appObject)
     {
         header('Content-type: application/json');
 
@@ -143,7 +143,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         print json_encode($data);
     }
 
-    public function handleSettings($request, $appObject)
+    public function handleSettingsAPI($request, $appObject)
     {
         header('Content-type: application/json');
 
@@ -192,7 +192,57 @@ class WeatherMapCactiUserPlugin extends UIBase
     }
 
 
+
+    // ***********************************************************************************************
     // Below here are the old server-side functions that are replaced by client components
+
+
+    public function handleDefaultView($request, $appObject)
+    {
+        global $wm_showOldUI;
+
+        $this->cactiHeader();
+
+        if ($wm_showOldUI) {
+
+            print "This will all be replaced.";
+
+            $pageStyle = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
+            $userId = $this->manager->application->getCurrentUserId();
+            $limitToGroup = $this->getGroupFilter($request);
+
+            $mapList = $this->manager->getMapsForUser($userId, $limitToGroup);
+
+            // "First-only" style
+            if ($pageStyle == 2) {
+                $mapList = array($mapList[0]);
+            }
+            $mapCount = count($mapList);
+
+            $this->outputMapHeader($mapList, false, $limitToGroup);
+
+            if ($pageStyle == 0 && $mapCount > 1) {
+                $this->drawThumbnailView($mapList);
+            } else {
+                $this->drawFullMapView($mapList);
+            }
+
+            if ($mapCount == 0) {
+                print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
+            }
+        }
+
+        print "<h3>This is the React UI below here</h3>";
+        print '<style src="cacti-resources/user/main.css"></style>';
+        print "<div id='weathermap-user-root'></div>";
+        print '<script type="text/javascript" src="cacti-resources/user/main.js"></script>';
+
+        print "<hr />";
+
+        $this->outputVersionBox();
+
+        $this->cactiFooter();
+    }
 
     public function handleViewMap($request, $appObject)
     {
@@ -219,47 +269,6 @@ class WeatherMapCactiUserPlugin extends UIBase
         print "Unimplemented handleViewCycleFiltered";
     }
 
-    public function handleDefaultView($request, $appObject)
-    {
-        $this->cactiHeader();
-
-        print "This will all be replaced.";
-
-        $pageStyle = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
-        $userId = $this->manager->application->getCurrentUserId();
-        $limitToGroup = $this->getGroupFilter($request);
-
-        $mapList = $this->manager->getMapsForUser($userId, $limitToGroup);
-
-        // "First-only" style
-        if ($pageStyle == 2) {
-            $mapList = array($mapList[0]);
-        }
-        $mapCount = count($mapList);
-
-        $this->outputMapHeader($mapList, false, $limitToGroup);
-
-        if ($pageStyle == 0 && $mapCount > 1) {
-            $this->drawThumbnailView($mapList);
-        } else {
-            $this->drawFullMapView($mapList);
-        }
-
-        if ($mapCount == 0) {
-            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
-        }
-
-        print "<h3>This is the React UI below here</h3>";
-        print '<style src="cacti-resources/user/main.css"></style>';
-        print "<div id='weathermap-user-root'></div>";
-        print '<script type="text/javascript" src="cacti-resources/user/main.js"></script>';
-
-        print "<hr />";
-
-        $this->outputVersionBox();
-
-        $this->cactiFooter();
-    }
 
     /**
      * Figure out which tab to show in the main view. If one was requested, use that. Otherwise use the first one.
@@ -498,7 +507,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         $mapTitle = $this->getMapTitle($map);
         print '<div class="weathermapholder" id="mapholder_' . $map->filehash . '">';
 
-        \html_start_box(__('Map for config file: %s', $map->configfile), '100%', '', '3', 'center', '');
+        \html_start_box(__($mapTitle), '100%', '', '3', 'center', '');
 
         ?>
         <tr class="even">

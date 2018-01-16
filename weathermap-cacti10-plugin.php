@@ -12,6 +12,8 @@ require_once dirname(__FILE__)."/lib/all.php";
 
 use Weathermap\Integrations\Cacti\WeatherMapCacti10UserPlugin;
 
+$wm_showOldUI = false;
+
 $plugin = new WeatherMapCacti10UserPlugin($config, "png", realpath(dirname(__FILE__)));
 
 $plugin->main($_REQUEST);

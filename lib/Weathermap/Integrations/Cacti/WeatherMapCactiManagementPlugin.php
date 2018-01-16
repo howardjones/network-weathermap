@@ -26,6 +26,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
     public $basePath;
 
     public $commands = array(
+        'settings' => array('handler' => 'handleSettingsAPI', 'args' => array()),
+        'dumpmaps' => array('handler' => 'handleDumpMapsAPI', 'args' => array()),
+
         'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id", "int"))),
         'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
         'group_form' => array('handler' => 'handleGroupForm', 'args' => array(array("id", "int"))),
@@ -94,8 +97,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
 //        'rebuildnow' => array('handler' => 'handleRebuildNowStep1', 'args' => array()),
 //        'rebuildnow2' => array('handler' => 'handleRebuildNowStep2', 'args' => array()),
-        'settingsdump' => array('handler' => 'handleDumpSettings', 'args' => array()),
-        'dump_maps' => array('handler' => 'handleDumpMaps', 'args' => array()),
+
         'enable_poller_output' => array('handler' => 'handleEnablePollerOutput', 'args' => array()),
         ':: DEFAULT ::' => array('handler' => 'handleManagementMainScreen', 'args' => array())
     );
@@ -147,7 +149,41 @@ class WeatherMapCactiManagementPlugin extends UIBase
         return $url;
     }
 
-    public function handleDumpMaps($request, $appObject)
+    public function handleSettingsAPI($request, $appObject)
+    {
+        header('Content-type: application/json');
+
+        $styleTextOptions = array("thumbs", "full", "full-first-only");
+        $trueFalseLookup = array(false, true);
+
+        $style = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
+
+        $cycleTime = $this->manager->application->getAppSetting("weathermap_cycle_refresh", 0);
+        if ($cycleTime == 0) {
+            $cycleTime = 'auto';
+        }
+
+        $showAllMapsTab = $this->manager->application->getAppSetting("weathermap_all_tab", 0);
+        $showMapSelector = $this->manager->application->getAppSetting("weathermap_map_selector", 0);
+
+        $data = array(
+            'wm_version' => WEATHERMAP_VERSION,
+            'page_style' => $styleTextOptions[$style],
+            'cycle_time' => (string)$cycleTime,
+            'show_all_tab' => $trueFalseLookup[$showAllMapsTab],
+            'map_selector' => $trueFalseLookup[$showMapSelector],
+            'thumb_url' => $this->makeURL(array("action" => "viewthumb")),
+            'image_url' => $this->makeURL(array("action" => "viewimage")),
+            'editor_url' => $this->editorURL,
+            'maps_url' => $this->makeURL(array("action" => "dumpmaps")),
+            'docs_url' => 'docs/',
+            'management_url' => $this->managementURL
+        );
+
+        print json_encode($data);
+    }
+
+    public function handleDumpMapsAPI($request, $appObject)
     {
         header('Content-type: application/json');
 
@@ -158,6 +194,12 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
         print json_encode($data);
     }
+
+
+
+    // ******************************************************
+
+
 
     public function handleEnablePollerOutput($request, $appObject)
     {
@@ -594,12 +636,6 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    public function handleDumpSettings($request, $appObject)
-    {
-        $this->cactiHeader();
-        print __("Unimplemented Dump Settings.");
-        $this->cactiFooter();
-    }
 
     public function handleManagementMainScreen($request, $appObject)
     {

@@ -166,9 +166,10 @@ class WeatherMapCactiUserPlugin extends UIBase
             'cycle_time' => (string)$cycleTime,
             'show_all_tab' => $trueFalseLookup[$showAllMapsTab],
             'map_selector' => $trueFalseLookup[$showMapSelector],
-            'thumb_url' => $this->makeURL(array("action" => "viewthumb")),
-            'image_url' => $this->makeURL(array("action" => "viewimage")),
+            'thumb_url' => $this->makeURL(array("action" => "viewthumb")) . "&id=",
+            'image_url' => $this->makeURL(array("action" => "viewimage")) . "&id=",
             'editor_url' => $this->editorURL,
+            'maps_url' => $this->makeURL(array("action" => "maplist")),
             'docs_url' => 'docs/',
             'management_url' => null
         );

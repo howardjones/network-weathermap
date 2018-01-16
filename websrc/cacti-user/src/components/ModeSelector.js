@@ -30,7 +30,7 @@ class ModeSelector extends React.Component {
 
         return (
             <div className="ModeSelector layoutbox">
-                Temporary mode-selector:
+                Temporary mode-selector (until settings are hooked up):
                 <a onClick={this.clickedThumbs}>Thumbs</a> |
                 <a onClick={this.clickedFull}>Full</a> |
                 <a onClick={this.clickedFirstFull}>Full (first only)</a>

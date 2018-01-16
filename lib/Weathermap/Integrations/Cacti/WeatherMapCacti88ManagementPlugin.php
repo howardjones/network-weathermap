@@ -4,6 +4,7 @@ namespace Weathermap\Integrations\Cacti;
 
 require_once dirname(__FILE__) . '/weathermap-cacti88-plugin-compat.php';
 //require_once dirname(__FILE__) . "/WeatherMapCactiManagementPlugin.php";
+
 /**
  * The 0.8.8x specific parts of the Cacti 'management' plugin
  *
@@ -39,7 +40,7 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
 
         print "<h3>This is the React UI below here</h3>";
         print '<style src="cacti-resources/mgmt/main.css"></style>';
-        print "<div id='weathermap-mgmt-root'></div>";
+        print "<div id='weathermap-mgmt-root' data-url='" . $this->makeURL(array("action" => "settings")) . "'></div>";
         print '<script type="text/javascript" src="cacti-resources/mgmt/main.js"></script>';
 
         $this->cactiFooter();

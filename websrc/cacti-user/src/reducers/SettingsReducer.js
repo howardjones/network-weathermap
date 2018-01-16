@@ -1,5 +1,7 @@
 import {VIEW_ALL_FULL, VIEW_FIRST_FULL, VIEW_THUMBS} from '../actions';
 
+import {SET_SETTINGS} from "../actions";
+
 const INITIAL_STATE = {
     wm_version: '1.0',
     page_style: 'thumbs',  // 'full', 'full-first-only'
@@ -15,9 +17,17 @@ const INITIAL_STATE = {
 
 export default function (state = INITIAL_STATE, action) {
 
-   console.log(action);
-    
-    switch(action.type) {
+    console.log(action);
+
+    switch (action.type) {
+        case SET_SETTINGS:
+            if (action.settings !== undefined) {
+                return action.settings;
+            } else {
+                console.log("Got undefined settings in SET_SETTINGS");
+                return state;
+            }
+            break;
         case VIEW_ALL_FULL:
             return {...state, page_style: "full"};
 
@@ -30,5 +40,4 @@ export default function (state = INITIAL_STATE, action) {
         default:
             return state;
     }
-
 };

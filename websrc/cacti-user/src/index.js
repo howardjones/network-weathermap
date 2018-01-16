@@ -18,18 +18,23 @@ import MapGroup from './components/MapGroup';
 const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
 const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
+let wm_root = document.getElementById('weathermap-user-root');
+
 const AppRoutes = () => (
     <Router>
         <div>
             <Redirect from="/" to="/group/1"/>
             <Route path="/group/:group_id" component={MapGroup}/>
             <Route path="/map/:map_id" component={SingleMap}/>
-            <Route path="/" component={WMUserApp}/>
+            <Route path="/"
+                render={(routeProps) => (
+                    <WMUserApp {...routeProps} {...(wm_root.dataset)} />
+                )}
+            />
         </div>
     </Router>
 );
 
-
-ReactDOM.render(<Provider store={store}><AppRoutes/></Provider>, document.getElementById('weathermap-user-root'));
+ReactDOM.render(<Provider store={store}><AppRoutes/></Provider>, wm_root);
 
 

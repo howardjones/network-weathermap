@@ -170,8 +170,13 @@ class WeatherMapCactiUserPlugin extends UIBase
             'image_url' => $this->makeURL(array("action" => "viewimage")),
             'editor_url' => $this->editorURL,
             'docs_url' => 'docs/',
-            'management_url' => $this->managementURL
+            'management_url' => null
         );
+
+        // only pass the managementURL if the user can manage
+        if ($this->isWeathermapAdmin()) {
+            $data['management_url'] = $this->managementURL;
+        }
 
         print json_encode($data);
     }
@@ -191,10 +196,25 @@ class WeatherMapCactiUserPlugin extends UIBase
         $this->outputMapImage($request['id'], ".");
     }
 
+    protected function isWeathermapAdmin()
+    {
+        global $user_auth_realm_filenames;
 
+        $realmId = 0;
+        $realmName = $this->managementRealm;
 
-    // ***********************************************************************************************
-    // Below here are the old server-side functions that are replaced by client components
+        if (isset($user_auth_realm_filenames[$realmName])) {
+            $realmId = $user_auth_realm_filenames[$realmName];
+        }
+        $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+        $allowed = $this->manager->application->checkUserAccess($userid, $realmId);
+
+        if ($allowed || (empty($realmId))) {
+            return true;
+        }
+
+        return false;
+    }
 
 
     public function handleDefaultView($request, $appObject)
@@ -234,15 +254,22 @@ class WeatherMapCactiUserPlugin extends UIBase
 
         print "<h3>This is the React UI below here</h3>";
         print '<style src="cacti-resources/user/main.css"></style>';
-        print "<div id='weathermap-user-root'></div>";
+        print "<div id='weathermap-user-root' data-url='" . $this->makeURL(array("action" => "settings")) . "'></div>";
         print '<script type="text/javascript" src="cacti-resources/user/main.js"></script>';
 
         print "<hr />";
 
-        $this->outputVersionBox();
+        if ($wm_showOldUI) {
+            $this->outputVersionBox();
+        }
 
         $this->cactiFooter();
     }
+
+
+    // ***********************************************************************************************
+    // Below here are the old server-side functions that are replaced by client components
+
 
     public function handleViewMap($request, $appObject)
     {
@@ -321,25 +348,6 @@ class WeatherMapCactiUserPlugin extends UIBase
         return $tabs;
     }
 
-    protected function isWeathermapAdmin()
-    {
-        global $user_auth_realm_filenames;
-
-        $realmId = 0;
-        $realmName = $this->managementRealm;
-
-        if (isset($user_auth_realm_filenames[$realmName])) {
-            $realmId = $user_auth_realm_filenames[$realmName];
-        }
-        $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-        $allowed = $this->manager->application->checkUserAccess($userid, $realmId);
-
-        if ($allowed || (empty($realmId))) {
-            return true;
-        }
-
-        return false;
-    }
 
     protected function outputVersionBox()
     {

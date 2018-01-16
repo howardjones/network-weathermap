@@ -15,15 +15,21 @@ import {HashRouter as Router, Route} from 'react-router-dom'
 const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
 const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
+let wm_root = document.getElementById('weathermap-mgmt-root');
+
 const AppRoutes = () => (
     <Router>
         <div>
-            <Route path="/" component={App}/>
+            <Route path="/"
+                   render={(routeProps) => (
+                       <App {...routeProps} {...(wm_root.dataset)} />
+                   )}
+            />
         </div>
     </Router>
 );
 
 
-ReactDOM.render(<Provider store={store}><AppRoutes/></Provider>, document.getElementById('weathermap-mgmt-root'));
+ReactDOM.render(<Provider store={store}><AppRoutes/></Provider>, wm_root);
 
 

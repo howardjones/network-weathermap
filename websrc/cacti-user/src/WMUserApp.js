@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import {loadMaps} from './actions';
+import {loadSettings} from './actions';
 
 import './App.css';
 
@@ -12,7 +12,7 @@ class WMUserApp extends React.Component {
 //  <SingleMap map={map_id} />
 
     componentDidMount() {
-        this.props.loadMaps();
+        this.props.loadSettings(this.props.url);
     }
 
     render() {
@@ -21,6 +21,7 @@ class WMUserApp extends React.Component {
 
         return (
             <div className="WMUserApp layoutbox">
+                (The base URL is {this.props.url}, passed from outside)
                 {this.props.children}
             </div>
         );
@@ -30,7 +31,7 @@ class WMUserApp extends React.Component {
 const mapStateToProps = (state) => (state);
 
 const mapDispatchToProps = {
-    loadMaps,
+    loadSettings,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WMUserApp);

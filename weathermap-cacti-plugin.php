@@ -8,6 +8,7 @@ include_once("./include/auth.php");
 
 // include the weathermap class so that we can get the version
 include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
+include_once(dirname(__FILE__)."/lib/database.php");
 
 $action = "";
 if (isset($_POST['action'])) {
@@ -651,8 +652,14 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 
 function weathermap_translate_id($idname)
 {
-	$SQL = "select id from weathermap_maps where configfile='".mysql_real_escape_string($idname)."' or filehash='".mysql_real_escape_string($idname)."'";
-	$map = db_fetch_assoc($SQL);
+    $pdo = weathermap_get_pdo();
+
+    $stmt = $pdo->prepare("select id from weathermap_maps where configfile=? or filehash=?");
+    $stmt->execute(array($idname, $idname));
+    $map = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//	$SQL = "select id from weathermap_maps where configfile='".mysql_real_escape_string($idname)."' or filehash='".mysql_real_escape_string($idname)."'";
+//	$map = db_fetch_assoc($SQL);
 
 	return($map[0]['id']);	
 }

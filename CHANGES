@@ -7,6 +7,12 @@ IMPORTANT NOTE - you may need to reset permissions on your users after upgrading
 finally switched to the "new-style" plugin API that's been around for 5+ years. This handles
 permissions differently, unfortunately.
 
+IMPORTANT NOTE 2: THIS RELEASE DOES NOT WORK WITH CACTI 1.x! You will want version 1.0+ for that.
+
+0.98a
+    FIXED - Works with PHP 7.x and 5.6 - removed all mysql_*() function calls, and use PDO instead
+    FIXED - Blank line issue with RRDtool 1.5+
+
 0.98
     FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.
     FIXED - Editor 'delete link' broken

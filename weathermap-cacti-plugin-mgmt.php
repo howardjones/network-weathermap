@@ -6,10 +6,12 @@ include_once("./include/config.php");
 
 include_once($config["library_path"] . "/database.php");
 
+
 $weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 
 // include the weathermap class so that we can get the version
 include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
+include_once(dirname(__FILE__)."/lib/database.php");
 
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
 
@@ -421,11 +423,9 @@ function weathermap_group_move($id,$junk,$direction)
 
 function get_table_list()
 {
-	$sql = "show tables";
-	$result = db_fetch_assoc($sql) or die (mysql_error());
+    $result = db_fetch_assoc("show tables");
 
 	$tables = array();
-	$sql = array();
 
 	foreach($result as $index => $arr) {
 		foreach ($arr as $t) {
@@ -440,6 +440,8 @@ function maplist()
 {
 	global $colors, $menu;
 	global $i_understand_file_permissions_and_how_to_fix_them;
+
+	$pdo = weathermap_get_pdo();
 
 	#print "<pre>";
 	#print_r($menu);
@@ -515,7 +517,6 @@ function maplist()
 
 	$i = 0;
 	$queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by weathermap_groups.sortorder,sortorder");
-	// or die (mysql_error("Could not connect to database") )
 
 	$previous_id = -2;
 	$had_warnings = 0;
@@ -597,8 +598,12 @@ function maplist()
 			print "</td>";
 
 			print '<td>';
-			$UserSQL = 'select * from weathermap_auth where mapid='.$map['id'].' order by userid';
-			$userlist = db_fetch_assoc($UserSQL);
+//			$UserSQL = 'select * from weathermap_auth where mapid='.$map['id'].' order by userid';
+			$stmt = $pdo->prepare('select * from weathermap_auth where mapid=? order by userid');
+			$stmt->execute(array($map['id']));
+			$userlist = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//			$userlist = db_fetch_assoc($UserSQL);
 
 			$mapusers = array();
 			foreach ($userlist as $user)
@@ -818,6 +823,8 @@ function add_config($file)
 	global $weathermap_confdir;
 	global $colors;
 
+	$pdo = weathermap_get_pdo();
+
 	chdir($weathermap_confdir);
 
 	$path_parts = pathinfo($file);
@@ -834,19 +841,26 @@ function add_config($file)
 		$realfile = $weathermap_confdir.DIRECTORY_SEPARATOR.$file;
 		$title = wmap_get_title($realfile);
 
-		$file = mysql_real_escape_string($file);
-		$title = mysql_real_escape_string($title);
-		$SQL = "insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES ('$file','$title','on','','','','')";
-		db_execute($SQL);
+		$stmt = $pdo->prepare("insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES (?,?,'on','','','','')");
+
+//		$file = mysql_real_escape_string($file);
+//		$title = mysql_real_escape_string($title);
+//		$SQL = "insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES ('$file','$title','on','','','','')";
+//		db_execute($SQL);
+        $stmt->execute(array($file, $title));
 
 		// add auth for 'admin'
-		$last_id = mysql_insert_id();
-		// $myuid = (int)$_SESSION["sess_user_id"];
+//		$last_id = mysql_insert_id();
+		$last_id = $pdo->lastInsertId();
 		$myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-		$SQL = "insert into weathermap_auth (mapid,userid) VALUES ($last_id,$myuid)";
-		db_execute($SQL);
+//		$SQL = "insert into weathermap_auth (mapid,userid) VALUES ($last_id,$myuid)";
+		$stmt = $pdo->prepare("insert into weathermap_auth (mapid,userid) VALUES (?,?)");
+		$stmt->execute(array($last_id, $myuid));
+//		db_execute($SQL);
 
-		db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
+        $stmt = $pdo->prepare("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=?");
+        $stmt->execute(array($last_id));
+//		db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
 
 		map_resort();
 	}
@@ -1181,27 +1195,42 @@ function weathermap_map_settings_form($mapid=0,$settingid=0)
 
 function weathermap_setting_save($mapid,$name,$value)
 {
-	if($mapid >0)
-	{
-		db_execute("replace into weathermap_settings (mapid, optname, optvalue) values ($mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+    $pdo = weathermap_get_pdo();
+
+    $stmt = $pdo->prepare("replace into weathermap_settings (mapid, groupid, optname, optvalue) values (?,?,?,?)");
+
+    if($mapid >0)
+    {
+	    $stmt->execute(array($mapid, 0, $name, $value));
+
+//		db_execute("replace into weathermap_settings (mapid, optname, optvalue) values ($mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
 	}
 	elseif($mapid <0)
 	{
-		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, -$mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+        $stmt->execute(array(0, -$mapid, $name, $value));
+//		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, -$mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
 	}
 	else
 	{
-		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, 0,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+        $stmt->execute(array(0, 0, $name, $value));
+//		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, 0,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
 	}
 }
 function weathermap_setting_update($mapid,$settingid,$name,$value)
 {
-	db_execute("update weathermap_settings set optname='".mysql_real_escape_string($name)."', optvalue='".mysql_real_escape_string($value)."' where id=".intval($settingid));
+    $pdo = weathermap_get_pdo();
+
+    $stmt = $pdo->prepare("update weathermap_settings set optname=?, optvalue=? where id=?");
+    $stmt->execute(array($name, $value, intval($settingid)));
+//	db_execute("update weathermap_settings set optname='".mysql_real_escape_string($name)."', optvalue='".mysql_real_escape_string($value)."' where id=".intval($settingid));
 }
 
 function weathermap_setting_delete($mapid,$settingid)
 {
-	db_execute("delete from weathermap_settings where id=".intval($settingid)." and mapid=".intval($mapid));
+    $pdo = weathermap_get_pdo();
+    $stmt = $pdo->prepare("delete from weathermap_settings where id=? and mapid=?");
+    $stmt->execute(array(intval($settingid), intval($mapid)));
+//	db_execute("delete from weathermap_settings where id=".intval($settingid)." and mapid=".intval($mapid));
 }
 
 function weathermap_chgroup($id)
@@ -1348,18 +1377,28 @@ function weathermap_group_editor()
 
 function weathermap_group_create($newname)
 {
-	$sortorder = db_fetch_cell("select max(sortorder)+1 from weathermap_groups");
-	$SQL = sprintf("insert into weathermap_groups (name, sortorder) values ('%s',%d)", mysql_real_escape_string($newname), $sortorder);
-#	print $SQL;
-	db_execute($SQL);
+    $pdo = weathermap_get_pdo();
+
+    $stmt = $pdo->prepare("select max(sortorder)+1 from weathermap_groups")->execute();
+    $sortorder = $stmt->fetchColumn();
+
+//    $sortorder = db_fetch_cell("select max(sortorder)+1 from weathermap_groups");
+
+    $stmt = $pdo->prepare("insert into weathermap_groups (name, sortorder) values (?,?)");
+    $stmt->execute(array($newname, $sortorder));
+
+//    $SQL = sprintf("insert into weathermap_groups (name, sortorder) values ('%s',%d)", mysql_real_escape_string($newname), $sortorder);
+//	db_execute($SQL);
 }
 
 function weathermap_group_update($id, $newname)
 {
+    $pdo = weathermap_get_pdo();
+    $stmt = $pdo->prepare("update weathermap_groups set name=? where id=?");
+    $stmt->execute(array($newname, $id));
 
-	$SQL = sprintf("update weathermap_groups set name='%s' where id=%d", mysql_real_escape_string($newname), $id);
-#	print $SQL;
-	db_execute($SQL);
+//	$SQL = sprintf("update weathermap_groups set name='%s' where id=%d", mysql_real_escape_string($newname), $id);
+//	db_execute($SQL);
 }
 
 function weathermap_group_delete($id)

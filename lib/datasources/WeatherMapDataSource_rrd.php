@@ -6,6 +6,7 @@
 //
 
 include_once(dirname(__FILE__)."/../ds-common.php");
+include_once(dirname(__FILE__)."/../database.php");
 
 class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
@@ -73,7 +74,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		wm_debug("RRD ReadData: poller_output style\n");
 		
 		if(isset($config))
-		{		
+		{
+		    $pdo = weathermap_get_pdo();
+
 			// take away the cacti bit, to get the appropriate path for the table
 			// $db_rrdname = realpath($rrdfile);
 			$path_rra = $config["rra_path"];
@@ -87,22 +90,35 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				{
 					wm_debug("RRD ReadData: poller_output - DS name is ".$dsnames[$dir]."\n");
 					
-					$SQL = "select * from weathermap_data where rrdfile='".mysql_real_escape_string($db_rrdname)."' and data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
+//					$SQL = "select * from weathermap_data where rrdfile='".mysql_real_escape_string($db_rrdname)."' and data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
 					
-					$SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."' and data_template_rrd.data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
-					$SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."'";
-					
-					$worst_time = time() - 8*60;
-					$result = db_fetch_row($SQL);
+//					$SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."' and data_template_rrd.data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
+//					$SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."'";
+
+                    $statement_check = $pdo->prepare("select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path=? and data_template_rrd.data_source_name=?");
+                    $statement_valid = $pdo->prepare("select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path=?");
+                    $statement_search = $pdo->prepare("select * from weathermap_data where rrdfile=? and data_source_name=?");
+
+                    $statement_search->execute(array($db_rrdname, $dsnames[$dir]));
+                    $result = $statement_search->fetch(PDO::FETCH_ASSOC);
+
+                    $worst_time = time() - 8*60;
+//					$result = db_fetch_row($SQL);
 					// OK, the straightforward query for data failed, let's work out why, and add the new data source if necessary
 					if(!isset($result['id']))
 					{
 						wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for $db_rrdname:".$dsnames[$dir]."\n");
-						$result = db_fetch_row($SQLcheck);
+
+                        $statement_check->execute(array($db_rrdname,$dsnames[$dir]));
+                        $result = $statement_search->fetch(PDO::FETCH_ASSOC);
+//						$result = db_fetch_row($SQLcheck);
 						if(!isset($result['local_data_id']))
 						{
 							$fields = array();
-							$results = db_fetch_assoc($SQLvalid);
+
+                            $statement_valid->execute(array($db_rrdname));
+                            $results = $statement_search->fetchAll(PDO::FETCH_ASSOC);
+//                            $results = db_fetch_assoc($SQLvalid);
 							foreach ($results as $result)
 							{
 								$fields[] = $result['data_source_name'];
@@ -121,9 +137,12 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 							// add the new data source (which we just checked exists) to the table. 
 							// Include the local_data_id as well, to make life easier in poller_output
 							// (and to allow the cacti: DS plugin to use the same table, too)
-							$SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0,".$result['local_data_id'].")";
-							wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID ".$result['local_data_id']."\n");
-							db_execute($SQLins);
+                            wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID ".$result['local_data_id']."\n");
+                            $statement_insert = $pdo->prepare("insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (?,?, 0,?)");
+                            $statement_insert->execute(array($db_rrdname, $dsnames[$dir],$result['local_data_id']));
+
+//							$SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0,".$result['local_data_id'].")";
+//							db_execute($SQLins);
 						}
 					}
 					else
@@ -146,13 +165,18 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						$ldi = 0;
 						if(!isset($result['local_data_id']) || $result['local_data_id']==0)
 						{
-							$r2 = db_fetch_row($SQLcheck);
+                            $statement_check->execute(array($db_rrdname,$dsnames[$dir]));
+                            $r2 = $statement_search->fetch(PDO::FETCH_ASSOC);
+//							$r2 = db_fetch_row($SQLcheck);
 							if(isset($r2['local_data_id']))
 							{
 								$ldi = $r2['local_data_id'];
 								wm_debug("RRD ReadData: updated  local_data_id for wmdata.id=" . $result['id'] . "to $ldi\n");
 								// put that in now, so that we can skip this step next time
-								db_execute("update weathermap_data set local_data_id=".$r2['local_data_id']." where id=".$result['id']);
+                                $statement_update = $pdo->prepare("update weathermap_data set local_data_id=? where id=?");
+                                $statement_update->execute(array($r2['local_data_id'], $result['id']));
+
+//								db_execute("update weathermap_data set local_data_id=".$r2['local_data_id']." where id=".$result['id']);
 								
 							}
 						}
@@ -273,17 +297,22 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 		if (isset($pipe))
 		{
-			fgets($pipe, 4096); // skip the blank line
+			// fgets($pipe, 4096); // skip the blank line
 			$buffer='';
 			$data_ok = FALSE;
 			
 			while (!feof($pipe))
 			{
 				$line=fgets($pipe, 4096);
-				wm_debug ("> " . $line);
-				$buffer.=$line;
-				$lines[]=$line;
-				$linecount++;
+                // there might (pre-1.5) or might not (1.5+) be a leading blank line
+                // we don't want to count it if there is
+                if (trim($line) != "") {
+
+                    wm_debug("> " . $line);
+                    $buffer .= $line;
+                    $lines[] = $line;
+                    $linecount++;
+                }
 			}				
 			pclose ($pipe);
 			if($linecount>1)
@@ -373,16 +402,20 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			// then we can treat them both the same.
 			$heads=preg_split("/\s+/", preg_replace("/^\s+/","timestamp ",$headings) );
 		
-			fgets($pipe, 4096); // skip the blank line
+			//fgets($pipe, 4096); // skip the blank line
 			$buffer='';
 
 			while (!feof($pipe))
 			{
 				$line=fgets($pipe, 4096);
-				wm_debug ("> " . $line);
-				$buffer.=$line;
-				$lines[]=$line;
-				$linecount++;
+                // there might (pre-1.5) or might not (1.5+) be a leading blank line
+                // we don't want to count it if there is
+                if (trim($line) != "") {
+                    wm_debug("> " . $line);
+                    $buffer .= $line;
+                    $lines[] = $line;
+                    $linecount++;
+                }
 				
 			}				
 			pclose ($pipe);

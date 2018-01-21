@@ -101,7 +101,7 @@ function weathermap_run_maps($mydir)
         $orig_cwd = getcwd();
         chdir($mydir);
 
-        $statement = $pdo->prepare("REPLACE INTO settings VALUES('weathermap_last_start_time', ?");
+        $statement = $pdo->prepare("REPLACE INTO settings VALUES('weathermap_last_start_time', ?)");
         $statement->execute(array(time()));
 
         // first, see if the output directory even exists

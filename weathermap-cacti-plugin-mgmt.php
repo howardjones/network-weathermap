@@ -1379,7 +1379,8 @@ function weathermap_group_create($newname)
 {
     $pdo = weathermap_get_pdo();
 
-    $stmt = $pdo->prepare("select max(sortorder)+1 from weathermap_groups")->execute();
+    $stmt = $pdo->prepare("select max(sortorder)+1 from weathermap_groups");
+    $stmt->execute();
     $sortorder = $stmt->fetchColumn();
 
 //    $sortorder = db_fetch_cell("select max(sortorder)+1 from weathermap_groups");

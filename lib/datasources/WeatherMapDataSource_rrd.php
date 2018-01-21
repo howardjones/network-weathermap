@@ -104,20 +104,21 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
                     $worst_time = time() - 8*60;
 //					$result = db_fetch_row($SQL);
+
 					// OK, the straightforward query for data failed, let's work out why, and add the new data source if necessary
 					if(!isset($result['id']))
 					{
 						wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for $db_rrdname:".$dsnames[$dir]."\n");
 
                         $statement_check->execute(array($db_rrdname,$dsnames[$dir]));
-                        $result = $statement_search->fetch(PDO::FETCH_ASSOC);
+                        $result = $statement_check->fetch(PDO::FETCH_ASSOC);
 //						$result = db_fetch_row($SQLcheck);
 						if(!isset($result['local_data_id']))
 						{
 							$fields = array();
 
                             $statement_valid->execute(array($db_rrdname));
-                            $results = $statement_search->fetchAll(PDO::FETCH_ASSOC);
+                            $results = $statement_valid->fetchAll(PDO::FETCH_ASSOC);
 //                            $results = db_fetch_assoc($SQLvalid);
 							foreach ($results as $result)
 							{
@@ -137,9 +138,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 							// add the new data source (which we just checked exists) to the table. 
 							// Include the local_data_id as well, to make life easier in poller_output
 							// (and to allow the cacti: DS plugin to use the same table, too)
-                            wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID ".$result['local_data_id']."\n");
-                            $statement_insert = $pdo->prepare("insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (?,?, 0,?)");
-                            $statement_insert->execute(array($db_rrdname, $dsnames[$dir],$result['local_data_id']));
+                            wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID " . $result['local_data_id'] . "\n");
+                            $statement_insert = $pdo->prepare("INSERT INTO weathermap_data (rrdfile, data_source_name, sequence, local_data_id) VALUES (?,?, 0,?)");
+                            $statement_insert->execute(array($db_rrdname, $dsnames[$dir], $result['local_data_id']));
 
 //							$SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0,".$result['local_data_id'].")";
 //							db_execute($SQLins);
@@ -166,7 +167,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						if(!isset($result['local_data_id']) || $result['local_data_id']==0)
 						{
                             $statement_check->execute(array($db_rrdname,$dsnames[$dir]));
-                            $r2 = $statement_search->fetch(PDO::FETCH_ASSOC);
+                            $r2 = $statement_check->fetch(PDO::FETCH_ASSOC);
 //							$r2 = db_fetch_row($SQLcheck);
 							if(isset($r2['local_data_id']))
 							{

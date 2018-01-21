@@ -228,6 +228,8 @@ $host_id = -1;
 $overlib = true;
 $aggregate = false;
 
+$pdo = weathermap_get_pdo();
+
 if(isset($_REQUEST['aggregate'])) $aggregate = ( $_REQUEST['aggregate']==0 ? false : true);
 if(isset($_REQUEST['overlib'])) $overlib= ( $_REQUEST['overlib']==0 ? false : true);
 
@@ -322,7 +324,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1')
     if(isset($_REQUEST['aggregate'])) $aggregate = ( $_REQUEST['aggregate']==0 ? false : true);
     if(isset($_REQUEST['overlib'])) $overlib= ( $_REQUEST['overlib']==0 ? false : true);
 
-
+    $pdo = weathermap_get_pdo();
 
 	
 //	 $hosts = db_fetch_assoc("select id,CONCAT_WS('',description,' (',hostname,')') as name from host order by description,hostname");

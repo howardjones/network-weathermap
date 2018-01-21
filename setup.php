@@ -11,6 +11,8 @@
 *******************************************************************************/
 
 
+include_once(dirname(__FILE__)."/lib/database.php");
+
 function plugin_weathermap_install()
 {
 	api_plugin_register_hook('weathermap', 'config_arrays', 'weathermap_config_arrays', 'setup.php');
@@ -115,26 +117,34 @@ function weathermap_page_head()
 
 function weathermap_page_title( $t )
 {
-        if(preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches))
-        {
-                $t .= " - Weathermap";
+    $pdo = weathermap_get_pdo();
 
-		if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=([^&]+)/',$_SERVER['REQUEST_URI'],$matches))
-                {
-                        $mapid = $matches[1];
-						if(preg_match("/^\d+$/",$mapid))
-						{
-							$title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=".intval($mapid));
-						}
-						else
-						{
-							$title = db_fetch_cell("SELECT titlecache from weathermap_maps where filehash='".mysql_real_escape_string($mapid)."'");
-						}
-                        if(isset($title)) $t .= " - $title";
-                }
+    if(preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches))
+    {
+            $t .= " - Weathermap";
 
-        }
-        return($t);
+    if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=([^&]+)/',$_SERVER['REQUEST_URI'],$matches))
+            {
+                    $mapid = $matches[1];
+                    if(preg_match("/^\d+$/",$mapid))
+                    {
+                        $stmt = $pdo->prepare("SELECT titlecache from weathermap_maps where ID=?");
+                        $stmt->execute(array(intval($mapid)));
+                        $title = $stmt->fetchColumn();
+//                        $title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=".intval($mapid));
+                    }
+                    else
+                    {
+                        $stmt = $pdo->prepare("SELECT titlecache from weathermap_maps where filehash=?");
+                        $stmt->execute(array($mapid));
+                        $title = $stmt->fetchColumn();
+//                        $title = db_fetch_cell("SELECT titlecache from weathermap_maps where filehash='".mysql_real_escape_string($mapid)."'");
+                    }
+                    if(isset($title)) $t .= " - $title";
+            }
+
+    }
+    return($t);
 }
 
 
@@ -246,6 +256,7 @@ function weathermap_setup_table () {
 	include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
 
 	$dbversion = read_config_option("weathermap_db_version");
+	$pdo = weathermap_get_pdo();
 
 	$myversioninfo = weathermap_version();
 	$myversion = $myversioninfo['version'];
@@ -256,7 +267,7 @@ function weathermap_setup_table () {
 	{
 		# cacti_log("Doing setup_table() \n",true,"WEATHERMAP");
 		$sql = "show tables";
-		$result = db_fetch_assoc($sql) or die (mysql_error());
+		$result = db_fetch_assoc($sql);
 
 		$tables = array();
 		$sql = array();
@@ -291,14 +302,20 @@ function weathermap_setup_table () {
 		}
 		else
 		{
-			$colsql = "show columns from weathermap_maps from " . $database_default;
-			$result = mysql_query($colsql) or die (mysql_error());
+		    $stmt = $pdo->prepare("show columns from weathermap_maps from ?");
+		    $stmt->execute(array($database_default));
+//			$colsql = "show columns from weathermap_maps from " . $database_default;
+//			$result = mysql_query($colsql);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 			$found_so = false;	$found_fh = false;
 			$found_wc = false;	$found_cf = false;
 			$found_96changes = false;
 			$found_96bchanges = false;
 			
-			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+//			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+            foreach ($result as $row) {
 				if ($row['Field'] == 'sortorder') $found_so = true;
 				if ($row['Field'] == 'filehash') $found_fh = true;
 				if ($row['Field'] == 'warncount') $found_wc = true;
@@ -365,11 +382,17 @@ function weathermap_setup_table () {
 		}
 		else
 		{
-			$colsql = "show columns from weathermap_data from " . $database_default;
-			$result = mysql_query($colsql) or die (mysql_error());
+            $stmt = $pdo->prepare("show columns from weathermap_data from ?");
+            $stmt->execute(array($database_default));
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//			$colsql = "show columns from weathermap_data from " . $database_default;
+//			$result = mysql_query($colsql);
+
 			$found_ldi = false;
 			
-			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+//			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+            foreach ($result as $row) {
 				if ($row['Field'] == 'local_data_id') $found_ldi = true;
 			}
 			if (!$found_ldi) 

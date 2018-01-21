@@ -52,7 +52,7 @@ $thold_present = false;
                         }
 
 			$sql = "show tables";
-			$result = db_fetch_assoc($sql) or die (mysql_error());
+			$result = db_fetch_assoc($sql);
 			$tables = array();
 			
 			foreach($result as $index => $arr) {

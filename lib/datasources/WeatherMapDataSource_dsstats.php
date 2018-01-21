@@ -1,6 +1,7 @@
 <?php
 
-include_once(dirname(__FILE__)."/../ds-common.php");
+include_once dirname(__FILE__)."/../ds-common.php";
+include_once dirname(__FILE__)."/../database.php";
 
 class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 
@@ -32,7 +33,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 			}		
 						
 			$sql = "show tables";
-			$result = db_fetch_assoc($sql) or die (mysql_error());
+			$result = db_fetch_assoc($sql);
 			$tables = array();
 			
 			foreach($result as $index => $arr) {
@@ -95,6 +96,8 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 		$datatype = "";
 		$field = "";
 
+		$pdo = weathermap_get_pdo();
+
 		if(preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
 		{
 			$local_data_id = $matches[1];
@@ -139,13 +142,15 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 		
 		if($table != "" and $field != "")
 		{
-			$SQL = sprintf("select %s as name, %s as result from %s where local_data_id=%d and (%s='%s' or %s='%s')", 
-					$keyfield, $field, 
-					$table, $local_data_id, $keyfield, 
-					mysql_real_escape_string($dsnames[IN]), $keyfield, mysql_real_escape_string($dsnames[OUT])
-				);
+		    // I know... but the field names and table name are variable!
+			$SQL = sprintf("select %s as name, %s as result from %s where local_data_id=? and (%s=? or %s=?)",
+					$keyfield, $field, $table, $keyfield, $keyfield);
 
-			$results = db_fetch_assoc($SQL);
+			$stmt = $pdo->prepare($SQL);
+			$stmt->execute(array($local_data_id, $dsnames[IN], $dsnames[OUT]));
+			$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//			$results = db_fetch_assoc($SQL);
 			if(sizeof($results)>0)
 			{
 				foreach ($results as $result)
@@ -164,10 +169,13 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 			{
 				wm_debug("Didn't get data for 'wm' source. Inserting new tasks.");
 				// insert the required details into weathermap_data, so it will be picked up next time
-				$SQL = sprintf("select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=%d",
-						$local_data_id
-						);
-				$result = db_fetch_row($SQL);
+                $stmt = $pdo->prepare("select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=?");
+                $stmt->execute(array($local_data_id));
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+//				$SQL = sprintf("select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=%d",
+//						$local_data_id
+//						);
+//				$result = db_fetch_row($SQL);
 				if(sizeof($result)>0)
 				{
 					$db_rrdname = $result['path'];
@@ -176,12 +184,14 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 					{
 						if($data[$dir] === NULL)
 						{
-							$SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('" . 
-								mysql_real_escape_string($db_rrdname) . "','" . 
-								mysql_real_escape_string($dsnames[$dir]) . "', 0," . 
-								$local_data_id.")";
+						    $stmt = $pdo->prepare("insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (?,?,0,?)");
+						    $stmt->execute(array($db_rrdname, $dsnames[$dir], $local_data_id));
+//							$SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('" .
+//								mysql_real_escape_string($db_rrdname) . "','" .
+//								mysql_real_escape_string($dsnames[$dir]) . "', 0," .
+//								$local_data_id.")";
 							// warn($SQLins);
-							db_execute($SQLins);
+//							db_execute($SQLins);
 						}
 					}
 				}
@@ -193,7 +203,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 		}
 
 		// fill all that other information (ifSpeed, etc)
-		if($local_data_id>0) UpdateCactiData($item, $local_data_id);
+		if ($local_data_id > 0) UpdateCactiData($item, $local_data_id);
 		
 		wm_debug ("DSStats ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		

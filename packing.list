@@ -89,7 +89,7 @@
 ./editor-resources/editor.css
 ./editor-resources/editor.js
 ./editor-resources/index.php
-./editor-resources/jquery-latest.min.js
+./vendor/jquery/dist/jquery.min.js
 ./images/application.png
 ./images/application_side_list.png
 ./images/application_xp_terminal.png
@@ -231,8 +231,7 @@
 ./cacti-resources/img/exclamation.png
 ./cacti-resources/img/tab_weathermap.gif
 ./cacti-resources/img/tab_weathermap_red.gif
-./vendor/jquery.min.js
-./vendor/idle-timer.min.js
+./vendor/jquery/dist/jquery.min.js
 ./weathermap-cacti-plugin-editor.php
 ./editor-resources/jquery.event.drag-1.0.js
 ./editor-resources/jquery.fastTrigger-min.js

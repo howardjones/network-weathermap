@@ -44,7 +44,7 @@ function plugin_weathermap_uninstall()
 function plugin_weathermap_version()
 {
 	return array(       'name'          => 'weathermap',
-		'version'       => '0.98',
+		'version'       => '0.98a',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',

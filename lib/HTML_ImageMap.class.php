@@ -1,5 +1,5 @@
 <?php
-// Copyright Howard Jones, 2005 howie@thingy.com
+// Copyright Howard Jones, 2005-2018 howie@thingy.com
 // http://wotsit.thingy.com/haj/cacti/
 // Released under the GNU Public License
 

@@ -1,6 +1,6 @@
-## PHP Network Weathermap 0.98
+## PHP Network Weathermap 0.98a
 
-This is PHP Network Weathermap, version 0.98 by Howard Jones (howie@thingy.com)
+This is PHP Network Weathermap, version 0.98a by Howard Jones (howie@thingy.com)
 
 See the docs sub-directory for full HTML documentation, FAQ and example config.
 
@@ -11,8 +11,9 @@ See COPYING for the license under which php-weathermap is released.
 There is much more information, tutorials and updates available at:
     http://www.network-weathermap.com/
 
+*IMPORTANT NOTE*: This version only works with Cacti 0.8.8 (not 1.x.x)
 
-----
+------
 
 PHP Weathermap contains components from other software developers:
 

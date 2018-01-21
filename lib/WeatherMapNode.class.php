@@ -1,6 +1,6 @@
 <?php
-// PHP Weathermap 0.98
-// Copyright Howard Jones, 2005-2016 howie@thingy.com
+// PHP Weathermap 0.98a
+// Copyright Howard Jones, 2005-2018 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 

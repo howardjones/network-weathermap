@@ -1,6 +1,6 @@
 <?php
-// PHP Weathermap 0.98
-// Copyright Howard Jones, 2005-2016 howie@thingy.com
+// PHP Weathermap 0.98a
+// Copyright Howard Jones, 2005-2018 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
@@ -2102,7 +2102,7 @@ function draw_spine($im, $spine,$col)
 
 		if($required_version != "") {	
 			// doesan't need to be complete, just in the right order
-			$known_versions = array("0.97","0.97a","0.97b","0.98");
+			$known_versions = array("0.97","0.97a","0.97b","0.98","0.98a");
 			$my_version = array_search($WEATHERMAP_VERSION,$known_versions);	
 			$req_version = array_search($required_version,$known_versions);	
 			if($req_version > $my_version) {

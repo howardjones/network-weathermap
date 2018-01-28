@@ -25,7 +25,7 @@
       "sortorder": "3"
     },
     {
-      "group_id": "1",
+      "group_id": "2",
       "titlecache": "Simple Map",
       "filehash": "901636b56f9733647884",
       "thumb_width": "250",
@@ -38,6 +38,11 @@
       "id": "1",
       "name": "Weathermaps",
       "sortorder": "1"
+    },
+    {
+      "id": "2",
+      "name": "More Maps",
+      "sortorder": "2"
     }
   ]
 }

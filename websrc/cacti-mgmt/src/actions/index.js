@@ -11,7 +11,7 @@ export function loadMaps(source_url) {
     console.log("Getting maps from " + source_url);
 
     return (dispatch) => {
-        axios.get(source_url).then((response) => {
+        axios.get(source_url, {withCredentials: true}).then((response) => {
             console.log("Got map data");
             console.log(response.data);
             if (response.data.maps) {
@@ -29,7 +29,7 @@ export function loadSettings(settings_url) {
     // TODO - this needs to come from somewhere outside!
     // let url = "http://localhost:8016/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=settings";
 
-    console.log("Getting maps from " + settings_url);
+    console.log("Getting settings from " + settings_url);
 
     return (dispatch) => {
         axios.get(settings_url).then((response) => {

@@ -10,14 +10,14 @@ const MapCollection = (props) => {
     let maps = [];
 
     if (props.settings.page_style === 'thumbs') {
-        maps = my_maps.map((item) => {
-            return (<MapThumbnail map={item}/>)
+        maps = my_maps.map((item, index) => {
+            return (<MapThumbnail map={item} key={index}/>)
         });
     }
 
     if (props.settings.page_style === 'full') {
-        maps = my_maps.map((item) => {
-            return (<MapFull map={item}/>)
+        maps = my_maps.map((item, index) => {
+            return (<MapFull map={item} key={index}/>)
         });
     }
 

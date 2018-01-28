@@ -2,7 +2,7 @@
   "wm_version": "1.0.0dev",
   "page_style": "thumbs",
   "cycle_time": "auto",
-  "show_all_tab": true,
+  "show_all_tab": false,
   "map_selector": true,
   "thumb_url": "http://localhost:8016/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=viewthumb&id=",
   "image_url": "http://localhost:8016/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=viewimage&id=",

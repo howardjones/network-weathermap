@@ -3,6 +3,7 @@ import './App.css';
 import {connect} from 'react-redux';
 
 import {loadSettings} from './actions';
+import MapList from "./components/MapList";
 
 class App extends Component {
 
@@ -13,36 +14,14 @@ class App extends Component {
 
     render() {
 
-        const ll = this.props.maps.map((item) => {
-            return (<tr>
-                <td>{item.id}</td>
-                <td>{item.configfile}</td>
-                <td>{item.titlecache}</td>
-                <td>group{item.group_id}</td>
-                <td>{item.runtime} ({item.warncount})</td>
-                <td>{item.active}</td>
-            </tr>)
-        });
+
 
         return (
             <div>
                 <p>Weathermap Management App goes here.
                 It will get data from {this.props.url} and maps from {this.props.settings.maps_url}</p>
-                <table border={1}>
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Config File</th>
-                        <th>Title</th>
-                        <th>Group</th>
-                        <th>Last Run</th>
-                        <th>Active</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {ll}
-                    </tbody>
-                </table>
+                <p>If there are any warnings, they should go here</p>
+                <MapList maps={this.props.maps}/>
 
             </div>
         );

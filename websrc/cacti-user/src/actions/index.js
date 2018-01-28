@@ -14,7 +14,7 @@ export function loadMaps(source_url) {
     console.log("Getting maps from " + source_url);
 
     return (dispatch) => {
-        axios.get(source_url).then((response) => {
+        axios.get(source_url, {withCredentials: true}).then((response) => {
             console.log("Got map data");
             console.log(response.data);
             if (response.data.maps) {

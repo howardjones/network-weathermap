@@ -856,6 +856,8 @@ class EditorUI extends UIBase
      */
     public function loadCacti($cactiBaseDirectory)
     {
+        global $cacti_url;
+
         $this->foundCacti = false;
         // check if the goalposts have moved
         if (is_dir($cactiBaseDirectory) && file_exists($cactiBaseDirectory . "/include/global.php")) {
@@ -912,6 +914,9 @@ class EditorUI extends UIBase
         if ($this->validateRequest($action, $request)) {
             $editor = new Editor();
             $this->setEmbedded($fromPlugin);
+            if ($this->isEmbedded()) {
+
+            }
 
             if (!isset($this->commands[$action]['late_load'])) {
                 $editor->loadConfig($this->mapFileName);
@@ -1048,6 +1053,9 @@ class EditorUI extends UIBase
         $tpl->set("WEATHERMAP_VERSION", WEATHERMAP_VERSION);
         $tpl->set("fromplug", ($this->isEmbedded() ? 1 : 0));
 
+        // TODO - this should come from Cacti or other host
+        $tpl->set("host_url", "http://made-up-url.example.com/");
+
         $tpl->set("imageurl", htmlspecialchars($mapURL));
         if ($this->selected != "") {
             $tpl->set("imageurl", htmlspecialchars($mapURL . "&selected=" . urlencode($this->selected)));
@@ -1091,23 +1099,23 @@ class EditorUI extends UIBase
         $tpl->set("fonts_json", $fontsJSON);
 
         $globalData = array(
-            "linklabels"=>$editor->map->links['DEFAULT']->labelStyle,
-            "linkfont"=>$editor->map->links['DEFAULT']->bwfont,
-            "nodefont"=>$editor->map->nodes['DEFAULT']->labelfont,
-            "arrowstyle"=>$editor->map->links['DEFAULT']->arrowStyle,
-            "htmlstyle"=>$editor->map->htmlstyle,
-            "legendfont"=>$editor->map->keyfont,
-            "map_width"=>$editor->map->width,
-            "map_height"=>$editor->map->height,
-            "map_legendtext"=>$editor->map->keytext['DEFAULT'],
-            "map_stamp"=>$editor->map->stamptext,
-            "link_width"=>$editor->map->links['DEFAULT']->width,
-            "link_defaultbwin"=>$editor->map->links['DEFAULT']->maxValuesConfigured[IN],
-            "link_defaultbwout"=>$editor->map->links['DEFAULT']->maxValuesConfigured[OUT],
-            "map_pngfile"=>$editor->map->imageoutputfile,
-            "map_htmlfile"=>$editor->map->htmloutputfile,
-            "map_bgfile"=>$editor->map->background,
-            "title"=>$editor->map->title
+            "linklabels" => $editor->map->links['DEFAULT']->labelStyle,
+            "linkfont" => $editor->map->links['DEFAULT']->bwfont,
+            "nodefont" => $editor->map->nodes['DEFAULT']->labelfont,
+            "arrowstyle" => $editor->map->links['DEFAULT']->arrowStyle,
+            "htmlstyle" => $editor->map->htmlstyle,
+            "legendfont" => $editor->map->keyfont,
+            "map_width" => $editor->map->width,
+            "map_height" => $editor->map->height,
+            "map_legendtext" => $editor->map->keytext['DEFAULT'],
+            "map_stamp" => $editor->map->stamptext,
+            "link_width" => $editor->map->links['DEFAULT']->width,
+            "link_defaultbwin" => $editor->map->links['DEFAULT']->maxValuesConfigured[IN],
+            "link_defaultbwout" => $editor->map->links['DEFAULT']->maxValuesConfigured[OUT],
+            "map_pngfile" => $editor->map->imageoutputfile,
+            "map_htmlfile" => $editor->map->htmloutputfile,
+            "map_bgfile" => $editor->map->background,
+            "title" => $editor->map->title
         );
         $tpl->set("global", json_encode($globalData, JSON_PRETTY_PRINT));
         $tpl->set("global2", $editor->map->getJSONConfig());

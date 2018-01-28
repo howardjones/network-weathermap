@@ -23,15 +23,15 @@
     {
       "id": "3",
       "sortorder": "2",
-      "group_id": "1",
-      "active": "on",
+      "group_id": "2",
+      "active": "off",
       "configfile": "simple.conf",
       "imagefile": "",
       "htmlfile": "",
       "titlecache": "Simple Map",
       "filehash": "8cdedb512caf26110fb4",
-      "warncount": "0",
-      "debug": "off",
+      "warncount": "1",
+      "debug": "on",
       "runtime": "0.17647695541382",
       "lastrun": null,
       "config": "",
@@ -50,8 +50,8 @@
       "htmlfile": "",
       "titlecache": "0.96 Test Map -",
       "filehash": "b065e3b11c5e2813d39d",
-      "warncount": "0",
-      "debug": "off",
+      "warncount": "5",
+      "debug": "once",
       "runtime": "0.23335886001587",
       "lastrun": null,
       "config": "",
@@ -77,8 +77,8 @@
       "config": "",
       "thumb_width": "250",
       "thumb_height": "164",
-      "schedule": "*",
-      "archiving": "off"
+      "schedule": "0 0 * * *",
+      "archiving": "on"
     }
   ],
   "groups": [
@@ -86,6 +86,11 @@
       "id": "1",
       "name": "Weathermaps",
       "sortorder": "1"
+    },
+    {
+      "id": "2",
+      "name": "G2",
+      "sortorder": "2"
     }
   ]
 }

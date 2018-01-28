@@ -11,10 +11,10 @@ const MapGroup = ({match}) => {
 
     return (
         <div className="MapGroup layoutbox">
-            <ModeSelector/>
             <GroupTabs group_id={match.params.group_id}/>
             <MapCollection group_id={match.params.group_id}/>
             <LinksFooter/>
+            <ModeSelector/>
         </div>
     )
 }

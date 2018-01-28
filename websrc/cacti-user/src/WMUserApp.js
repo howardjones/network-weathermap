@@ -5,6 +5,13 @@ import {loadSettings} from './actions';
 
 import './App.css';
 
+import {HashRouter, Redirect, Route} from 'react-router-dom'
+
+
+import SingleMap from './components/SingleMap';
+import MapGroup from './components/MapGroup';
+
+
 class WMUserApp extends React.Component {
 
 //  <GroupTabs group={group_id}/>
@@ -21,8 +28,16 @@ class WMUserApp extends React.Component {
 
         return (
             <div className="WMUserApp layoutbox">
-                (The base URL is {this.props.url}, passed from outside)
-                {this.props.children}
+                <small>(The Base URL is {this.props.url}, passed from outside)</small>
+                <HashRouter>
+                    <div>
+                        <Route path="/" exact>
+                            <Redirect to="/group/1"/>
+                        </Route>
+                        <Route path="/group/:group_id" component={MapGroup}/>
+                        <Route path="/map/:map_id" component={SingleMap}/>
+                    </div>
+                </HashRouter>
             </div>
         );
     }

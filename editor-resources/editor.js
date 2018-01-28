@@ -81,10 +81,10 @@ function attach_click_events() {
     jQuery("area[id^='LEGEN']").attr("href", "#").click(position_legend);
 
     if (fromplug === 1) {
-        console.log(cacti_url);
-        jQuery("#tb_newfile").html('Return to<br>Cacti').click(function () {
-            console.log(cacti_url);
-            window.location = cacti_url;
+        console.log(host_url);
+        jQuery("#tb_newfile").html('Return to<br>Host').click(function () {
+            console.log(host_url);
+            window.location = host_url;
         })
     }
     else {

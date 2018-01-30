@@ -15,11 +15,13 @@ class MapList extends Component {
         if (t==='once') {
             return <FormattedMessage id='once' default='once'/>
         }
+
+        return <div>SOMETHING WENT WRONG HERE</div>
     }
 
     render() {
 
-        const ll = this.props.maps.map((item, index) => {
+        const map_entries = this.props.maps.map((item, index) => {
             return (<tr key={index}>
                 <td>{item.id}</td>
                 <td>{item.configfile}</td>
@@ -48,7 +50,7 @@ class MapList extends Component {
             </tr>
             </thead>
             <tbody>
-            {ll}
+            {map_entries}
             </tbody>
         </table>
 

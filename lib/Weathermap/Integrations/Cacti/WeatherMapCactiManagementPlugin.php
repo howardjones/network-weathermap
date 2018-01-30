@@ -179,7 +179,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             'image_url' => $this->makeURL(array("action" => "viewimage")),
             'editor_url' => $this->editorURL,
             'maps_url' => $this->makeURL(array("action" => "dumpmaps")),
-            'docs_url' => 'docs/'
+            'docs_url' => 'docs/index.html'
         );
 
         print json_encode($data);
@@ -1208,7 +1208,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     {
         $html = "";
 
-        $html .= '<a class="linkOverDark" href="docs/">Local Documentation</a>';
+        $html .= '<a class="linkOverDark" href="docs/index.html">Local Documentation</a>';
         $html .= ' -- <a class="linkOverDark" href="http://www.network-weathermap.com/">Weathermap Website</a>';
         $html .= ' -- <a class="linkOverDark" href="' . $this->makeURL(
             array(),

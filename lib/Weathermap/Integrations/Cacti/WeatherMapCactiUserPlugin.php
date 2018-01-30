@@ -170,7 +170,7 @@ class WeatherMapCactiUserPlugin extends UIBase
             'image_url' => $this->makeURL(array("action" => "viewimage")) . "&id=",
             'editor_url' => $this->editorURL,
             'maps_url' => $this->makeURL(array("action" => "maplist")),
-            'docs_url' => 'docs/',
+            'docs_url' => 'docs/index.html',
             'management_url' => null
         );
 
@@ -359,7 +359,7 @@ class WeatherMapCactiUserPlugin extends UIBase
 
         if ($isAdmin) {
             $pageFooter .= ' --- <a href="' . $this->managementURL . '" title="Go to the map management page">';
-            $pageFooter .= 'Weathermap Management</a> | <a target="_blank" href="docs/">Local Documentation</a>';
+            $pageFooter .= 'Weathermap Management</a> | <a target="_blank" href="docs/index.html">Local Documentation</a>';
             $pageFooter .= ' | <a target="_blank" href="' . $this->editorURL . '">Editor</a>';
         }
 

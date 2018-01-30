@@ -40,7 +40,7 @@ const AppRoutes = () => (
     </Router>
 );
 
-const locale = "fr";
+const locale = wm_root.dataset['locale'] || 'en';
 
 ReactDOM.render(<Provider store={store}>
     <IntlProvider messages={translations[locale]} locale={locale}>

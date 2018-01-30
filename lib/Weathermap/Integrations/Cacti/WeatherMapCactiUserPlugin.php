@@ -253,9 +253,12 @@ class WeatherMapCactiUserPlugin extends UIBase
             }
         }
 
+        // get the locale from host app
+        $locale = $this->manager->application->getLocale();
+
         print "<h3>This is the React UI below here</h3>";
         print '<style src="cacti-resources/user/main.css"></style>';
-        print "<div id='weathermap-user-root' data-url='" . $this->makeURL(array("action" => "settings")) . "'></div>";
+        print "<div id='weathermap-user-root' data-locale='" . $locale . "' data-url='" . $this->makeURL(array("action" => "settings")) . "'></div>";
         print '<script type="text/javascript" src="cacti-resources/user/main.js"></script>';
 
         print "<hr />";

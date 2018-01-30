@@ -12,6 +12,13 @@ use Weathermap\Integrations\ApplicationInterface;
  */
 class CactiApplicationInterface extends ApplicationInterface
 {
+    public function getLocale()
+    {
+        global $cacti_locale;
+
+        return $cacti_locale;
+    }
+
     public function getAppSetting($name, $defaultValue = "")
     {
         $statement = $this->pdo->prepare("SELECT value FROM settings WHERE name=?");

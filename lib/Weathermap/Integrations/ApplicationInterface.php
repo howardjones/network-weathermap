@@ -21,6 +21,11 @@ class ApplicationInterface
         $this->pdo = $pdo;
     }
 
+    public function getLocale()
+    {
+        return "en";
+    }
+
     public function getAppSetting($name, $defaultValue)
     {
         return $defaultValue;

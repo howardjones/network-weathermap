@@ -40,7 +40,7 @@ const AppRoutes = () => (
     </Router>
 );
 
-const locale = wm_root.dataset['locale'] || 'en';
+const locale = translations.hasOwnProperty(wm_root.dataset['locale']) ? wm_root.dataset['locale'] : 'en';
 
 ReactDOM.render(<Provider store={store}>
     <IntlProvider messages={translations[locale]} locale={locale}>

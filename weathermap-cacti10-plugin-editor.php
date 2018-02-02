@@ -18,8 +18,9 @@ require_once $config['library_path'] . '/database.php';
 require_once dirname(__FILE__)."/lib/all.php";
 
 
-$cameFromCacti = true;
-$cactiPluginURL = "weathermap-cacti10-plugin-mgmt.php";
-$cactiEditorURL = "weathermap-cacti10-plugin-editor.php";
+$cameFromHost = true;
+$hostPluginURL = "weathermap-cacti10-plugin-mgmt.php";
+$hostEditorURL = "weathermap-cacti10-plugin-editor.php";
+$hostType = 'cacti';
 
 require_once dirname(__FILE__) . '/editor.php';

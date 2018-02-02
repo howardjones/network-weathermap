@@ -12,11 +12,15 @@ use Weathermap\Editor\EditorUI;
 $editorEnabled = true;
 
 // If we're embedded in the Cacti UI (included from weathermap-cacti-plugin-editor.php), then authentication has happened. Enable the editor.
-if (isset($cameFromCacti) && $cameFromCacti == true) {
+if (isset($cameFromHost) && $cameFromHost == true) {
     $editorEnabled = true;
 } else {
-    $cameFromCacti = false;
+    $cameFromHost = false;
 }
+
+$hostType = isset($hostType) ? $hostType : '';
+$hostEditorURL = isset($hostEditorURL) ? $hostEditorURL : 'editor.php';
+$hostPluginURL = isset($hostPluginURL) ? $hostPluginURL : '';
 
 if (!$editorEnabled) {
     print "<p>The editor has not been enabled for standalone use yet.</p>";
@@ -31,4 +35,4 @@ $ui->moduleChecks();
 
 chdir(dirname(__FILE__));
 
-$ui->main($_REQUEST, $cameFromCacti);
+$ui->main($_REQUEST, $cameFromHost);

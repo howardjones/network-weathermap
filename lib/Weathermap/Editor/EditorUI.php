@@ -26,9 +26,9 @@ class EditorUI extends UIBase
     private $mapShortName;
 
     private $fromPlugin;
-    private $foundCacti = false;
+    private $foundHost = false;
     private $cactiBase = "../..";
-    private $cactiURL = "/";
+    private $hostURL = "/";
     private $ignoreCacti = false;
     private $configError = "";
     private $nextAction = "";
@@ -858,7 +858,7 @@ class EditorUI extends UIBase
     {
         global $cacti_url;
 
-        $this->foundCacti = false;
+        $this->foundHost = false;
         // check if the goalposts have moved
         if (is_dir($cactiBaseDirectory) && file_exists($cactiBaseDirectory . "/include/global.php")) {
             // include the cacti-config, so we know about the database
@@ -875,8 +875,8 @@ class EditorUI extends UIBase
             $cactiFound = false;
         }
 
-        $this->foundCacti = $cactiFound;
-        return $this->foundCacti;
+        $this->foundHost = $cactiFound;
+        return $this->foundHost;
     }
 
     public function main($request, $fromPlugin = false)
@@ -1044,6 +1044,10 @@ class EditorUI extends UIBase
      */
     public function showMainPage($editor)
     {
+        global $hostPluginURL;
+        global $hostEditorURL;
+        global $hostType;
+
         /* add a random bit onto the URL so that the next request won't get the same URL/ETag combo
            even if the config file contents don't change, but the two requests for the same editor page WILL */
 
@@ -1053,8 +1057,9 @@ class EditorUI extends UIBase
         $tpl->set("WEATHERMAP_VERSION", WEATHERMAP_VERSION);
         $tpl->set("fromplug", ($this->isEmbedded() ? 1 : 0));
 
+        $tpl->set("host_url", $hostPluginURL);
         // TODO - this should come from Cacti or other host
-        $tpl->set("host_url", "http://made-up-url.example.com/");
+        $tpl->set("host_type", $hostType);
 
         $tpl->set("imageurl", htmlspecialchars($mapURL));
         if ($this->selected != "") {
@@ -1077,7 +1082,7 @@ class EditorUI extends UIBase
         $tpl->set("map_width", $editor->map->width);
         $tpl->set("map_height", $editor->map->height);
         $tpl->set("log", $this->logMessage);
-        $tpl->set("editor_name", "editor.php");
+        $tpl->set("editor_name", $hostEditorURL);
 
         $tpl->set("nodeselection", $this->makeNodeSelector($editor->map));
 

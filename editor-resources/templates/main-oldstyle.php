@@ -1,16 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-    <style type="text/css">
-        <?php
-                // if the cacti config was included properly, then
-                // this will be non-empty, and we can unhide the cacti links in the Link Properties box
-        if (!isset($config['cacti_version'])) {
-            echo "    .cactilink { display: none; }\n";
-            echo "    .cactinode { display: none; }\n";
-        }
-        ?>
-    </style>
+
     <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css"/>
     <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
     <script src="editor-resources/editor.js" type="text/javascript"></script>
@@ -25,8 +16,18 @@
         var $global_settings2 = <?php echo $global2; ?>;
         var editor_url = '<?php echo $editor_name; ?>';
         var fromplug = <?php echo $fromplug ?>;
-        var host_url = <?php echo host_url ?>;
+        var host_url = '<?php echo $host_url ?>';
+        var host_type = '<?php echo $host_type ?>';
     </script>
+    <style type="text/css">
+        <?php
+        // if the host is cacti, we can unhide the cacti links in the Link Properties box
+        if ($fromplug && $host_type=='cacti') {
+            echo "    .cactilink { display: none; }\n";
+            echo "    .cactinode { display: none; }\n";
+        }
+        ?>
+    </style>
     <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title>
 </head>
 

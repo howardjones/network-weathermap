@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 
 import {loadSettings} from './actions';
 import MapList from "./components/MapList";
+import Footer from "./components/Footer";
 
 class App extends Component {
 
@@ -18,11 +19,9 @@ class App extends Component {
 
         return (
             <div>
-                <p>Weathermap Management App goes here.
-                It will get data from {this.props.url} and maps from {this.props.settings.maps_url}</p>
                 <p>If there are any warnings, they should go here</p>
                 <MapList maps={this.props.maps}/>
-
+                <Footer/>
             </div>
         );
     }

@@ -3,8 +3,7 @@
 <head>
     <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css"/>
     <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
-    <script src="editor-resources/editor.js" type="text/javascript"></script>
-    <script src="editor-resources/editor16.js" type="text/javascript"></script>
+    <script src="editor-resources/editor-front.js" type="text/javascript"></script>
     <title>PHP Weathermap Editor <?php echo WEATHERMAP_VERSION; ?></title></head>
 <body>
 <div id="nojs" class="alert"><b>WARNING</b> - Sorry, it's partly laziness on my part, but you really need JavaScript

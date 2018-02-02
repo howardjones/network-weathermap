@@ -24,7 +24,7 @@ class MapList extends Component {
         const map_entries = this.props.maps.map((item, index) => {
             return (<tr key={index}>
                 <td>{item.id}</td>
-                <td>{item.configfile}</td>
+                <td><a href={this.props.settings.editor_url + item.configfile}>{item.configfile}</a></td>
                 <td>{item.titlecache}</td>
                 <td>{item.group_id}</td>
                 <td><FormattedNumber value={item.runtime} />s {item.warncount > 0 ? <span className="wm_map_warnings">(<FormattedNumber value={item.warncount}/>&nbsp;<FormattedPlural value={item.warncount} zero="" one="warning" other="warnings"/>)</span>: ""}</td>

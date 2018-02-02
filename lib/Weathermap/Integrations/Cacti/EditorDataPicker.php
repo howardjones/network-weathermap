@@ -7,6 +7,7 @@ namespace Weathermap\Integrations\Cacti;
 
 use Weathermap\UI\UIBase;
 use Weathermap\UI\SimpleTemplate;
+use PDO;
 
 /**
  * Data/Graph picker for the Editor, looking inside the Cacti database
@@ -72,13 +73,13 @@ class EditorDataPicker extends UIBase
         }
 
         if ($hostId >= 0) {
-            $picklistSQL = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
+            $picklistSQL = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache AS description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
             $picklistSQL .= " and graph_local.host_id=? ";
             $picklistSQL .= " order by title_cache";
             $statement = $pdo->prepare($picklistSQL);
             $statement->execute(array($hostId));
         } else {
-            $picklistSQL = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
+            $picklistSQL = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache AS description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
             $picklistSQL .= " order by title_cache";
             $statement = $pdo->prepare($picklistSQL);
             $statement->execute();
@@ -86,7 +87,7 @@ class EditorDataPicker extends UIBase
 
         $sources = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        uasort($sources, "usortNaturalDescriptions");
+        uasort($sources, array($this, "usortNaturalDescriptions"));
 
         $hosts = $this->cactiHostList($pdo);
 
@@ -125,16 +126,16 @@ class EditorDataPicker extends UIBase
 
         if (isset($request['host_id']) && intval($request['host_id']) >= 0) {
             $hostID = intval($request['host_id']);
-            $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache as description, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  AND data_local.host_id=?  ORDER BY name_cache;");
+            $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache AS description, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  AND data_local.host_id=?  ORDER BY name_cache;");
             $statement->execute(array(intval($request['host_id'])));
         } else {
-            $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache as description, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  ORDER BY name_cache;");
+            $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache AS description, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  ORDER BY name_cache;");
             $statement->execute();
             $hostID = -1;
         }
 
         $sources = $statement->fetchAll(PDO::FETCH_ASSOC);
-        uasort($sources, "usortNaturalDescriptions");
+        uasort($sources, array($this, "usortNaturalDescriptions"));
 
         $hosts = $this->cactiHostList($pdo);
 
@@ -226,10 +227,31 @@ class EditorDataPicker extends UIBase
         $statement->execute();
 
         $hosts = $statement->fetchAll(PDO::FETCH_ASSOC);
-        uasort($hosts, "usortNaturalNames");
+        uasort($hosts, array($this, "usortNaturalNames"));
 
         return $hosts;
     }
+
+    /** usortNaturalNames - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+     * @arg $a - the first string to compare
+     * @arg $b - the second string to compare
+     * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+     * $b is equal to $b */
+    function usortNaturalNames($a, $b)
+    {
+        return strnatcasecmp($a['name'], $b['name']);
+    }
+
+    /** usortNaturalDescriptions - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+     * @arg $a - the first string to compare
+     * @arg $b - the second string to compare
+     * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+     * $b is equal to $b */
+    function usortNaturalDescriptions($a, $b)
+    {
+        return strnatcasecmp($a['description'], $b['description']);
+    }
+
 }
 
 function jsEscape($str)
@@ -242,22 +264,3 @@ function jsEscape($str)
     return $str;
 }
 
-/** usortNaturalNames - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
- * @arg $a - the first string to compare
- * @arg $b - the second string to compare
- * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
- * $b is equal to $b */
-function usortNaturalNames($a, $b)
-{
-    return strnatcasecmp($a['name'], $b['name']);
-}
-
-/** usortNaturalDescriptions - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
- * @arg $a - the first string to compare
- * @arg $b - the second string to compare
- * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
- * $b is equal to $b */
-function usortNaturalDescriptions($a, $b)
-{
-    return strnatcasecmp($a['description'], $b['description']);
-}

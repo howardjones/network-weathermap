@@ -177,7 +177,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             'map_selector' => $trueFalseLookup[$showMapSelector],
             'thumb_url' => $this->makeURL(array("action" => "viewthumb")),
             'image_url' => $this->makeURL(array("action" => "viewimage")),
-            'editor_url' => $this->editorURL,
+            'editor_url' => $this->makeURL(array("action" => "nothing", "mapname" => ""), $this->editorURL),
             'maps_url' => $this->makeURL(array("action" => "dumpmaps")),
             'docs_url' => 'docs/index.html'
         );

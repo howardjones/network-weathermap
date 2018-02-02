@@ -20,7 +20,7 @@ class App extends Component {
         return (
             <div>
                 <p>If there are any warnings, they should go here</p>
-                <MapList maps={this.props.maps}/>
+                <MapList maps={this.props.maps} settings={this.props.settings}/>
                 <Footer/>
             </div>
         );

@@ -22,7 +22,7 @@
     <style type="text/css">
         <?php
         // if the host is cacti, we can unhide the cacti links in the Link Properties box
-        if ($fromplug && $host_type=='cacti') {
+        if (!$fromplug || ($fromplug && $host_type!='cacti')) {
             echo "    .cactilink { display: none; }\n";
             echo "    .cactinode { display: none; }\n";
         }

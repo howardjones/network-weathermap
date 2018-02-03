@@ -32,6 +32,7 @@ class MapList extends Component {
                 <td>{this.on_off_once(item.debug)}</td>
                 <td>{this.on_off_once(item.archiving)}</td>
                 <td>{item.schedule === "*" ? <FormattedMessage id="always" defaultMessage="always"/> : item.schedule}</td>
+                <td>-</td>
             </tr>)
         });
 
@@ -47,6 +48,7 @@ class MapList extends Component {
                 <th><FormattedMessage id="debugging" defaultMessage="Debugging"/></th>
                 <th><FormattedMessage id="archiving" defaultMessage="Archiving"/></th>
                 <th><FormattedMessage id="schedule" defaultMessage="Schedule"/></th>
+                <th><FormattedMessage id="access" defaultMessage="Access"/></th>
             </tr>
             </thead>
             <tbody>

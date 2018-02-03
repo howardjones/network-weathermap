@@ -678,6 +678,7 @@ class MapManager
         if (!in_array('weathermap_auth', $tables)) {
             $databaseUpdates[] = "CREATE TABLE weathermap_auth (
                                 userid MEDIUMINT(9) NOT NULL DEFAULT '0',
+                                usergroupid MEDIUMINT(9) NOT NULL DEFAULT '0',
                                 mapid INT(11) NOT NULL DEFAULT '0'
                         );";
         }
@@ -763,6 +764,11 @@ class MapManager
         }
 
         $databaseUpdates[] = "UPDATE weathermap_maps SET filehash=LEFT(MD5(concat(id,configfile,rand())),20) WHERE filehash = ''";
+
+        $columns = $this->getColumnList("weathermap_auth");
+        if (!in_array('usergroupid', $columns)) {
+            $databaseUpdates[] = "ALTER TABLE weathermap_auth ADD usergroupid MEDIUMINT(9) NOT NULL DEFAULT 0 AFTER userid";
+        }
 
         $columns = $this->getColumnList("weathermap_data");
         if (count($columns) > 0) {

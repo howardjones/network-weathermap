@@ -1,4 +1,3 @@
-
 const translations = {
     'fr': {
         'title': 'Titre',
@@ -12,17 +11,28 @@ const translations = {
         'once': 'une fois que',
         'off': 'non',
         'on': 'oui',
-        'always': 'toujours'
+        'always': 'toujours',
+        'never': 'jamais',
+        'access': 'accès'
     },
-    'es': {
-
-    },
+    'es': {},
     'ru': {
-
+        'title': 'заглавие',
+        'group': 'группа',
+        'debugging': 'отладка',
+        'archiving': 'архивировать',
+        'config_file': 'Файл конфигурации',
+        'last_ran':'предыдущий',
+        'schedule': 'график',
+        'enabled': 'живой',
+        'once': 'Один',
+        'off': 'нет',
+        'on': 'да',
+        'always': 'всегда',
+        'never': 'ни разу',
+        'access': 'позволил'
     },
-    'pt': {
-
-    }
+    'pt': {}
 };
 
 export default translations;

@@ -89,7 +89,7 @@ function weathermap_show_tab()
         $tabURL = $weathermapBaseURL . '/images/' . $tabName;
 
         printf(
-            '<a href="%s"><img src="%s" alt="' . __('Weathermap') . '" align="absmiddle" border="0" /></a>',
+            '<a href="%s"><img src="%s" alt="' . __('Weathermap', 'weathermap') . '" align="absmiddle" border="0" /></a>',
             $weathermapURL,
             $tabURL
         );
@@ -102,18 +102,18 @@ function weathermap_config_arrays()
 {
     global $menu;
 
-    api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin.php', __('Weathermap: View'), 1);
+    api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin.php', __('Weathermap: View', 'weathermap'), 1);
     api_plugin_register_realm(
         'weathermap',
         'weathermap-cacti10-plugin-mgmt.php',
-        __('Weathermap: Configure/Manage'),
+        __('Weathermap: Configure/Manage', 'weathermap'),
         1
     );
-    api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-editor.php', __('Weathermap: Edit Maps'), 1);
+    api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-editor.php', __('Weathermap: Edit Maps', 'weathermap'), 1);
 
     $wm_menu = array(
-        'plugins/weathermap/weathermap-cacti10-plugin-mgmt.php' => __('Weathermaps'),
-        'plugins/weathermap/weathermap-cacti10-plugin-mgmt-groups.php' => __('Groups')
+        'plugins/weathermap/weathermap-cacti10-plugin-mgmt.php' => __('Weathermaps', 'weathermap'),
+        'plugins/weathermap/weathermap-cacti10-plugin-mgmt-groups.php' => __('Groups', 'weathermap')
     );
 
     $menu[__('Management')]['plugins/weathermap/weathermap-cacti10-plugin-mgmt.php'] = $wm_menu;
@@ -123,32 +123,32 @@ function weathermap_config_settings()
 {
     global $tabs, $settings;
 
-    $tabs['maps'] = __('Maps');
+    $tabs['weathermap'] = __('Maps', 'weathermap');
 
     $temp = array(
         'weathermap_header' => array(
-            'friendly_name' => __('Network Weathermap'),
+            'friendly_name' => __('Network Weathermap', 'weathermap'),
             'method' => 'spacer',
         ),
         'weathermap_pagestyle' => array(
-            'friendly_name' => __('Page style'),
-            'description' => __('How to display multiple maps.'),
+            'friendly_name' => __('Page style', 'weathermap'),
+            'description' => __('How to display multiple maps.', 'weathermap'),
             'method' => 'drop_array',
             'array' => array(
-                0 => __('Thumbnail Overview'),
-                1 => __('Full Images'),
-                2 => __('Show Only First')
+                0 => __('Thumbnail Overview', 'weathermap'),
+                1 => __('Full Images', 'weathermap'),
+                2 => __('Show Only First', 'weathermap')
             )
         ),
         'weathermap_thumbsize' => array(
-            'friendly_name' => __('Thumbnail Maximum Size'),
-            'description' => __('The maximum width or height for thumbnails in thumbnail view, in pixels. Takes effect after the next poller run.'),
+            'friendly_name' => __('Thumbnail Maximum Size', 'weathermap'),
+            'description' => __('The maximum width or height for thumbnails in thumbnail view, in pixels. Takes effect after the next poller run.', 'weathermap'),
             'method' => 'textbox',
             'max_length' => 5,
         ),
         'weathermap_cycle_refresh' => array(
-            'friendly_name' => __('Refresh Time'),
-            'description' => __('How often to refresh the page in Cycle mode. Automatic makes all available maps fit into 5 minutes.'),
+            'friendly_name' => __('Refresh Time', 'weathermap'),
+            'description' => __('How often to refresh the page in Cycle mode. Automatic makes all available maps fit into 5 minutes.', 'weathermap'),
             'method' => 'drop_array',
             'array' => array(
                 0 => __('Automatic'),
@@ -161,18 +161,18 @@ function weathermap_config_settings()
             )
         ),
         'weathermap_output_format' => array(
-            'friendly_name' => __('Output Format'),
-            'description' => __('What format do you prefer for the generated map images and thumbnails?'),
+            'friendly_name' => __('Output Format', 'weathermap'),
+            'description' => __('What format do you prefer for the generated map images and thumbnails?', 'weathermap'),
             'method' => 'drop_array',
             'array' => array(
-                'png' => __('PNG (default)'),
-                'jpg' => __('JPEG'),
-                'gif' => __('GIF')
+                'png' => __('PNG (default)', 'weathermap'),
+                'jpg' => __('JPEG', 'weathermap'),
+                'gif' => __('GIF', 'weathermap')
             )
         ),
         'weathermap_render_period' => array(
-            'friendly_name' => __('Map Rendering Interval'),
-            'description' => __('How often do you want Weathermap to recalculate it\'s maps? You should not touch this unless you know what you are doing! It is mainly needed for people with non-standard polling setups.'),
+            'friendly_name' => __('Map Rendering Interval', 'weathermap'),
+            'description' => __('How often do you want Weathermap to recalculate its maps? You should not touch this unless you know what you are doing! It is mainly needed for people with non-standard polling setups.', 'weathermap'),
             'method' => 'drop_array',
             'array' => array(
                 -1 => __('Never (manual updates)'),
@@ -192,21 +192,21 @@ function weathermap_config_settings()
         ),
 
         'weathermap_all_tab' => array(
-            'friendly_name' => __('Show \'All\' Tab'),
-            'description' => __('When using groups, add an \'All Maps\' tab to the tab bar.'),
+            'friendly_name' => __('Show \'All\' Tab', 'weathermap'),
+            'description' => __('When using groups, add an \'All Maps\' tab to the tab bar.', 'weathermap'),
             'method' => 'drop_array',
             'array' => array(
-                0 => __('No (default)'),
-                1 => __('Yes')
+                0 => __('No (default)', 'weathermap'),
+                1 => __('Yes', 'weathermap')
             )
         ),
         'weathermap_map_selector' => array(
-            'friendly_name' => __('Show Map Selector'),
-            'description' => __('Show a combo-box map selector on the full-screen map view.'),
+            'friendly_name' => __('Show Map Selector', 'weathermap'),
+            'description' => __('Show a combo-box map selector on the full-screen map view.', 'weathermap'),
             'method' => 'drop_array',
             'array' => array(
-                0 => __('No'),
-                1 => __('Yes (default)')
+                0 => __('No', 'weathermap'),
+                1 => __('Yes (default)', 'weathermap')
             )
         ),
         'weathermap_quiet_logging' => array(
@@ -219,10 +219,10 @@ function weathermap_config_settings()
             )
         )
     );
-    if (isset($settings['maps'])) {
-        $settings['maps'] = array_merge($settings['maps'], $temp);
+    if (isset($settings['weathermap'])) {
+        $settings['weathermap'] = array_merge($settings['weathermap'], $temp);
     } else {
-        $settings['maps'] = $temp;
+        $settings['weathermap'] = $temp;
     }
 }
 

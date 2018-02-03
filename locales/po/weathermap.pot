@@ -5,3 +5,6 @@ msgstr ""
 # Tab text
 msgid "Weathermap"
 msgstr ""
+
+msgid "Maps"
+msgstr ""

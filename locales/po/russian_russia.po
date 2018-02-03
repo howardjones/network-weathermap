@@ -1,0 +1,7 @@
+# Menu Text
+msgid "Weathermaps"
+msgstr "Карты погоды"
+
+# Tab text
+msgid "Weathermap"
+msgstr "Karta pogody"

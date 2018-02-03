@@ -17,20 +17,20 @@ const translations = {
     },
     'es': {},
     'ru': {
-        'title': 'заглавие',
+        'title': 'название',
         'group': 'группа',
         'debugging': 'отладка',
         'archiving': 'архивировать',
         'config_file': 'Файл конфигурации',
-        'last_ran':'предыдущий',
-        'schedule': 'график',
-        'enabled': 'живой',
+        'last_ran':'последний запуск',
+        'schedule': 'расписание',
+        'enabled': 'включен',
         'once': 'Один',
         'off': 'нет',
         'on': 'да',
         'always': 'всегда',
         'never': 'никогда',
-        'access': 'позволил'
+        'access': 'доступ'
     },
     'pt': {}
 };

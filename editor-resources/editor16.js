@@ -17,6 +17,14 @@ function update_fontlist(fonts) {
 }
 
 
+function update_form_fields(mapping, properties) {
+    for (var field in mapping) {
+        if (mapping.hasOwnProperty(field)) {
+            jQuery('#' + field).val(properties[mapping[field]]);
+        }
+    }
+}
+
 function update_map_properties(properties) {
 
     var mapping = {
@@ -29,19 +37,24 @@ function update_map_properties(properties) {
         'map_width': 'map_width',
         'map_height': 'map_height',
         'map_pngfile': 'map_pngfile',
-        'map_htmlfile': 'map_htmlfile'
+        'map_htmlfile': 'map_htmlfile',
+        'map_bgfile': 'map_bgfile'
+    };
+    update_form_fields(mapping, properties);
+}
+
+function update_map_style(properties) {
+    var mapping = {
+        'mapstyle_linklabels': 'linklabels',
+        'mapstyle_htmlstyle': 'htmlstyle',
+        'mapstyle_arrowstyle': 'arrowstyle',
+        'mapstyle_legendfont': 'legendfont',
+        'mapstyle_linkfont': 'linkfont',
+        'mapstyle_nodefont': 'nodefont'
+
     };
 
-    for (var field in mapping) {
-        if (mapping.hasOwnProperty(field)) {
-            jQuery('#' + field).val(properties[mapping[field]]);
-        }
-    }
-
-    // TODO - figure out the extra logic to possibly add the extra image
-    // jQuery('#map_bgfile').value();
-
-
+    update_form_fields(mapping, properties);
 }
 
 function update_imagelists(images) {
@@ -59,7 +72,7 @@ function initJS16() {
     update_imagelists(imlist);
     update_fontlist(fontlist);
     update_map_properties(global_settings);
-
+    update_map_style(global_settings);
 
     // TODO: set the selected settings for each font in mapstyle
     // mapstyle_linklabels

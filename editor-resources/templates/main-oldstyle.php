@@ -371,7 +371,7 @@
                 </tr>
                 <tr>
                     <th>HTML Style</th>
-                    <td><select name="mapstyle_htmlstyle">
+                    <td><select id="mapstyle_htmlstyle" name="mapstyle_htmlstyle">
                             <option value="overlib">
                                 Overlib (DHTML)
                             </option>
@@ -382,7 +382,7 @@
                 </tr>
                 <tr>
                     <th>Arrow Style</th>
-                    <td><select name="mapstyle_arrowstyle">
+                    <td><select id="mapstyle_arrowstyle" name="mapstyle_arrowstyle">
                             <option
                                     value="classic">Classic
                             </option>

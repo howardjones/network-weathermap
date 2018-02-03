@@ -1039,7 +1039,7 @@ class Editor
         }
 
         $this->map->htmlstyle = $params['htmlstyle'];
-        $this->map->keyfont = intval($_REQUEST['legendfont']);
+        $this->map->keyfont = intval($params['legendfont']);
 
         $inheritables = array(
             array('link', 'labelStyle', 'bwlabels', ""),

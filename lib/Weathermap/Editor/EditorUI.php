@@ -291,6 +291,7 @@ class EditorUI extends UIBase
                 array('mapstyle_nodefont', 'int'),
                 array('mapstyle_linkfont', 'int'),
                 array('mapstyle_legendfont', 'int'),
+                array('mapstyle_htmlstyle', 'string'),
             ),
             "handler" => "cmdMapStyle"
         ),
@@ -1073,6 +1074,7 @@ class EditorUI extends UIBase
 
         // draw a map to throw away, just to get the imagemap updated
         $editor->map->DrawMap('null');
+        $real_html_style = $editor->map->htmlstyle;
         $editor->map->htmlstyle = 'editor';
         $editor->map->calculateImageMap();
 
@@ -1110,7 +1112,7 @@ class EditorUI extends UIBase
             "linkfont" => $editor->map->links['DEFAULT']->bwfont,
             "nodefont" => $editor->map->nodes['DEFAULT']->labelfont,
             "arrowstyle" => $editor->map->links['DEFAULT']->arrowStyle,
-            "htmlstyle" => $editor->map->htmlstyle,
+            "htmlstyle" => $real_html_style,
             "legendfont" => $editor->map->keyfont,
             "map_width" => $editor->map->width,
             "map_height" => $editor->map->height,

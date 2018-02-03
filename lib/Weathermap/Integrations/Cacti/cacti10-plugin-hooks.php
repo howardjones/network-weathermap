@@ -69,21 +69,11 @@ function weathermap_top_graph_refresh($refresh)
 function weathermap_show_tab()
 {
     global $config, $user_auth_realm_filenames;
-    $realm_id = 0;
 
-    if (isset($user_auth_realm_filenames[basename('weathermap-cacti10-plugin.php')])) {
-        $realm_id = $user_auth_realm_filenames[basename('weathermap-cacti10-plugin.php')];
-    }
+    if (api_plugin_user_realm_auth('weathermap-cacti10-plugin.php')) {
 
-    $tabstyle = intval(read_config_option('superlinks_tabstyle'));
-    $userid = (isset($_SESSION['sess_user_id']) ? intval($_SESSION['sess_user_id']) : 1);
+        $tabstyle = intval(read_config_option('superlinks_tabstyle'));
 
-    $pdo = weathermap_get_pdo();
-    $stmt = $pdo->prepare('SELECT user_auth_realm.realm_id FROM user_auth_realm WHERE user_auth_realm.user_id=? AND user_auth_realm.realm_id=?');
-    $stmt->execute(array($userid, $realm_id));
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    if ((count($result) > 0) || (empty($realm_id))) {
         if ($tabstyle > 0) {
             $prefix = 's_';
         } else {
@@ -112,16 +102,14 @@ function weathermap_config_arrays()
 {
     global $menu;
 
-    if (function_exists('api_plugin_register_realm')) {
-        api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin.php', __('Weathermap: View'), 1);
-        api_plugin_register_realm(
-            'weathermap',
-            'weathermap-cacti10-plugin-mgmt.php',
-            __('Weathermap: Configure/Manage'),
-            1
-        );
-        api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-editor.php', __('Weathermap: Edit Maps'), 1);
-    }
+    api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin.php', __('Weathermap: View'), 1);
+    api_plugin_register_realm(
+        'weathermap',
+        'weathermap-cacti10-plugin-mgmt.php',
+        __('Weathermap: Configure/Manage'),
+        1
+    );
+    api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-editor.php', __('Weathermap: Edit Maps'), 1);
 
     $wm_menu = array(
         'plugins/weathermap/weathermap-cacti10-plugin-mgmt.php' => __('Weathermaps'),

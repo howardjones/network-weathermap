@@ -209,13 +209,14 @@ function click_handler(e) {
 
     // we've got a command queued, so do the appropriate thing
     else {
+
         if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link') {
-            document.getElementById('param').value = NodeIDs[objectid];
+            document.getElementById('param').value = getNodeFromID(objectid);
             document.frmMain.submit();
         }
 
         else if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link2') {
-            document.getElementById('param').value = NodeIDs[objectid];
+            document.getElementById('param').value = getNodeFromID(objectid);
             document.frmMain.submit();
         }
 
@@ -228,6 +229,19 @@ function click_handler(e) {
             click_handler(e);
         }
     }
+}
+
+function getNodeFromID(id) {
+    for (var nodename in mapdata.Nodes) {
+        if (mapdata.Nodes.hasOwnProperty(nodename)) {
+            var node = mapdata.Nodes[nodename];
+            if (node.id === id) {
+                return node.name;
+            }
+        }
+    }
+
+    return undefined;
 }
 
 // used by the Submit button on each of the properties dialogs

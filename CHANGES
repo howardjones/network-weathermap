@@ -22,6 +22,7 @@ and makes using current development tools (like phpunit) more difficult.
              * Data picker is rewritten
              * Rewritten drawing code for links and nodes
              * Everything uses PHP namespaces now, and standards for format, naming and layout.
+    CHANGE - Internationalization support - first translations are by me with Google Translate, so corrections are welcome!
     CHANGE - Totally rewritten editor. I know it looks the same, but the guts is entirely new.
     CHANGE - Lots more testing. New editor can be automatically tested. Lots of tests for rest of code.
     FIXED - PHP 5.3 bug introduced in command-line tool in 0.98

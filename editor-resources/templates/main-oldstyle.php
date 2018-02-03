@@ -280,27 +280,27 @@
                 </tr>
                 <tr>
                     <th>Legend Text</th>
-                    <td><input name="map_legend" size="25" type="text"
+                    <td><input id="map_legend" name="map_legend" size="25" type="text"
                         /></td>
                 </tr>
                 <tr>
                     <th>Timestamp Text</th>
-                    <td><input name="map_stamp" size="25" type="text"
+                    <td><input id="map_stamp" name="map_stamp" size="25" type="text"
                         /></td>
                 </tr>
 
                 <tr>
                     <th>Default Link Width</th>
-                    <td><input name="map_linkdefaultwidth" size="6" type="text"
+                    <td><input id="map_linkdefaultwidth" name="map_linkdefaultwidth" size="6" type="text"
                         /> pixels
                     </td>
                 </tr>
 
                 <tr>
                     <th>Default Link Bandwidth</th>
-                    <td><input name="map_linkdefaultbwin" size="6" type="text"
+                    <td><input id="map_linkdefaultbwin" name="map_linkdefaultbwin" size="6" type="text"
                         />
-                        bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text"
+                        bit/sec in, <input id="map_linkdefaultbwout" name="map_linkdefaultbwout" size="6" type="text"
                         />
                         bit/sec out
                     </td>
@@ -309,8 +309,8 @@
 
                 <tr>
                     <th>Map Size</th>
-                    <td><input name="map_width" size="5" type=
-                        "text"/> x <input name="map_height" size="5"
+                    <td><input id="map_width" name="map_width" size="5" type=
+                        "text"/> x <input id="map_height" name="map_height" size="5"
                                           type=
                                           "text"
                         />
@@ -319,17 +319,17 @@
                 </tr>
                 <tr>
                     <th>Output Image Filename</th>
-                    <td><input name="map_pngfile" type="text"
+                    <td><input id="map_pngfile" name="map_pngfile" type="text"
                         /></td>
                 </tr>
                 <tr>
                     <th>Output HTML Filename</th>
-                    <td><input name="map_htmlfile" type="text"
+                    <td><input id="map_htmlfile" name="map_htmlfile" type="text"
                         /></td>
                 </tr>
                 <tr>
                     <th>Background Image Filename</th>
-                    <td><select name="map_bgfile" class="imlist"></select></td>
+                    <td><select id="map_bgfile" name="map_bgfile" class="imlist"></select></td>
                 </tr>
 
             </table>

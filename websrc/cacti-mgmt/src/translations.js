@@ -29,7 +29,7 @@ const translations = {
         'off': 'нет',
         'on': 'да',
         'always': 'всегда',
-        'never': 'ни разу',
+        'never': 'никогда',
         'access': 'позволил'
     },
     'pt': {}

@@ -8,21 +8,58 @@
 
 jQuery(document).ready(initJS16);
 
-function initJS16() {
+function update_fontlist(fonts) {
+    jQuery.each(fonts, function (index, value) {
+        // slot in the list of fonts in each of the select boxes where they are expected
+        var newitem = jQuery("<option />").attr("value", value).text(value);
+        jQuery(".fontlist").append(newitem);
+    });
+}
 
-    jQuery.each(imlist, function (index, value) {
+
+function update_map_properties(properties) {
+
+    var mapping = {
+        'map_title': 'title',
+        'map_legend': 'map_legendtext',
+        'map_stamp': 'map_stamp',
+        'map_linkdefaultwidth': 'link_width',
+        'map_linkdefaultbwin': 'link_defaultbwin',
+        'map_linkdefaultbwout': 'link_defaultbwout',
+        'map_width': 'map_width',
+        'map_height': 'map_height',
+        'map_pngfile': 'map_pngfile',
+        'map_htmlfile': 'map_htmlfile'
+    };
+
+    for (var field in mapping) {
+        if (mapping.hasOwnProperty(field)) {
+            jQuery('#' + field).val(properties[mapping[field]]);
+        }
+    }
+
+    // TODO - figure out the extra logic to possibly add the extra image
+    // jQuery('#map_bgfile').value();
+
+
+}
+
+function update_imagelists(images) {
+    jQuery.each(images, function (index, value) {
         // slot in the list of images in:
         //    node icon selectbox
         //    map background image
         var newitem = jQuery("<option />").attr("value", value).text(value);
         jQuery(".imlist").append(newitem);
     });
+}
 
-    jQuery.each(fontlist, function (index, value) {
-        // slot in the list of fonts in each of the select boxes where they are expected
-        var newitem = jQuery("<option />").attr("value", value).text(value);
-        jQuery(".fontlist").append(newitem);
-    });
+function initJS16() {
+
+    update_imagelists(imlist);
+    update_fontlist(fontlist);
+    update_map_properties(global_settings);
+
 
     // TODO: set the selected settings for each font in mapstyle
     // mapstyle_linklabels

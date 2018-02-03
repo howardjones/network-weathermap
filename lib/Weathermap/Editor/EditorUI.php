@@ -394,7 +394,9 @@ class EditorUI extends UIBase
 
         if (isset($params['selected']) && substr($params['selected'], 0, 5) == 'NODE:') {
             $nodename = substr($params['selected'], 5);
-            $editor->map->nodes[$nodename]->selected = 1;
+            if ($editor->map->nodeExists($nodename)) {
+                $editor->map->nodes[$nodename]->selected = 1;
+            }
         }
 
         $editor->map->drawMap('', '', 250, true, false, false);

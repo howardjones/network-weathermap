@@ -75,18 +75,15 @@ class Editor
 
     public function getItemConfig($itemType, $itemName)
     {
-        if ($itemType == 'node') {
-            if ($this->map->nodeExists($itemName)) {
-                $node = $this->map->getNode($itemName);
-                return $node->getConfig();
-            }
+        if ($itemType == 'node' && $this->map->nodeExists($itemName)) {
+            $node = $this->map->getNode($itemName);
+            return $node->getConfig();
+
         }
 
-        if ($itemType == 'link') {
-            if ($this->map->linkExists($itemName)) {
-                $link = $this->map->getlink($itemName);
-                return $link->getConfig();
-            }
+        if ($itemType == 'link' && $this->map->linkExists($itemName)) {
+            $link = $this->map->getlink($itemName);
+            return $link->getConfig();
         }
 
         return false;

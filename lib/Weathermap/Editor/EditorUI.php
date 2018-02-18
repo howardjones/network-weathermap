@@ -121,6 +121,7 @@ class EditorUI extends UIBase
                 array("link_name", "name"),
             ),
             "working" => true,
+            "reload_after_action" => true,
             "handler" => "cmdReplaceLinkConfig"
         ),
         "set_node_config" => array(
@@ -130,6 +131,7 @@ class EditorUI extends UIBase
                 array("node_name", "name"),
             ),
             "working" => true,
+            "reload_after_action" => true,
             "handler" => "cmdReplaceNodeConfig"
         ),
         "add_link" => array(
@@ -234,13 +236,6 @@ class EditorUI extends UIBase
             "working" => true,
             "handler" => "cmdTidyAllLinks"
         ),
-//        "retidy_all" => array(
-//            "args" => array(
-//                array("mapname", "mapfile")
-//            ),
-//            "working" => true,
-//            "handler" => "cmdReTidyAllLinks"
-//        ),
         "retidy" => array(
             "args" => array(
                 array("mapname", "mapfile")
@@ -699,7 +694,6 @@ class EditorUI extends UIBase
      */
     public function cmdMapProperties($params, $editor)
     {
-        // TODO: this is empty!!
         $update = array(
             "title" => $params["map_title"],
             "legend" => $params["map_legend"],
@@ -824,8 +818,6 @@ class EditorUI extends UIBase
     public function cmdGetItemConfig($params, $editor)
     {
         header('Content-type: text/plain');
-
-        $map = $editor->map;
 
         $itemName = $params['item_name'];
         $itemType = $params['item_type'];
@@ -1021,6 +1013,12 @@ class EditorUI extends UIBase
 
             if (!isset($this->commands[$action]['no_save'])) {
                 $editor->saveConfig();
+            }
+
+            // reload the new config if we directly set config using the Edit button in a node or link
+            // otherwise it won't be reflected in the editor dialogs (even though it IS in the image)
+            if (isset($this->commands[$action]['reload_after_action'])) {
+                $editor->loadConfig($this->mapFileName);
             }
 
             if ($result !== false) {

@@ -19,6 +19,8 @@ class UIBase
 
     private $types = array(
         "int" => "validateArgInt",
+        "float" => "validateArgFloat",
+        "bandwidth" => "validateArgBandwidth",
         "name" => "validateArgName",
         "jsname" => "validateArgJavascriptName",
         "mapfile" => "validateArgMapFilename",
@@ -247,6 +249,33 @@ class UIBase
         }
 
         if ((is_numeric($value) && (intval($value) == floatval($value)))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function validateArgFloat($value)
+    {
+        if (is_numeric($value)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private function validateArgBandwidth($value)
+    {
+        if ($this->validateArgFloat($value)) {
+            return true;
+        }
+
+        $suffix = substr($value, -1, 1);
+        $remains = substr($value, 0, -1);
+        $possible = array('T', 'G', 'M', 'K', 'm', 'u');
+
+        if (in_array($suffix, $possible) && $this->validateArgFloat($remains)) {
             return true;
         }
 

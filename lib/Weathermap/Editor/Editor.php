@@ -16,6 +16,7 @@ use Weathermap\Core\MathUtility;
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\Target;
 use Weathermap\Core\StringUtility;
+use Weathermap\UI\UIBase;
 
 /** Wrapper API around Map to provide the relevant operations to manipulate
  *  the map contents that an editor will need, without it needing to see inside the map object.
@@ -1050,6 +1051,69 @@ class Editor
         $this->handleInheritance($inheritables, $params);
     }
 
+
+    public function updateMapProperties($params)
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        $this->map->title = $params['title'];
+        $this->map->legends['DEFAULT']->keytitle = $params['legend'];
+        $this->map->stamptext = $params['stamp'];
+
+        $this->map->htmloutputfile = $params['htmlfile'];
+        $this->map->imageoutputfile = $params['pngfile'];
+
+        $this->map->width = $params['width'];
+        $this->map->height = $params['height'];
+
+        $this->map->background = $params['bgfile'];
+
+
+        $inheritables = array(
+            array('link', 'width', 'linkdefaultwidth', "float"),
+        );
+
+        $this->handleInheritance($inheritables, $params);
+
+        $defaultLink = $this->map->getLink("DEFAULT");
+
+        $defaultLink->width = $params['linkdefaultwidth'];
+        $defaultLink->addNote("my_width", $params['linkdefaultwidth']);
+
+
+        $bwin = $params['linkdefaultbwin'];
+        $bwout = $params['linkdefaultbwout'];
+
+        $bwin_old = $defaultLink->maxValuesConfigured[IN];
+        $bwout_old = $defaultLink->maxValuesConfigured[OUT];
+
+        if (!UIBase::wmeValidateBandwidth($bwout)) {
+            $bwout = $bwout_old;
+        }
+
+        if (!UIBase::wmeValidateBandwidth($bwin)) {
+            $bwin = $bwin_old;
+        }
+
+        if (($bwin_old != $bwin) || ($bwout_old != $bwout)) {
+            $defaultLink->maxValuesConfigured[IN] = $bwin;
+            $defaultLink->maxValuesConfigured[OUT] = $bwout;
+            $defaultLink->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffix($bwin, $this->map->kilo);
+            $defaultLink->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffix($bwout, $this->map->kilo);
+        }
+
+        foreach ($this->map->links as $link) {
+            if (($link->maxValuesConfigured[IN] == $bwin_old) || ($link->maxValuesConfigured[OUT] == $bwout_old)) {
+                $link->maxValuesConfigured[IN] = $bwin;
+                $link->maxValuesConfigured[OUT] = $bwout;
+                $link->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffix($bwin, $this->map->kilo);
+                $link->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffix($bwout, $this->map->kilo);
+            }
+        }
+    }
+
     public function asJS()
     {
         if (!$this->isLoaded()) {
@@ -1112,4 +1176,5 @@ class Editor
             }
         }
     }
+
 }

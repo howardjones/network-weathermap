@@ -78,6 +78,7 @@ function attach_click_events() {
     jQuery("area[id^='LINK:']").attr("href", "#").click(click_handler);
     jQuery("area[id^='NODE:']").attr("href", "#").click(click_handler);
     jQuery("area[id^='TIMES']").attr("href", "#").click(position_timestamp);
+    jQuery("area[id^='TITLE']").attr("href", "#").click(position_title);
     jQuery("area[id^='LEGEN']").attr("href", "#").click(position_legend);
 
     if (fromplug === 1) {
@@ -396,6 +397,12 @@ function map_style() {
 function position_timestamp() {
     document.getElementById('tb_help').innerText = 'Click on the map where you would like to put the timestamp.';
     document.getElementById('action').value = "place_stamp";
+    mapmode('xy');
+}
+
+function position_title() {
+    document.getElementById('tb_help').innerText = 'Click on the map where you would like to put the title.';
+    document.getElementById('action').value = "place_title";
     mapmode('xy');
 }
 

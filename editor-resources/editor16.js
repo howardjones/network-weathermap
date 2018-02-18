@@ -58,6 +58,9 @@ function update_map_style(properties) {
 }
 
 function update_imagelists(images) {
+    var newitem = jQuery("<option />").attr("value", "--NONE--").text("--NONE--");
+    jQuery(".imlist").append(newitem);
+
     jQuery.each(images, function (index, value) {
         // slot in the list of images in:
         //    node icon selectbox

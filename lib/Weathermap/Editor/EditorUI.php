@@ -168,6 +168,15 @@ class EditorUI extends UIBase
             "working" => true,
             "handler" => "cmdMoveTimestamp"
         ),
+        "place_title" => array(
+            "args" => array(
+                array("mapname", "mapfile"),
+                array("x", "int"),
+                array("y", "int"),
+            ),
+            "working" => true,
+            "handler" => "cmdMoveTitle"
+        ),
         "via_link" => array(
             "args" => array(
                 array("mapname", "mapfile"),
@@ -293,11 +302,23 @@ class EditorUI extends UIBase
                 array('mapstyle_legendfont', 'int'),
                 array('mapstyle_htmlstyle', 'string'),
             ),
+            "working" => true,
             "handler" => "cmdMapStyle"
         ),
         "set_map_properties" => array(
             "args" => array(
                 array("mapname", "mapfile"),
+                array("map_title", "string"),
+                array("map_legend", "string"),
+                array("map_width", "int"),
+                array("map_height", "int"),
+                array("map_stamp", "string"),
+                array("map_bgfile", "string"),
+                array("map_pngfile", "string"),
+                array("map_htmlfile", "string"),
+                array("map_linkdefaultwidth", "float"),
+                array("map_linkdefaultbwin", "string"),
+                array("map_linkdefaultbwout", "string"),
             ),
             "handler" => "cmdMapProperties"
         ),
@@ -675,11 +696,29 @@ class EditorUI extends UIBase
     public function cmdMapProperties($params, $editor)
     {
         // TODO: this is empty!!
+        $update = array(
+            "title" => $params["map_title"],
+            "legend" => $params["map_legend"],
+            "width" => $params["map_width"],
+            "height" => $params["map_height"],
+            "stamp" => $params["map_stamp"],
+            "bgfile" => ($params["map_bgfile"] == '--NONE--' ? '' : $params["map_bgfile"]),
+            "pngfile" => $params["map_pngfile"],
+            "htmlfile" => $params["map_htmlfile"],
+            "linkdefaultwidth" => $params["map_linkdefaultwidth"],
+            "linkdefaultbwin" => $params["map_linkdefaultbwin"],
+            "linkdefaultbwout" => $params["map_linkdefaultbwout"],
+        );
+
+        // TODO Sanitization
+
+        $editor->updateMapProperties($update);
     }
 
     /**
      * @param string[] $params
      * @param Editor $editor
+     * @throws WeathermapInternalFail
      */
     public function cmdMapStyle($params, $editor)
     {
@@ -831,6 +870,14 @@ class EditorUI extends UIBase
         $y = $this->snap($params['y']);
 
         $editor->placeTimestamp($x, $y);
+    }
+
+    public function cmdMoveTitle($params, $editor)
+    {
+        $x = $this->snap($params['x']);
+        $y = $this->snap($params['y']);
+
+        $editor->placeTitle($x, $y);
     }
 
     // Labels for Nodes, Links and Scales shouldn't have spaces in
@@ -1123,7 +1170,7 @@ class EditorUI extends UIBase
             "link_defaultbwout" => $editor->map->links['DEFAULT']->maxValuesConfigured[OUT],
             "map_pngfile" => $editor->map->imageoutputfile,
             "map_htmlfile" => $editor->map->htmloutputfile,
-            "map_bgfile" => $editor->map->background,
+            "map_bgfile" => ($editor->map->background == '' ? '--NONE--' : $editor->map->background),
             "title" => $editor->map->title
         );
         $tpl->set("global", json_encode($globalData, JSON_PRETTY_PRINT));

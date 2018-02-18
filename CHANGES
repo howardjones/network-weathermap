@@ -8,7 +8,8 @@ and makes using current development tools (like phpunit) more difficult.
 
 1.0.0
     Special thanks to arjanoosting, YATV and hawson for code contributions on github, and especially
-    Martin (malgoe) for working on Vagrant and documentation to enable other contributors!
+    Martin (malgoe) for working on Vagrant and documentation to enable other contributors, and netniV
+    for development support.
 
     CHANGE - Various performance improvements (thanks to ikorzha758 for lots of feedback back in 2014)
              For my test case, I got from 2.5 seconds to 0.6 seconds to render a set of maps - 5x speedup!

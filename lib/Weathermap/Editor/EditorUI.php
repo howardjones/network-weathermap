@@ -36,7 +36,7 @@ class EditorUI extends UIBase
     private $param2 = "";
     private $mapDirectory = "configs";
 
-    private $useOverlay = false;
+    private $useOverlayVIA = false;
     private $useOverlayRelative = false;
     private $gridSnapValue = 0;
 
@@ -325,8 +325,12 @@ class EditorUI extends UIBase
         "editor_settings" => array(
             "args" => array(
                 array("mapname", "mapfile"),
+                array('editorsettings_showvias', 'int'),
+                array('editorsettings_showrelative', 'int'),
+                array('editorsettings_gridsnap', 'int'),
             ),
-            "handler" => "cmdEditorSettings"
+            "handler" => "cmdEditorSettings",
+            "working" => true,
         ),
         "nothing" => array(
             "args" => array(
@@ -350,7 +354,7 @@ class EditorUI extends UIBase
             $parts = explode(":", $_COOKIE[$cookieName]);
 
             if ((isset($parts[0])) && (intval($parts[0]) == 1)) {
-                $this->useOverlay = true;
+                $this->useOverlayVIA = true;
             }
             if ((isset($parts[1])) && (intval($parts[1]) == 1)) {
                 $this->useOverlayRelative = true;
@@ -421,7 +425,7 @@ class EditorUI extends UIBase
             }
         }
 
-        $editor->map->drawMap('', '', 250, true, false, false);
+        $editor->map->drawMap('', '', 250, true, $this->useOverlayVIA, $this->useOverlayRelative);
 
         return false;
     }
@@ -740,7 +744,9 @@ class EditorUI extends UIBase
      */
     public function cmdEditorSettings($params, $editor)
     {
-        // TODO: this is empty!!
+        $this->useOverlayVIA = $params['editorsettings_showvias'] == 1 ? true : false;
+        $this->useOverlayRelative = $params['editorsettings_showrelative'] == 1 ? true : false;
+        $this->gridSnapValue = intval($params['editorsettings_gridsnap']);
     }
 
 
@@ -929,10 +935,49 @@ class EditorUI extends UIBase
         return $this->foundHost;
     }
 
-    public function main($request, $fromPlugin = false)
+    public function extractSettingsCookie($cookies)
+    {
+        // these are all set via the Editor Settings dialog, in the editor, now.
+
+        $this->useOverlayVIA = false; // set to TRUE to enable experimental overlay showing VIAs
+        $this->useOverlayRelative = false; // set to TRUE to enable experimental overlay showing relative-positioning
+        $this->gridSnapValue = 0; // set non-zero to snap to a grid of that spacing
+
+        if (isset($cookies['wmeditor'])) {
+            $parts = explode(":", $cookies['wmeditor']);
+
+            if ((isset($parts[0])) && (intval($parts[0]) == 1)) {
+                $this->useOverlayVIA = true;
+            }
+
+            if ((isset($parts[1])) && (intval($parts[1]) == 1)) {
+                $this->useOverlayRelative = true;
+            }
+
+            if ((isset($parts[2])) && (intval($parts[2]) != 0)) {
+                $this->gridSnapValue = intval($parts[2]);
+            }
+        }
+    }
+
+    public function createSettingsCookie()
+    {
+        $value = "";
+        $value .= ($this->useOverlayVIA ? "1" : "0");
+        $value .= ":";
+        $value .= ($this->useOverlayRelative ? "1" : "0");
+        $value .= ":";
+        $value .= intval($this->gridSnapValue);
+
+        setcookie("wmeditor", $value, time() + 60 * 60 * 24 * 30);
+    }
+
+    public function main($request, $cookies, $fromPlugin = false)
     {
         $mapFileName = "";
         $action = "";
+
+        $this->extractSettingsCookie($cookies);
 
         if (isset($request['action'])) {
             $action = strtolower(trim($request['action']));
@@ -1128,7 +1173,13 @@ class EditorUI extends UIBase
         $tpl->set("imagemap", $editor->map->generateSortedImagemap("weathermap_imap"));
         $tpl->set("map_json", $editor->map->asJS());
 
-        $tpl->set("editor_settings", "var editor_settings = {};\n");
+        $editor_settings = array(
+            'via_overlay' => $this->useOverlayVIA ? "1" : "0",
+            'rel_overlay' => $this->useOverlayRelative ? "1" : "0",
+            'grid_snap' => $this->gridSnapValue
+        );
+
+        $tpl->set("editor_settings", "var editor_settings = " . json_encode($editor_settings) . ";\n");
 
         $tpl->set("map_width", $editor->map->width);
         $tpl->set("map_height", $editor->map->height);
@@ -1175,6 +1226,8 @@ class EditorUI extends UIBase
         );
         $tpl->set("global", json_encode($globalData, JSON_PRETTY_PRINT));
         $tpl->set("global2", $editor->map->getJSONConfig());
+
+        $this->createSettingsCookie();
 
         echo $tpl->fetch("editor-resources/templates/main-oldstyle.php");
     }

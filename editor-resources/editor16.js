@@ -70,12 +70,22 @@ function update_imagelists(images) {
     });
 }
 
+function update_editor_settings(properties) {
+    var mapping = {
+        'editorsettings_showvias': 'via_overlay',
+        'editorsettings_showrelative': 'rel_overlay',
+        'editorsettings_gridsnap': 'grid_snap'
+    };
+    update_form_fields(mapping, properties);
+}
+
 function initJS16() {
 
     update_imagelists(imlist);
     update_fontlist(fontlist);
     update_map_properties(global_settings);
     update_map_style(global_settings);
+    update_editor_settings(editor_settings);
 
     // TODO: set the selected settings for each font in mapstyle
     // mapstyle_linklabels

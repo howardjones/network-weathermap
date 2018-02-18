@@ -35,4 +35,4 @@ $ui->moduleChecks();
 
 chdir(dirname(__FILE__));
 
-$ui->main($_REQUEST, $cameFromHost);
+$ui->main($_REQUEST, $_COOKIE, $cameFromHost);

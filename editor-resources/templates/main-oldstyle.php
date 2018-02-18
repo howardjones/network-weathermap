@@ -544,7 +544,7 @@
                 <tr>
                     <th>Snap To Grid</th>
                     <td><select id="editorsettings_gridsnap" name="editorsettings_gridsnap">
-                            <option value="NO">No</option>
+                            <option value="0">No</option>
                             <option value="5">5 pixels</option>
                             <option value="10">10 pixels</option>
                             <option value="15">15 pixels</option>

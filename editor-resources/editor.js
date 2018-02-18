@@ -120,7 +120,7 @@ function attach_click_events() {
     jQuery('.wm_submit').click(do_submit);
     jQuery('.wm_cancel').click(cancel_op);
 
-    jQuery('#link_cactipick').click(cactipicker).attr("href", "#");
+    jQuery('#link_cactipick').click(linkcactipicker).attr("href", "#");
     jQuery('#node_cactipick').click(nodecactipicker).attr("href", "#");
 
     jQuery('#xycapture').mousemove(coord_update).mouseout(coord_release);
@@ -250,7 +250,10 @@ function do_submit() {
     document.frmMain.submit();
 }
 
-function openpicker(url) {
+function openPickerWindow(url) {
+
+    // TODO - something to save the previous position of the picker in a cookie
+
     // make sure it isn't already opened
     if (!newWindow || newWindow.closed) {
         newWindow = window.open("", "cactipicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
@@ -264,12 +267,22 @@ function openpicker(url) {
     newWindow.location = url;
 }
 
-function cactipicker() {
-    openpicker("cacti-pick.php?action=link_step1");
+function linkcactipicker() {
+    var target = encodeURI(
+        "Link: " + document.getElementById('link_name').value
+        + " ("
+        + document.getElementById('link_nodename1').innerText
+        + ' to '
+        + document.getElementById('link_nodename2').innerText
+        + ")"
+    );
+
+    openPickerWindow("cacti-pick.php?action=link_step1&target=" + target);
 }
 
 function nodecactipicker() {
-    openpicker("cacti-pick.php?action=node_step1");
+    var target = encodeURI("Node: " + document.getElementById('node_name').value);
+    openPickerWindow("cacti-pick.php?action=node_step1&target=" + target);
 }
 
 function show_context_help(itemid, targetid) {

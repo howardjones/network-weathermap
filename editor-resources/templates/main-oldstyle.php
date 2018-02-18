@@ -83,7 +83,7 @@
     <div id="dlgNodeProperties" class="dlgProperties">
         <div class="dlgTitlebar">
             Node Properties
-            <input size="6" name="node_name" type="hidden"/>
+            <input size="6" name="node_name" id="node_name" type="hidden"/>
             <ul>
                 <li><a id="tb_node_submit" class="wm_submit" title="Submit any changes made">Submit</a></li>
                 <li><a id="tb_node_cancel" class="wm_cancel" title="Cancel any changes">Cancel</a></li>
@@ -168,7 +168,7 @@
                 Link from '<span id="link_nodename1">%NODE1%</span>' to '<span id="link_nodename2">%NODE2%</span>'
             </div>
 
-            <input size="6" name="link_name" type="hidden"/>
+            <input size="6" name="link_name" id="link_name" type="hidden"/>
 
             <table width="100%">
                 <tr>

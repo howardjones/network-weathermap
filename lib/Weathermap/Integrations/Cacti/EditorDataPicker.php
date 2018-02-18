@@ -22,7 +22,8 @@ class EditorDataPicker extends UIBase
             "args" => array(
                 array("host_id", "int", true),
                 array("aggregate", "int", true),
-                array("overlib", "int", true)
+                array("overlib", "int", true),
+                array("target", "string", true)
             ),
             "handler" => "handleLinkStep1"
         ),
@@ -37,7 +38,8 @@ class EditorDataPicker extends UIBase
             "args" => array(
                 array("host_id", "int", true),
                 array("aggregate", "int", true),
-                array("overlib", "int", true)
+                array("overlib", "int", true),
+                array("target", "string", true)
             ),
             "handler" => "handleNodeStep1"
         )
@@ -93,13 +95,14 @@ class EditorDataPicker extends UIBase
 
         $tpl = new SimpleTemplate();
         $tpl->set("title", "Pick a graph");
+        $tpl->set("target", htmlspecialchars($request['target'], ENT_QUOTES, 'UTF-8'));
         $tpl->set("hosts", $hosts);
         $tpl->set("sources", $sources);
         $tpl->set("overlib", ($overlib ? 1 : 0));
         $tpl->set("selected_host", $hostId);
         $tpl->set("aggregate", ($aggregate ? 1 : 0));
-        $tpl->set("base_url", jsEscape(isset($config['base_url']) ? $config['base_url'] : ''));
-        $tpl->set("rra_path", jsEscape($config['rra_path']));
+        $tpl->set("base_url", json_encode(isset($config['base_url']) ? $config['base_url'] : ''));
+        $tpl->set("rra_path", json_encode($config['rra_path']));
 
         echo $tpl->fetch("editor-resources/templates/picker-graph.php");
     }
@@ -141,14 +144,15 @@ class EditorDataPicker extends UIBase
 
         $tpl = new SimpleTemplate();
         $tpl->set("title", "Pick a data source");
+        $tpl->set("target", htmlspecialchars($request['target'], ENT_QUOTES, 'UTF-8'));
         $tpl->set("selected_host", $hostID);
         $tpl->set("hosts", $hosts);
         $tpl->set("recents", self::getRecentHosts());
         $tpl->set("sources", $sources);
         $tpl->set("overlib", ($overlib ? 1 : 0));
         $tpl->set("aggregate", ($aggregate ? 1 : 0));
-        $tpl->set("base_url", jsEscape(isset($config['base_url']) ? $config['base_url'] : ''));
-        $tpl->set("rra_path", jsEscape($config['rra_path']));
+        $tpl->set("base_url", json_encode(isset($config['base_url']) ? $config['base_url'] : ''));
+        $tpl->set("rra_path", json_encode($config['rra_path']));
 
         echo $tpl->fetch("editor-resources/templates/picker-data.php");
     }
@@ -167,7 +171,7 @@ class EditorDataPicker extends UIBase
 
         $tpl = new SimpleTemplate();
         $tpl->set("graphId", $graphId);
-        $tpl->set("base_url", jsEscape(isset($config['base_url']) ? $config['base_url'] : ''));
+        $tpl->set("base_url", json_encode(isset($config['base_url']) ? $config['base_url'] : ''));
 
         echo $tpl->fetch("editor-resources/templates/picker-update.php");
     }
@@ -253,14 +257,3 @@ class EditorDataPicker extends UIBase
     }
 
 }
-
-function jsEscape($str)
-{
-    $str = str_replace('\\', '\\\\', $str);
-    $str = str_replace("'", "\\'", $str);
-
-    $str = "'" . $str . "'";
-
-    return $str;
-}
-

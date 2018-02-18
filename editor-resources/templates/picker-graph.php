@@ -32,6 +32,7 @@
 <body class="graph-picker">
 
 <h3><?php echo $title ?></h3>
+<h4><?php echo $target ?></h4>
 
 <form name="mini">
     Host: <select id="host_id" name="host_id">

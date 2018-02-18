@@ -51,7 +51,6 @@ function update_map_style(properties) {
         'mapstyle_legendfont': 'legendfont',
         'mapstyle_linkfont': 'linkfont',
         'mapstyle_nodefont': 'nodefont'
-
     };
 
     update_form_fields(mapping, properties);

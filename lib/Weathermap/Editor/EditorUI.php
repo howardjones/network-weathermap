@@ -25,6 +25,8 @@ class EditorUI extends UIBase
     private $mapFileName;
     private $mapShortName;
 
+
+
     private $fromPlugin;
     private $foundHost = false;
     private $cactiBase = "../..";
@@ -39,6 +41,8 @@ class EditorUI extends UIBase
     private $useOverlayVIA = false;
     private $useOverlayRelative = false;
     private $gridSnapValue = 0;
+
+    private $minBGImageSize = 80;
 
     // All the valid commands, and their expected parameters, so we can centralise the validation
     public $commands = array(
@@ -312,8 +316,8 @@ class EditorUI extends UIBase
                 array("map_pngfile", "string"),
                 array("map_htmlfile", "string"),
                 array("map_linkdefaultwidth", "float"),
-                array("map_linkdefaultbwin", "string"),
-                array("map_linkdefaultbwout", "string"),
+                array("map_linkdefaultbwin", "bandwidth"),
+                array("map_linkdefaultbwout", "bandwidth"),
             ),
             "handler" => "cmdMapProperties"
         ),
@@ -339,25 +343,7 @@ class EditorUI extends UIBase
 
     public function __construct()
     {
-        $this->unpackCookie();
         $this->editor = new Editor();
-    }
-
-    public function unpackCookie($cookieName = "wmeditor")
-    {
-        if (isset($_COOKIE[$cookieName])) {
-            $parts = explode(":", $_COOKIE[$cookieName]);
-
-            if ((isset($parts[0])) && (intval($parts[0]) == 1)) {
-                $this->useOverlayVIA = true;
-            }
-            if ((isset($parts[1])) && (intval($parts[1]) == 1)) {
-                $this->useOverlayRelative = true;
-            }
-            if ((isset($parts[2])) && (intval($parts[2]) != 0)) {
-                $this->gridSnapValue = intval($parts[2]);
-            }
-        }
     }
 
     /**
@@ -410,8 +396,6 @@ class EditorUI extends UIBase
          * random addition so that it only matches between multiple URLs on the same page.
          */
         $editor->loadConfig($this->mapFileName);
-
-        // TODO - add in checks for overlays
 
         if (isset($params['selected']) && substr($params['selected'], 0, 5) == 'NODE:') {
             $nodename = substr($params['selected'], 5);
@@ -708,7 +692,6 @@ class EditorUI extends UIBase
             "linkdefaultbwout" => $params["map_linkdefaultbwout"],
         );
 
-        // TODO Sanitization
 
         $editor->updateMapProperties($update);
     }
@@ -1187,6 +1170,7 @@ class EditorUI extends UIBase
         $tpl->set("nodeselection", $this->makeNodeSelector($editor->map));
 
         $imageList = $this->getAvailableImages("images", $editor->map);
+
         $imagesJSON = "\nvar imlist = " . json_encode($imageList) . ";\n";
         $tpl->set("images_json", $imagesJSON);
 
@@ -1264,7 +1248,12 @@ class EditorUI extends UIBase
                     $uri = $imageDirectory . "/" . $file;
 
                     if (is_readable($realFile) && (preg_match('/\.(gif|jpg|png)$/i', $file))) {
-                        $imageList[] = $uri;
+                        $size = getimagesize($realFile);
+                        $bg = false;
+                        if ($size[0] > $this->minBGImageSize && $size[1] > $this->minBGImageSize) {
+                            $bg = true;
+                        }
+                        $imageList[] = array($uri, $bg);
                     }
                 }
 
@@ -1274,7 +1263,14 @@ class EditorUI extends UIBase
 
         foreach ($map->usedImages as $im) {
             if (!in_array($im, $imageList)) {
-                $imageList[] = $im;
+                $bg = false;
+                if (file_exists($im)) {
+                    $size = getimagesize($im);
+                    if ($size[0] > $this->minBGImageSize && $size[1] > $this->minBGImageSize) {
+                        $bg = true;
+                    }
+                }
+                $imageList[] = array($im, $bg);
             }
         }
         sort($imageList);

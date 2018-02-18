@@ -329,7 +329,7 @@
                 </tr>
                 <tr>
                     <th>Background Image Filename</th>
-                    <td><select id="map_bgfile" name="map_bgfile" class="imlist"></select></td>
+                    <td><select id="map_bgfile" name="map_bgfile" class="bgimlist"></select></td>
                 </tr>
 
             </table>

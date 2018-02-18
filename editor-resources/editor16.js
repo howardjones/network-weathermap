@@ -59,13 +59,17 @@ function update_map_style(properties) {
 function update_imagelists(images) {
     var newitem = jQuery("<option />").attr("value", "--NONE--").text("--NONE--");
     jQuery(".imlist").append(newitem);
+    jQuery(".bgimlist").append(newitem);
 
     jQuery.each(images, function (index, value) {
         // slot in the list of images in:
         //    node icon selectbox
         //    map background image
-        var newitem = jQuery("<option />").attr("value", value).text(value);
+        var newitem = jQuery("<option />").attr("value", value[0]).text(value[0]);
         jQuery(".imlist").append(newitem);
+        if (value[1]) {
+            jQuery(".bgimlist").append(newitem);
+        }
     });
 }
 
@@ -85,13 +89,4 @@ function initJS16() {
     update_map_properties(global_settings);
     update_map_style(global_settings);
     update_editor_settings(editor_settings);
-
-    // TODO: set the selected settings for each font in mapstyle
-    // mapstyle_linklabels
-    // mapstyle_htmlstyle
-    // mapstyle_arrowstyle
-    // mapstyle_nodefont
-    // mapstyle_linkfont
-    // mapstyle_legendfont
-
 }

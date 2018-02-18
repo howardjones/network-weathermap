@@ -1872,6 +1872,20 @@ class Map extends MapBase
         return true;
     }
 
+    public function updateUsedImages()
+    {
+        if ($this->background != "") {
+            $this->usedImages [] = $this->background;
+        }
+
+        foreach ($this->getRealNodes() as $nodename) {
+            $node = $this->getNode($nodename);
+            if ($node->iconfile != "" && ! $node->hasArtificialIcon()) {
+                $this->usedImages [] = $node->iconfile;
+            }
+        }
+
+    }
 
 }
 // vim:ts=4:sw=4:

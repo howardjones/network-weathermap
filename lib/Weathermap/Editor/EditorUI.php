@@ -26,7 +26,6 @@ class EditorUI extends UIBase
     private $mapShortName;
 
 
-
     private $fromPlugin;
     private $foundHost = false;
     private $cactiBase = "../..";
@@ -1235,6 +1234,11 @@ class EditorUI extends UIBase
         return $this->fromPlugin;
     }
 
+    /**
+     * @param string $imageDirectory
+     * @param Map $map
+     * @return array
+     */
     public function getAvailableImages($imageDirectory, $map)
     {
         $imageList = array();
@@ -1261,15 +1265,15 @@ class EditorUI extends UIBase
             }
         }
 
+        $map->updateUsedImages();
+
         foreach ($map->usedImages as $im) {
             if (!in_array($im, $imageList)) {
                 $bg = false;
-                if (file_exists($im)) {
-                    $size = getimagesize($im);
-                    if ($size[0] > $this->minBGImageSize && $size[1] > $this->minBGImageSize) {
-                        $bg = true;
-                    }
+                if ($map->background == $im) {
+                    $bg = true;
                 }
+
                 $imageList[] = array($im, $bg);
             }
         }

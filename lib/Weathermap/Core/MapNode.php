@@ -153,6 +153,15 @@ class MapNode extends MapDataItem
         return 'NODE';
     }
 
+    public function hasArtificialIcon()
+    {
+        if ($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink') {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * @param resource $imageRef
      * @param Map $map
@@ -277,7 +286,7 @@ class MapNode extends MapDataItem
             $iconWidth = 0;
             $iconHeight = 0;
 
-            if ($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink') {
+            if ($this->hasArtificialIcon()) {
                 $iconImageRef = $this->drawArtificialIcon($map, $labelColour);
             } else {
                 $iconImageRef = $this->drawRealIcon($map, $iconColour);
@@ -612,7 +621,7 @@ class MapNode extends MapDataItem
             "iconfile" => $this->iconfile
         );
 
-        if (preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/', $this->iconfile)) {
+        if ($this->hasArtificialIcon() || $this->iconfile == 'none') {
             $newOutput['iconfile'] = '::' . $this->iconfile;
         }
 

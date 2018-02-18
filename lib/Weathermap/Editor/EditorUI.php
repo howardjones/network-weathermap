@@ -318,7 +318,8 @@ class EditorUI extends UIBase
                 array("map_linkdefaultbwin", "bandwidth"),
                 array("map_linkdefaultbwout", "bandwidth"),
             ),
-            "handler" => "cmdMapProperties"
+            "handler" => "cmdMapProperties",
+            "working" => true
         ),
         "editor_settings" => array(
             "args" => array(
@@ -1179,7 +1180,11 @@ class EditorUI extends UIBase
                 $todo .= "$cmdname ";
             }
         }
-        $tpl->set('internal', "Remaining to fix: " . $todo);
+        if ($todo != "") {
+            $todo = "Remaining to fix: " . $todo;
+        }
+
+        $tpl->set('internal', $todo);
 
         $fonts = $editor->map->fonts->getList();
         ksort($fonts);

@@ -42,6 +42,7 @@ Dependencies are managed with bower. If you have never used it before, you will 
 * Install bower: `npm install -g bower`
 * Install [composer](https://getcomposer.org/)
 * Go to the weathermap checkout directory
+* Make sure that directory is called `weathermap` and not `network-weathermap` (which git will default to) or Cacti will not recognise it properly.
 * `bower install` should install all the necessary javascript dependencies to the vendor/ directory.
 * `composer update` will grab the PHP dependencies for both the runtime and testing environments
 The release process collects up these files and puts them in the zip file, via the packing.list file(s). You only need to do this if you are working with the current development code.
@@ -55,9 +56,9 @@ The release process collects up these files and puts them in the zip file, via t
 
 * Move to React for Cacti UI, with only JSON/API type stuff in the PHP code
 
-* Update Editor to use same UI classes as Cacti (input validation, one method per 'command', testability)
+* ~~Update Editor to use same UI classes as Cacti (input validation, one method per 'command', testability)~~
 
-* Update Editor Data Picker to use same UI classes as Cacti (input validation, one method per 'command', testability)
+* ~~Update Editor Data Picker to use same UI classes as Cacti (input validation, one method per 'command', testability)~~
 
 * Break down 'monster methods' into simpler ones. Identify groups within the larger classes for refactoring (e.g. plugin-related stuff in Map)
 

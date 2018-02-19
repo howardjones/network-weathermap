@@ -4,6 +4,7 @@
 /*global base_url:false */
 /*global overlib:false */
 /*global aggregate:false */
+
 /*global selected_host:false */
 
 function getUrlParameter(sParam) {
@@ -21,24 +22,32 @@ function getUrlParameter(sParam) {
     }
 }
 
+function buildUrl(url, parameters) {
+    var qs = "";
+    for (var key in parameters) {
+        if (parameters.hasOwnProperty(key)) {
+            var value = parameters[key];
+            qs += encodeURIComponent(key) + "=" + encodeURIComponent(value) + "&";
+        }
+    }
+    if (qs.length > 0) {
+        qs = qs.substring(0, qs.length - 1); //chop off last "&"
+        url = url + "?" + qs;
+    }
+    return url;
+}
+
 function applyDSFilterChange(objForm) {
-    var strURL = '?host_id=' + objForm.host_id.value;
 
-    // This changes!
-    strURL = strURL + '&action=' + getUrlParameter('action');
+    var params = {
+        'host_id': objForm.host_id.value,
+        'action': getUrlParameter('action'),
+        'target': getUrlParameter('target'),
+        'overlib': objForm.overlib.checked ? 1 : 0,
+        'aggregate': objForm.aggregate.checked ? 1 : 0
+    };
 
-    if (objForm.overlib.checked) {
-        strURL = strURL + "&overlib=1";
-    } else {
-        strURL = strURL + "&overlib=0";
-    }
-
-    if (objForm.aggregate.checked) {
-        strURL = strURL + "&aggregate=1";
-    } else {
-        strURL = strURL + "&aggregate=0";
-    }
-    document.location = strURL;
+    document.location = buildUrl("", params);
 }
 
 function update_source_link_step2(graphid) {
@@ -61,6 +70,10 @@ function dataSelected(event) {
     var path = $(this).data("path");
 
     var fullpath = path.replace(/<path_rra>/, rra_path);
+
+    if (document.mini.dsstats.checked) {
+        fullpath = "8*dsstats:" + data_id + ":traffic_in:traffic_out";
+    }
 
     console.log(fullpath);
 
@@ -110,15 +123,17 @@ $(document).ready(function () {
     });
 
     $("body.data-picker span.ds_includegraph").show();
-    $("body.data-picker span.aggregate").show();
+    $("body.data-picker span.aggregate_choice").show();
     $("body.data-picker span.ds_dsstats").show();
 
-    if (aggregate) {
+    if (aggregate == 1) {
         // TODO: Check what this did before!
+        document.mini.aggregate.checked = (aggregate == 1 ? true : false);
     }
 
-    if (overlib) {
+    if (overlib == 1) {
         // TODO: Check what this did before!
+        document.mini.overlib.checked = (overlib == 1 ? true : false);
     }
 
     if (selected_host >= 0) {

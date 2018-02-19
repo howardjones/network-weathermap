@@ -40,7 +40,6 @@ if (isset($config['cacti_version'])) {
     }
 }
 
-$pdo = weathermap_get_pdo();
-
 $ui = new EditorDataPicker();
+$ui->pdo = weathermap_get_pdo();
 $ui->main($_REQUEST);

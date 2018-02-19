@@ -12,9 +12,9 @@
         var overlib = <?php echo $overlib ?>;
         var selected_host = <?php echo $selected_host ?>;
 
-        $(document).ready(function() {
-            $("select#host_id").val(<?php echo $selected_host ?>);
-        });
+        //$(document).ready(function() {
+        //    $("select#host_id").val(<?php //echo $selected_host ?>//);
+        //});
     </script>
 
     <style type="text/css">
@@ -43,8 +43,8 @@
         <?php endforeach ?>
     </select><br />
     <span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"> (case-sensitive)<br /></span>
-    <span class="ds_includegraph" style="display: none;"><input id="overlib" name="overlib" type="checkbox" value="yes"> <label for="overlib">Set both OVERLIBGRAPH and INFOURL.</label><br /></span>
-    <span class="aggregate_choice"  style="display: none;"><input id="aggregate" name="aggregate" type="checkbox" value="yes"> <label for="aggregate">Append TARGET to existing one (Aggregate)</label></span>
+    <span class="ds_includegraph" style="display: none;"><input id="overlib" name="overlib" type="checkbox" value="1"> <label for="overlib">Set both OVERLIBGRAPH and INFOURL.</label><br /></span>
+    <span class="aggregate_choice"  style="display: none;"><input id="aggregate" name="aggregate" type="checkbox" value="1"> <label for="aggregate">Append TARGET to existing one (Aggregate)</label></span>
 </form>
 <div class="listcontainer">
     <ul id="dslist">

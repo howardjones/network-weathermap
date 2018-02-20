@@ -1,28 +1,51 @@
-.App {
-  text-align: center;
+.wm-actionbar {
+    padding: 3px;
+    background: lightgray;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.wm-actionbar button {
+    margin-right: 5px;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.wm-footer {
+    padding: 3px;
+    background: lightgray;
+    border-top: solid 1px darkgray;
 }
 
-.App-title {
-  font-size: 1.5em;
+.wm-footer-element {
+    margin-right: 6px;
+    border-right: 1px solid gray;
+    padding-right: 6px;
 }
 
-.App-intro {
-  font-size: large;
+.wm-picker tr {
+    border-bottom: 1px solid lightgray;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.wm-picker {
+    margin: 3px;
+}
+
+.wm-picker td {
+    padding: 3px;
+}
+
+.wm-popup {
+    position: absolute;
+    left: 130px;
+    top: 130px;
+    z-index: 1000;
+    width: 600px;
+    background: white;
+}
+
+.wm-picker-container {
+    padding: 20px;
+    border: 2px solid green;
+}
+
+.wm-map-properties-container {
+    padding: 20px;
+    border: 2px solid blue;
 }

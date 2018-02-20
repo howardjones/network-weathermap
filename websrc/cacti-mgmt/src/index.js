@@ -20,6 +20,8 @@ import translations from './translations';
 import reducers from './reducers';
 
 import {HashRouter as Router, Route} from 'react-router-dom'
+import FileSelector from "./components/FileSelector";
+import MapProperties from "./components/MapProperties";
 
 const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
 const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
@@ -36,6 +38,8 @@ const AppRoutes = () => (
                        <App {...routeProps} {...(wm_root.dataset)} />
                    )}
             />
+            <Route exact path="/add-map-picker" component={FileSelector} />
+            <Route exact path="/map/:id/properties" component={MapProperties} />
         </div>
     </Router>
 );

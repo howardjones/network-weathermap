@@ -102,15 +102,6 @@ function weathermap_config_arrays()
 {
     global $menu;
 
-    api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin.php', __('Weathermap: View', 'weathermap'), 1);
-    api_plugin_register_realm(
-        'weathermap',
-        'weathermap-cacti10-plugin-mgmt.php',
-        __('Weathermap: Configure/Manage', 'weathermap'),
-        1
-    );
-    api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-editor.php', __('Weathermap: Edit Maps', 'weathermap'), 1);
-
     $wm_menu = array(
         'plugins/weathermap/weathermap-cacti10-plugin-mgmt.php' => __('Weathermaps', 'weathermap'),
         'plugins/weathermap/weathermap-cacti10-plugin-mgmt-groups.php' => __('Groups', 'weathermap')

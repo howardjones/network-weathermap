@@ -51,6 +51,10 @@ function plugin_weathermap_install()
     \api_plugin_register_hook('weathermap', 'poller_output', 'weathermap_poller_output', 'setup10.php');
     \api_plugin_register_hook('weathermap', 'poller_bottom', 'weathermap_poller_bottom', 'setup10.php');
 
+    \api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin.php', __('Weathermap: View', 'weathermap'), 1);
+    \api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-mgmt.php', __('Weathermap: Configure/Manage', 'weathermap'), 1);
+    \api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-editor.php', __('Weathermap: Edit Maps', 'weathermap'), 1);
+
     weathermap_setup_table();
 }
 

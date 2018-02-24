@@ -1,4 +1,21 @@
 const translations = {
+    'en': {
+        'title': 'Title',
+        'group': 'Group',
+        'enabled': 'Enabled',
+        'debugging': 'Debugging',
+        'schedule': 'Schedule',
+        'archiving': 'Archiving',
+        'config_file': 'Config File',
+        'last_ran': 'Last Run',
+        'once': 'once',
+        'off': 'off',
+        'on': 'on',
+        'always': 'always',
+        'never': 'never',
+        'access': 'Access',
+        'no_maps': 'No maps in this group'
+    },
     'fr': {
         'title': 'Titre',
         'group': 'Groupe',

@@ -58,7 +58,11 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
         // get the locale from host app
         $locale = $this->manager->application->getLocale();
         print "<h3>This is the React UI below here</h3>";
-        print '<style src="cacti-resources/mgmt/main.css"></style>';
+        print '<style>@import "cacti-resources/mgmt/main.css";</style>';
+        print "<h3>Testing API</h3>";
+        print '<a href="?action=dumpmaps">Map List</a> - ';
+        print '<a href="?action=settings">Settings</a> - ';
+        print '<a href="?action=mapfiles">Map Files</a>';
         print "<div id='weathermap-mgmt-root' data-locale='" . $locale . "' data-url='" . $this->makeURL(array("action" => "settings")) . "'></div>";
         print '<script type="text/javascript" src="cacti-resources/mgmt/main.js"></script>';
 

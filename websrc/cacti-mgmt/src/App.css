@@ -49,3 +49,21 @@
     padding: 20px;
     border: 2px solid blue;
 }
+
+.wm-group-properties-container {
+    padding: 20px;
+    border: 2px solid blue;
+}
+
+.wm-add-group-container {
+    padding: 20px;
+    border: 2px solid green;
+}
+
+.wm-create-map-container {
+    padding: 20px;
+    border: 2px solid green;
+}
+
+
+.wm-row-selected { background: yellow; }

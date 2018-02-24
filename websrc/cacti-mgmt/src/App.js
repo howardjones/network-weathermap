@@ -19,9 +19,10 @@ class App extends Component {
         return (
             <div>
                 <p>Most styling is temporary!</p>
-                <p>If there are any warnings, they should go here</p>
-                <ActionBar />
-                <MapList maps={this.props.maps} settings={this.props.settings}/>
+                <p>If there are any warnings, they should go here (e.g. file permissions or other global warnings)</p>
+
+                <ActionBar/>
+                <MapList maps={this.props.maps} groups={this.props.groups} settings={this.props.settings}/>
                 <Footer settings={this.props.settings}/>
             </div>
         );

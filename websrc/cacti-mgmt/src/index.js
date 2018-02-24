@@ -22,6 +22,9 @@ import reducers from './reducers';
 import {HashRouter as Router, Route} from 'react-router-dom'
 import FileSelector from "./components/FileSelector";
 import MapProperties from "./components/MapProperties";
+import AddGroup from "./components/AddGroup";
+import CreateMap from "./components/CreateMap";
+import GroupProperties from "./components/GroupProperties";
 
 const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
 const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
@@ -38,8 +41,11 @@ const AppRoutes = () => (
                        <App {...routeProps} {...(wm_root.dataset)} />
                    )}
             />
-            <Route exact path="/add-map-picker" component={FileSelector} />
-            <Route exact path="/map/:id/properties" component={MapProperties} />
+            <Route exact path="/add-map-picker" component={FileSelector}/>
+            <Route exact path="/map/:id/properties" component={MapProperties}/>
+            <Route exact path="/group/:id/properties" component={GroupProperties}/>
+            <Route exact path="/add-group-form" component={AddGroup}/>
+            <Route exact path="/create-map" component={CreateMap}/>
         </div>
     </Router>
 );

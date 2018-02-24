@@ -165,6 +165,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     private function getMapFileList()
     {
         $files = array();
+        $valid_files = array();
 
         $loaded = array();
 
@@ -179,28 +180,34 @@ class WeatherMapCactiManagementPlugin extends UIBase
         if (!is_dir($this->configPath)) {
             return $files;
         }
+
         $dh = opendir($this->configPath);
         if ($dh) {
             while ($file = readdir($dh)) {
-                $realfile = $this->configPath . '/' . $file;
-
                 // skip .-prefixed files like .htaccess, since it seems
                 // that otherwise people will add them as map config files.
                 // and the index.php too - for the same reason
                 if (substr($file, 0, 1) != '.' && $file != 'index.php') {
-                    $used = in_array($file, $loaded);
-                    $flags = array();
-                    if ($used) {
-                        $flags [] = 'USED';
-                    }
-
-                    if (is_file($realfile)) {
-                        $title = $this->manager->extractMapTitle($realfile);
-                        $files [] = array($file, $title, $flags);
-                    }
+                    $valid_files [] = $file;
                 }
             }
             closedir($dh);
+        }
+
+        sort($valid_files);
+
+        foreach ($valid_files as $file) {
+            $realfile = $this->configPath . '/' . $file;
+            $used = in_array($file, $loaded);
+            $flags = array();
+            if ($used) {
+                $flags [] = 'USED';
+            }
+
+            if (is_file($realfile)) {
+                $title = $this->manager->extractMapTitle($realfile);
+                $files [] = array("config" => $file, "title" => $title, "flags" => $flags);
+            }
         }
 
         return $files;
@@ -249,9 +256,16 @@ class WeatherMapCactiManagementPlugin extends UIBase
     ) {
         header('Content-type: application/json');
 
+        $groups = $this->manager->getGroups();
+        $group_assoc = array();
+
+        foreach ($groups as $group) {
+            $group_assoc[$group->id] = $group;
+        }
+
         $data = array(
             'maps' => $this->manager->getMaps(),
-            'groups' => $this->manager->getGroups()
+            'groups' => $group_assoc
         );
 
         print json_encode($data);
@@ -287,7 +301,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         print json_encode($data);
     }
 
-    // ******************************************************
+// ******************************************************
 
 
     public
@@ -560,8 +574,8 @@ class WeatherMapCactiManagementPlugin extends UIBase
     }
 
 
-    // *****************************************************************************************
-    // These ones need overrides (UI stuff)
+// *****************************************************************************************
+// These ones need overrides (UI stuff)
     public
     function handleMapSettingsForm(
         $request,
@@ -817,7 +831,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    // *****************************************************************************************
+// *****************************************************************************************
 
     protected
     function maplistWarnings()

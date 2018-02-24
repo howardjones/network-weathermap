@@ -25,7 +25,6 @@ export default function (state = INITIAL_STATE, action) {
                 console.log("Got undefined settings in SET_SETTINGS");
                 return state;
             }
-            break;
 
         default:
             return state;

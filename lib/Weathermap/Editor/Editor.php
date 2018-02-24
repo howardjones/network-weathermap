@@ -1086,6 +1086,7 @@ class Editor
         $bwin_old = $defaultLink->maxValuesConfigured[IN];
         $bwout_old = $defaultLink->maxValuesConfigured[OUT];
 
+        // TODO - there are two methods doing this job in UIBase
         if (!UIBase::wmeValidateBandwidth($bwout)) {
             $bwout = $bwout_old;
         }

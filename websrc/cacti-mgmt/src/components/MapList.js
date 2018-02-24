@@ -21,6 +21,7 @@ class MapList extends Component {
 
     render() {
 
+
         const map_entries = this.props.maps.map((item, index) => {
             return (<tr key={index}>
                 <td>{item.id}</td>

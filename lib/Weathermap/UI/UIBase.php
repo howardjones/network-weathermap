@@ -267,18 +267,9 @@ class UIBase
 
     private function validateArgBandwidth($value)
     {
-        if ($this->validateArgFloat($value)) {
+        if (preg_match('/^(\d+\.?\d*[KMGT]?)$/', $value)) {
             return true;
         }
-
-        $suffix = substr($value, -1, 1);
-        $remains = substr($value, 0, -1);
-        $possible = array('T', 'G', 'M', 'K', 'm', 'u');
-
-        if (in_array($suffix, $possible) && $this->validateArgFloat($remains)) {
-            return true;
-        }
-
         return false;
     }
 

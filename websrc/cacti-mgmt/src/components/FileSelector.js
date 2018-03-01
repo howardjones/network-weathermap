@@ -113,7 +113,7 @@ class FileSelector extends Component {
             contents = <div>Loading</div>
         }
 
-        return <div className='wm-picker-container  wm-popup'>
+        return <div className='wm-file-selector'>
             {contents}
         </div>
 

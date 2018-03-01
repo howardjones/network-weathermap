@@ -31,15 +31,6 @@
     padding: 3px;
 }
 
-.wm-popup {
-    position: absolute;
-    left: 130px;
-    top: 130px;
-    z-index: 1000;
-    width: 600px;
-    background: white;
-}
-
 .wm-picker-container {
     padding: 20px;
     border: 2px solid green;
@@ -65,5 +56,51 @@
     border: 2px solid green;
 }
 
+.wm-file-selector {
+    padding: 20px;
+    border: 2px solid green;
+}
 
-.wm-row-selected { background: yellow; }
+.wm-row-selected {
+    background: yellow;
+}
+
+.centred_box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+/* added to the body element when shown; prevent scrolling */
+.wm-modal-open {
+    overflow: hidden;
+}
+
+/* container that contains all modals and backdrops */
+.wm-modal-container {
+    position: fixed;
+    z-index: 1000
+}
+
+/* backdrop shown behind each modal */
+.wm-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(0,0,0,0.3)
+}
+
+/* wrapper element for the modal component */
+.wm-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #777;
+}

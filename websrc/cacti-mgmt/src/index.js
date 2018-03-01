@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import 'react-router-modal/css/react-router-modal.css';
+
 import App from './App';
 
 import {applyMiddleware, createStore} from 'redux';
@@ -25,6 +27,7 @@ import MapProperties from "./components/MapProperties";
 import AddGroup from "./components/AddGroup";
 import CreateMap from "./components/CreateMap";
 import GroupProperties from "./components/GroupProperties";
+import {ModalContainer, ModalRoute} from "react-router-modal";
 
 const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
 const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
@@ -41,11 +44,18 @@ const AppRoutes = () => (
                        <App {...routeProps} {...(wm_root.dataset)} />
                    )}
             />
-            <Route exact path="/add-map-picker" component={FileSelector}/>
-            <Route exact path="/map/:id/properties" component={MapProperties}/>
-            <Route exact path="/group/:id/properties" component={GroupProperties}/>
-            <Route exact path="/add-group-form" component={AddGroup}/>
-            <Route exact path="/create-map" component={CreateMap}/>
+
+            <ModalRoute exact path='/add-map-picker' component={FileSelector} parentPath='/'/>
+
+            <ModalRoute exact path="/map/:id/properties" component={MapProperties} parentPath='/'/>
+            <ModalRoute exact path="/group/:id/properties" component={GroupProperties} parentPath='/'/>
+            <ModalRoute exact path="/add-group-form" component={AddGroup} parentPath='/'/>
+            <ModalRoute exact path="/create-map" component={CreateMap} parentPath='/'/>
+
+            <ModalContainer bodyModalOpenClassName='wm-modal-open'
+                            containerClassName='wm-modal-container'
+                            backdropClassName='wm-modal-backdrop'
+                            modalClassName='wm-modal'/>
         </div>
     </Router>
 );

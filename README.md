@@ -52,7 +52,7 @@ Dependencies are managed with bower. If you have never used it before, you will 
 * `composer update` will grab the PHP dependencies for both the runtime and testing environments
 The release process collects up these files and puts them in the zip file, via the packing.list file(s). You only need to do this if you are working with the current development code.
 
-If you aren't intended to do any development, run the tests, or contribute patches (why not? It's fun!) then you can use `composer update --without-dev` above, and reduce the number of PHP packages installed significantly.
+If you aren't intended to do any development, run the tests, or contribute patches (why not? It's fun!) then you can use `composer update --no-dev` above, and reduce the number of PHP packages installed significantly.
 
 ### Work currently in progress:
 

@@ -26,11 +26,10 @@ release:
 	#sql
 	# remove the dev-only dependencies from vendor
 	composer --no-dev update
-	# copy in the compiled javascript from the react apps
-	cp websrc/cacti-user/build/static/js/main.*.js cacti-resources/user.min.js
-	cp websrc/cacti-user/build/static/css/main.*.css cacti-resources/user.min.css
-	cp websrc/cacti-mgmt/build/static/js/main.*.js cacti-resources/mgmt.min.js
-	cp websrc/cacti-mgmt/build/static/css/main.*.css cacti-resources/mgmt.min.css
+	bower install
+	# build the react apps (yarn copies the compiled files over)
+	cd websrc/cacti-user; yarn run build
+	cd websrc/cacti-mgmt; yarn run build
 	echo Building release $(RELNAME)
 	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)

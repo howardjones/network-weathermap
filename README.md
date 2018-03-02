@@ -1,9 +1,11 @@
 # PHP Network Weathermap 1.0.0 (dev)
 
-## Current Status (2017-11-03)
+## Current Status (2018-03-02)
 
 I decided it would be useful to add this section to the top of the README, while things are moving around a lot. Here
 is what is working, and what is being worked on:
+
+*NOTE* First, please note that Weathermap will require PHP 5.6 or above, from 1.0.0 onwards (including the current dev version).
 
 ### General goals
 
@@ -26,7 +28,7 @@ plugin does, too.
 
 * __CLI__ - should be working OK. Rewritten to avoid PEAR dependency. There's also a `weathermap-new` which needs testing, but is intended to replace the old `weathermap` (all the business is in a class, not the script)
 
-* __Editor__ - Partly (75%) implemented class/template-based version of editor (same UI) currently named `editor16.php`. Old `editor.php` is probably broken, since its files have been moved around. BUT PARTS THAT DON'T YET WORK CAN MANGLE YOUR MAP! (e.g. tidy recently deleted links) 
+* __Editor__ - Re-implemented class/template-based version of editor (same UI). 
 
 * __Cacti 0.8 Plugin__ - broken UI, working poller. Code has all been moved, poller run, UI not tested.
 
@@ -47,6 +49,7 @@ Dependencies are managed with bower. If you have never used it before, you will 
 * `composer update` will grab the PHP dependencies for both the runtime and testing environments
 The release process collects up these files and puts them in the zip file, via the packing.list file(s). You only need to do this if you are working with the current development code.
 
+If you aren't intended to do any development, run the tests, or contribute patches (why not? It's fun!) then you can use `composer update --without-dev` above, and reduce the number of PHP packages installed significantly.
 
 ### Work currently in progress:
 

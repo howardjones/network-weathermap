@@ -645,10 +645,8 @@ class MapManager
         return $columns;
     }
 
-    private function createMissingTables()
+    private function createMissingTables($tables)
     {
-        $tables = $this->getTableList();
-
         $databaseUpdates = array();
 
         if (!in_array('weathermap_maps', $tables)) {
@@ -725,7 +723,9 @@ class MapManager
         // only bother with all this if it's a new install, a new version, or we're in a development version
         // - saves a handful of db hits per request!
 
-        $databaseUpdates = $this->createMissingTables();
+        $tables = $this->getTableList();
+
+        $databaseUpdates = $this->createMissingTables($tables);
 
         $columns = $this->getColumnList("weathermap_maps");
         if (count($columns) > 0) {
@@ -766,8 +766,10 @@ class MapManager
         $databaseUpdates[] = "UPDATE weathermap_maps SET filehash=LEFT(MD5(concat(id,configfile,rand())),20) WHERE filehash = ''";
 
         $columns = $this->getColumnList("weathermap_auth");
-        if (!in_array('usergroupid', $columns)) {
-            $databaseUpdates[] = "ALTER TABLE weathermap_auth ADD usergroupid MEDIUMINT(9) NOT NULL DEFAULT 0 AFTER userid";
+        if (count($columns) > 0) {
+            if (!in_array('usergroupid', $columns)) {
+                $databaseUpdates[] = "ALTER TABLE weathermap_auth ADD usergroupid MEDIUMINT(9) NOT NULL DEFAULT 0 AFTER userid";
+            }
         }
 
         $columns = $this->getColumnList("weathermap_data");

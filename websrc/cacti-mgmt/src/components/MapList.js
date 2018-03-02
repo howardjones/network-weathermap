@@ -2,31 +2,38 @@ import React, {Component} from 'react';
 import {FormattedMessage} from 'react-intl';
 import MapListEntry from "./MapListEntry";
 import MapListHeader from "./MapListHeader";
+import {Link} from "react-router-dom";
+import GroupHeader from "./GroupHeader";
 
 class MapList extends Component {
 
     render() {
 
         const groups = Object.keys(this.props.groups).map((key, index) => {
-            const maps = this.props.maps.filter((map) => {
+            const group = this.props.groups[key];
+
+            const mapsInGroup = this.props.maps.filter((map) => {
                 return map.group_id === key;
             });
 
-            const m = maps.map((item, index) => {
-                return <MapListEntry key={index} item={item} groups={this.props.groups} settings={this.props.settings}/>
+            if (mapsInGroup.length === 0) {
+                return <div>
+                    <GroupHeader group={group}/>
+                    <em><FormattedMessage id="no_maps" defaultMessage="No maps in this group"/></em>
+                </div>
+            }
+
+            const mapEntries = mapsInGroup.map((item, index) => {
+                return <MapListEntry key={index} item={item} editor_url={this.props.settings.editor_url}/>
             });
 
-
             return <div key={index}>
-                <h3>{this.props.groups[key].name}
-                    <small>{this.props.groups[key].sortorder}</small>
-                </h3>
+                <GroupHeader group={group}/>
+
                 <table border={1} className="cactiTable">
                     <MapListHeader/>
                     <tbody>
-                    {maps.length === 0 ? <tr>
-                        <td><em><FormattedMessage id="no_maps" defaultMessage="No maps in this group"/></em></td>
-                    </tr> : m}
+                    {mapEntries}
                     </tbody>
                 </table>
             </div>

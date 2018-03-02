@@ -13,7 +13,6 @@ class ActionBar extends Component {
             <Link to="/add-map-picker">
                 <button>Add Map</button>
             </Link>
-
             <Link to="/add-group-form">
                 <button>Add Group</button>
             </Link>
@@ -26,13 +25,6 @@ class ActionBar extends Component {
                 <button>Settings</button>
             </Link>
             (all the weathermap-related settings - mainly for non-Cacti)
-            <Link to="/map/3/properties">
-                <button>Testing Map Properties Page</button>
-            </Link>
-            <Link to="/group/1/properties">
-                <button>Testing Group Properties Page</button>
-            </Link>
-
         </div>
     }
 }

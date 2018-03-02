@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {FormattedMessage, FormattedNumber, FormattedPlural} from 'react-intl';
+import {Link} from "react-router-dom";
 
 
 class MapListEntry extends Component {
@@ -21,18 +22,20 @@ class MapListEntry extends Component {
     }
 
 
-
     render() {
         const item = this.props.item;
 
+        const props_url = `/map/${item.id}/properties`;
+
         return (<tr key={item.id}>
-            <td>{item.id}</td>
+            <td><Link to={props_url}>
+                <button>...</button>
+            </Link>{item.id}</td>
             <td>
                 <small>{item.sortorder}</small>
             </td>
-            <td><a href={this.props.settings.editor_url + item.configfile}>{item.configfile}</a></td>
+            <td><a href={this.props.editor_url + item.configfile}>{item.configfile}</a></td>
             <td>{item.titlecache}</td>
-            <td>{item.group_id} ({this.props.groups[item.group_id].name})</td>
             <td><FormattedNumber value={item.runtime}/>s {item.warncount > 0 ?
                 <span className="wm_map_warnings">(<FormattedNumber value={item.warncount}/>&nbsp;<FormattedPlural
                     value={item.warncount} zero="" one="warning" other="warnings"/>)</span> : ""}</td>

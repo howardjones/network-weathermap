@@ -104,3 +104,9 @@
     background-color: white;
     border: 1px solid #777;
 }
+
+.wm-maptable-id { width: 3em; overflow: hidden; }
+.wm-maptable-sort { width: 3em; overflow: hidden; }
+.wm-maptable-filename { width: 200px; overflow: hidden; }
+.wm-maptable-title { width: 200px; overflow: hidden; }
+

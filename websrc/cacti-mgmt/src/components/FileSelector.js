@@ -8,18 +8,78 @@ class FileSelector extends Component {
         super();
 
         this.state = {files: [], loaded: false, show_used: false};
+
+        this.toggleHideUsed = this.toggleHideUsed.bind(this);
+        this.refreshList = this.refreshList.bind(this);
+        this.handleChangeChk = this.handleChangeChk.bind(this);
+
     }
 
     componentDidMount() {
+        this.refreshList();
+    }
 
+    refreshList() {
+        console.log("Loading");
         // fake an API call for now
         setTimeout(function () {
             this.setState((prevState, props) => {
 
-                let data = [{"config":"093-test.conf","title":"scriptalert(document.cookie);/script","flags":["USED"]},{"config":"094-test.conf","title":"Testing THold DS","flags":[]},{"config":"095-test.conf","title":"0.95 Test Map","flags":[]},{"config":"096-test-2.conf","title":"0.96 Test Map","flags":[]},{"config":"096-test.conf","title":"0.96 Test Map {map:titleextra}","flags":[]},{"config":"097-simple.conf","title":"0.97 DS changes","flags":["USED"]},{"config":"097-test.conf","title":"0.96 Test Map {map:titleextra}","flags":[]},{"config":"icon-scale-tag.conf","title":"(no title)","flags":[]},{"config":"lacour-bug.conf","title":"(no title)","flags":[]},{"config":"simple.conf","title":"Simple Map","flags":["USED"]},{"config":"switch-status-2.conf","title":"same map as switch-status.conf, but with every port scaled","flags":[]},{"config":"switch-status.conf","title":"(no title)","flags":["USED"]},{"config":"template-debug.conf","title":"0.96 Test Map","flags":[]},{"config":"test-bg.png","title":"(no title)","flags":[]},{"config":"timezones.conf","title":"(no title)","flags":[]},{"config":"torture-with-imaps.conf","title":"(no title)","flags":[]},{"config":"torture.conf","title":"(no title)","flags":[]},{"config":"weathermap.conf","title":"(no title)","flags":[]}];
+                let data = [{
+                    "config": "093-test.conf",
+                    "title": "scriptalert(document.cookie);/script",
+                    "flags": ["USED"]
+                }, {"config": "094-test.conf", "title": "Testing THold DS", "flags": []}, {
+                    "config": "095-test.conf",
+                    "title": "0.95 Test Map",
+                    "flags": []
+                }, {"config": "096-test-2.conf", "title": "0.96 Test Map", "flags": []}, {
+                    "config": "096-test.conf",
+                    "title": "0.96 Test Map {map:titleextra}",
+                    "flags": []
+                }, {
+                    "config": "097-simple.conf",
+                    "title": "0.97 DS changes",
+                    "flags": ["USED"]
+                }, {
+                    "config": "097-test.conf",
+                    "title": "0.96 Test Map {map:titleextra}",
+                    "flags": []
+                }, {"config": "icon-scale-tag.conf", "title": "(no title)", "flags": []}, {
+                    "config": "lacour-bug.conf",
+                    "title": "(no title)",
+                    "flags": []
+                }, {
+                    "config": "simple.conf",
+                    "title": "Simple Map",
+                    "flags": ["USED"]
+                }, {
+                    "config": "switch-status-2.conf",
+                    "title": "same map as switch-status.conf, but with every port scaled",
+                    "flags": []
+                }, {
+                    "config": "switch-status.conf",
+                    "title": "(no title)",
+                    "flags": ["USED"]
+                }, {"config": "template-debug.conf", "title": "0.96 Test Map", "flags": []}, {
+                    "config": "test-bg.png",
+                    "title": "(no title)",
+                    "flags": []
+                }, {
+                    "config": "timezones.conf",
+                    "title": "(no title)",
+                    "flags": []
+                }, {"config": "torture-with-imaps.conf", "title": "(no title)", "flags": []}, {
+                    "config": "torture.conf",
+                    "title": "(no title)",
+                    "flags": []
+                }, {"config": "weathermap.conf", "title": "(no title)", "flags": []}];
+
                 data = data.map((item, index) => {
                     return {...item, index: index, selected: false}
                 });
+
+                console.log("Loaded");
 
                 return {
                     ...prevState,
@@ -28,10 +88,6 @@ class FileSelector extends Component {
                 };
             });
         }.bind(this), 2000);
-
-        this.toggleHideUsed = this.toggleHideUsed.bind(this);
-        this.handleChangeChk = this.handleChangeChk.bind(this);
-
     }
 
     handleChangeChk(e) {
@@ -88,6 +144,9 @@ class FileSelector extends Component {
                 <p>
                     <button
                         onClick={this.toggleHideUsed}>{this.state.show_used ? "HIDE USED" : "INCLUDE USED"}</button>
+                    <button
+                        onClick={this.refreshList}>Refresh
+                    </button>
                 </p>
 
                 <table className="wm-picker">

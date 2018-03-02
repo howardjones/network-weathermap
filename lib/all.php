@@ -9,6 +9,12 @@
 
 require_once dirname(__FILE__) . '/Weathermap/Core/globals.php';
 require_once dirname(__FILE__) . '/Weathermap/Core/constants.php';
+
+// TODO: This is temporary for dev version
+if (!file_exists(dirname(__FILE__) . '/../vendor/autoload.php')) {
+    throw new Exception("No autoloader present. Did you read README.md for dev-specific instructions?");
+}
+
 require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 use Weathermap\Core\WMDebugFactory;

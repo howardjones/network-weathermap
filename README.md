@@ -5,7 +5,10 @@
 I decided it would be useful to add this section to the top of the README, while things are moving around a lot. Here
 is what is working, and what is being worked on:
 
-*NOTE* First, please note that Weathermap will require PHP 5.6 or above, from 1.0.0 onwards (including the current dev version).
+__NOTE__ First, please note that Weathermap will require PHP 5.6 or above, from 1.0.0 onwards (including the current dev version).
+
+__NOTE2__ For dev version, READ THIS FILE FIRST, before installing. Especially if you are thinking of installing on your production
+Cacti server.
 
 ### General goals
 
@@ -24,11 +27,11 @@ plugin does, too.
 
 ### Current Status/Usability
 
-* __Core__ - passing all tests. All code modified to use namespaces and autoloader, one class per file, most PSR-2 standards.
+* __Core__ - should be working OK. passing all tests. All code modified to use namespaces and autoloader, one class per file, most PSR-2 standards.
 
 * __CLI__ - should be working OK. Rewritten to avoid PEAR dependency. There's also a `weathermap-new` which needs testing, but is intended to replace the old `weathermap` (all the business is in a class, not the script)
 
-* __Editor__ - Re-implemented class/template-based version of editor (same UI). 
+* __Editor__ - should be working OK. Re-implemented class/template-based version of editor (same UI). 
 
 * __Cacti 0.8 Plugin__ - broken UI, working poller. Code has all been moved, poller run, UI not tested.
 
@@ -63,12 +66,14 @@ If you aren't intended to do any development, run the tests, or contribute patch
 
 * ~~Update Editor Data Picker to use same UI classes as Cacti (input validation, one method per 'command', testability)~~
 
+### Longer-term WIP:
+
 * Break down 'monster methods' into simpler ones. Identify groups within the larger classes for refactoring (e.g. plugin-related stuff in Map)
 
     * Poller - a single runMaps() function currently does almost everything. Replace with Poller class for general environment setup, which
     asks MapManager for the maps to run. ~~Use a MapRuntime class per-map to contain all the knowledge
     needed to run that map.~~
-    
+        
 * Dependency Injection - there's some ugly stuff especially with logging and global variables. Switch to a real logger (planning on monolog), wrapped
 in a simple class to manage things like muting certain messages, and switching between debug and normal logging. Then find
 a better way (DI container?) to have that one logger object shared between the places that want to use it. This also has some

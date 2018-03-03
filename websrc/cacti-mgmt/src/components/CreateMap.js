@@ -12,6 +12,7 @@ class CreateMap extends Component {
             <p>Map name: <input type="text"/></p>
             <p>source map: <FileSelector files={['-- BLANK --', 'file1','file2']}/></p>
             <p>Group name: <GroupSelector/></p>
+            <p>Immediately add to schedule? <input type="checkbox"/></p>
             <p>
                 <button><FormattedMessage id="create" defaultMessage="Create"/></button>
                 <Link to="/"><button><FormattedMessage id="cancel" defaultMessage="Cancel"/></button></Link>

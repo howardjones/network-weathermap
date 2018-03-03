@@ -46,6 +46,11 @@
     border: 2px solid blue;
 }
 
+.wm-app-settings-container {
+    padding: 20px;
+    border: 2px solid blue;
+}
+
 .wm-add-group-container {
     padding: 20px;
     border: 2px solid green;

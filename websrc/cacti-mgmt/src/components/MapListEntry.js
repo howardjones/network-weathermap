@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 
 class MapListEntry extends Component {
 
-    on_off_once(t) {
+    static on_off_once(t) {
         if (t === 'on') {
             return <FormattedMessage id='on' default='on'/>
         }
@@ -36,12 +36,12 @@ class MapListEntry extends Component {
             </td>
             <td><a href={this.props.editor_url + item.configfile}>{item.configfile}</a></td>
             <td>{item.titlecache}</td>
-            <td><FormattedNumber value={item.runtime}/>s {item.warncount > 0 ?
+            <td><FormattedNumber maximumFractionDigits={2} value={item.runtime}/>s {item.warncount > 0 ?
                 <span className="wm_map_warnings">(<FormattedNumber value={item.warncount}/>&nbsp;<FormattedPlural
                     value={item.warncount} zero="" one="warning" other="warnings"/>)</span> : ""}</td>
-            <td>{this.on_off_once(item.active)}</td>
-            <td>{this.on_off_once(item.debug)}</td>
-            <td>{this.on_off_once(item.archiving)}</td>
+            <td>{MapListEntry.on_off_once(item.active)}</td>
+            <td>{MapListEntry.on_off_once(item.debug)}</td>
+            <td>{MapListEntry.on_off_once(item.archiving)}</td>
             <td>{item.schedule === "*" ?
                 <FormattedMessage id="always" defaultMessage="always"/> : item.schedule}</td>
             <td>-</td>

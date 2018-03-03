@@ -39,7 +39,7 @@ IMPORTANT NOTE for 0.98 and later - you may need to reset permissions on your us
 finally switched to the "new-style" plugin API that's been around for 5+ years. This handles
 permissions differently, unfortunately.
 
-0.98
+0.98  
     FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.
     FIXED - Editor 'delete link' broken
     FIXED - KILO was ignored when processing %k in special tokens
@@ -71,7 +71,7 @@ permissions differently, unfortunately.
 
 0.97c had no additional changes - it's just 0.97b with some silly errors fixed, and  all
 the CSS files included with the correct paths. There were also reports of problems with the
-actual zip file.
+actual zip file.  April 10th 2013
 
 0.97b is a special release starting from 0.97a and backporting all the quick bugfixes from the 0.98 code.
 There are larger structural changes in 0.98 and new features, but these bugfixes were useful enough to
@@ -84,7 +84,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
 
 Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their security bug reports.
 
-0.97b	FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
+0.97b  April 5th 2013	
+    FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
     FIXED - memory leak in poller code. Memory usage is MUCH lower now.
     FIXED - updated mysql schema commands to use modern ENGINE instead of TYPE;
     FIXED - static datasource plugin honours KILO
@@ -106,7 +107,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
     ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
     ADDED - .htaccess files added for directories that don't need to be web-accessible - needs "AllowOverride Limit" or "AllowOverride All" in your Apache config.
 
-0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
+0.97a	March 9th 2010
+        FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)
 	FIXED - 'classic' legend drew 'hidden' colour values for things like key background colour. (thanks jmayniac)
 	FIXED - PHP 5.3 deprecated code in HTML_Imagemap.class.php
@@ -131,7 +133,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 	ADDED - Simple VIA editing in editor (thanks to Zdolny)
         ADDED - SCALE can accept G,M,K,T,m,u,n suffixes (for absolute scales)
 
-0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)
+0.97	January 18th 2010
+        FIXED - RRD Aggregation regexp was failing (thanks to shd)
 	FIXED - Scale numerals honour locale (thanks again, shd)
 	FIXED - THold plugin check failed with Thold 0.4.1 (PA 2.x, actually)
 	FIXED - Uninitialized variable in ReadData when plugin is disabled
@@ -166,14 +169,17 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
         ADDED - LABELOFFSET supports percentage compass offsets and radial offsets, like NODES does.
         ADDED - Percentage compass offsets (NODES and LABELOFFSET) support > 100% offsets
 
-0.96a	FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)
+0.96a	April 28th 2009
+
+        FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)
 	FIXED - \n is no longer treated as a newline in TARGETs (thanks NetAdmin)
 	FIXED - KILO was broken completely between 0.95b and 0.96 (thanks Jethro Binks)
 	FIXED - Link comments in certain positions could cause div-by-zero errors. (thanks again Jethro)
 	FIXED - USEICONSCALE didn't colorise (broken between 0.95b and 0.96 again) (thanks colejv)
 	FIXED - Managed to make LABELOFFSET case-sensitive.
 
-0.96	ADDED - TEMPLATE allows a node or link to copy it's settings from another, instead of from DEFAULT.
+0.96	April 19th 2009
+        ADDED - TEMPLATE allows a node or link to copy it's settings from another, instead of from DEFAULT.
 	ADDED - RRD datasource can take SET rrd_default_path to make configs a little easier to read.
 	ADDED - RRD datasource can take SET rrd_default_in_ds and rrd_default_out_ds for non-Cacti users.
 	ADDED - RRD datasource can get Cacti query information (in poller_output mode ONLY) - like ifAlias, ifSpeed etc
@@ -236,7 +242,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 	FIXED - Error reporting for CLI --define was bad. --help text was out of date.
 	FIXED - Editor will honour LABEL from NODE DEFAULT, if it is set.
 
-0.95b	FIXED - SQL schema issue that upset some mysql versions
+0.95b	March 23rd 2008
+	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor
 	FIXED - incorrect jquery path in cacti-picker
 	FIXED - INFOURL not used without overlib
@@ -245,14 +252,17 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 	FIXED - Page title can be incorrect if filehash starts with a digit.
 	FIXED - Cacti plugin behaves a little better with auth disabled.
 
-0.95a	FIXED - problem with global map variables. Oops.
+0.95a	March 10th 2008
+        FIXED - problem with global map variables. Oops.
 	FIXED - few deprecated function references.
 	FIXED - couple of tiny docs errors.
 	FIXED - bug where INFOURL without OVERLIBGRAPH would be ignored
 	CHANGE - Added in a SCALE line in the DEFAULT scale for between 0 and 1. Stops a lot of warnings on low-traffic links.
 	CHANGE - Tweaked node cloning in editor - clone is offset in x and y now.
 
-0.95	KNOWN ISSUE - ININFOURL/OUTINFOURL, INOVERLIBGRAPH/OUTOVERLIBGRAPH are not handled well by the editor. If you edit a map that uses these,
+0.95	March 3rd 2008
+
+        KNOWN ISSUE - ININFOURL/OUTINFOURL, INOVERLIBGRAPH/OUTOVERLIBGRAPH are not handled well by the editor. If you edit a map that uses these,
 		then the 'in' side of the link will be copied to the 'out' side. New editor will handle this better.
 
 	ADDED - you get a warning if you are using values outside of the defined SCALE now.
@@ -297,12 +307,14 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 	FIXED - Added some better controls into SNMP DS plugin. You can correctly pull
                 interface oper/admin status, for example, now.
 
-0.941	FIXED - Issue with '-' DS names again.
+0.941	December 1st 2007
+        FIXED - Issue with '-' DS names again.
 	FIXED - Added extra code to help discourage browser caching.
 	FIXED - Removed some extra chatty debugging code from poller_output.
 	ADDED - Page titles are more useful in Cacti now
 
-0.94    ADDED - INBWFORMAT and OUTBWFORMAT allow you to format the text for BWLABEL, same as for COMMENTs
+0.94    November 15th 2007
+        ADDED - INBWFORMAT and OUTBWFORMAT allow you to format the text for BWLABEL, same as for COMMENTs
         ADDED - New cactithold/cactimonitor data source plugin reads data from Cacti's Threshold plugin.
                 (Original development for this plugin was paid for by Stellar Consulting - Thanks!)
         ADDED - New LINKSTYLE command allows you to have one-way (one arrow) links.
@@ -315,7 +327,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 	FIXED - Imagemaps for horiz/vert format legend were wrong in editor (thanks to Alex Moura for pointing this out)
 	FIXED - Changes for compatibility with Cacti 0.8.7's moved config file.
 
-0.93    Added - weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
+0.93    October 5th 2007
+        Added - weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
         FIXED - the key_hidezero secret setting hides the zero in a gradient in a classic scale too.
         CHANGE - the auth realm names for Cacti have been changed to match ReportIt and Aggregate - easier to tell who does what
         ADDED - unique code for each warning message, and a page to explain it on the website. Ugh.
@@ -349,7 +362,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
         FIXED - divide-by-zero error for some (?) PHP versions in poller
         ADDED - Warning for duplicate node or link names
 
-0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
+0.92 - June 6th 2007
+       FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez
        FIXED a SET in DEFAULT node/link is inherited by all node/links now.
        FIXED changing defaults in the editor changes existing objects that use the default value
@@ -368,7 +382,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
        FIXED - strange edge case with gradient SCALE caused div-by-zero (Tiago Giorgetti)
        CHANGE - The editor doesn't *require* an editor-config.php anymore. It *will* warn you if the defaults aren't enough, however.
 
-0.91 - FIXED RRD bug with '-' DS names. This was fixed in 0.9pre3, but somehow slipped through.
+0.91 - May 13th 2007
+       FIXED RRD bug with '-' DS names. This was fixed in 0.9pre3, but somehow slipped through.
        FIXED KILO bug again (Steve Woodcock)
        FIXED handling of MRTG html files on remote systems
        FIXED ReadConfig doesn't complain about KEYPOS DEFAULT -1 -1 (as written by WriteConfig) anymore
@@ -380,7 +395,9 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
        NEW add a - to the front of a targetspec and you can take away values instead of aggregating them (think Total-VPN=Internet, for example)
        NEW the scale line that was 'hit' for each link direction is stored in inscalekey and outscalekey
 
-0.9  - Changed node rendering - now we render to a transparent mini-image and blit them on. This will be good for the editor.
+0.9  -    April 20th 2007
+
+Changed node rendering - now we render to a transparent mini-image and blit them on. This will be good for the editor.
 	FIXED long-undetected bug in HTML_ImageMap for similarly named nodes or links (SLander)
 	   Added BWLABELPOS - you can specify the position of the bandwidth labels along the link
        Added OVERLIBCAPTION based on code from Jared Gillis
@@ -406,14 +423,16 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 	   Cleaned up config parser. Can be more fussy. More consistent though.
 	   Added - CLI tool takes --define to define SET-style variables
 
-0.82   FIXED another variation on ReadFromRRD not detecting NaNs properly (hyland)
+0.82   May 17th 2006
+       FIXED another variation on ReadFromRRD not detecting NaNs properly (hyland)
        FIXED SQL error which affects only some MySQL 5s (gundamx)
        FIXED some minor php errors in setup.php (cigamit)
        Changed the rrdtool period from now-400 to now-800 to avoid long-poller-cycle problems.
        Did some more /=>DIRECTORY_SEPARATOR changes - there weren't any problems, but it's a potential one.
        FIXED if you use the editor and your rrdtool is somewhere other than /usr/bin/rrdtool then you get an incorrect error about checking line 27 of the CLI tool.
 
-0.81 - Added a Weathermaps link to the Cacti 'Configuration' side-menu. Removed 'Manage Maps' link in Weathermap tab. (knobdy)
+0.81 - April 17th 2006
+       Added a Weathermaps link to the Cacti 'Configuration' side-menu. Removed 'Manage Maps' link in Weathermap tab. (knobdy)
        File-picker in editor no longer masks on *.conf
 	   FIXED sort-order bug for imagemaps (Fran Boon)
 	   FIXED plugin shows same map twice if you have 'Anyone + users' (Fran Boon, again)
@@ -435,7 +454,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 	   Docs update - More FAQs and config reference improvements/amendments.
 	   Added 'Cycle' mode to plugin - automatically cycle between your weathermaps.
 
-0.8 -  Added ability to have multiple targets for a LINK - aggregate your T1s
+0.8 -  March 30th 2006
+       Added ability to have multiple targets for a LINK - aggregate your T1s
        Added ability to use half an RRD (use '-' as the DS name) - if you have 'in' in one RRD, and 'out' in another
        Added a tab-seperated file datasource for TARGET lines, so you can draw anything you can dump into a textfile.
        Added ability to specify which corner of a NODE each LINK-end goes to - handy for busy hub nodes
@@ -455,11 +475,13 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 	   Many Thanks to James Lang, Niels Baggesen and the [php-weathermap] mailing list for feedback
         during the testing of this release.
 
-0.71 - Fixed database code in cacti-pick.php
+0.71 - January 23rd 2006
+       Fixed database code in cacti-pick.php
        Fixed up editor to handle blank maps better.
        Fixed a problem with cached images in editor.
 
-0.7 -	Updated the manual and example map to reflect all these changes.
+0.7 -	 December 28th 2005
+        Updated the manual and example map to reflect all these changes.
 	Added config options for HTMLOUTPUTFILE and IMAGEOUTPUTFILE. The
         idea is to reduce the size of command-lines, and make the map files
         more self-contained. CLI options still take precedence.
@@ -484,7 +506,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
         PNG transparency in ICONs.
       Improved number and content of error messages.
 
-0.6 - Renamed weathermap.php to just 'weathermap' to make it more
+0.6 -  14 Sep 2005
+      Renamed weathermap.php to just 'weathermap' to make it more
       obviously not a PHP page.
       Fixed up NODE name regexp (thanks Niels Baggesen)
       Added warning for non-existent NODES in LINK (thanks again Niels Baggesen)
@@ -499,11 +522,13 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
       Moved responsibility for complete HTML page from the class to the CLI program - MakeHTML produces an HTML fragment now.
       Added ability to customise timestamp and legend text, by adding new text after the KEYPOS and TIMEPOS commands.
 
-0.5a - Fixed totally embarrassing problems with the DS-specification code.
+0.5a - 16 Jun 2005
+       Fixed totally embarrassing problems with the DS-specification code.
        As far as I can figure I never did test it. Oh dear. Thanks to
        Jethro Binks for speedy patches.
 
-0.5 - Fixed asymmetric BANDWIDTH bug - thanks rpingar
+0.5 - 16 Jun 2005
+      Fixed asymmetric BANDWIDTH bug - thanks rpingar
       Fix to make rrdtool commandline work on Windows - also thanks to rpingar
       Added specification of RRD DS names in TARGET ( blah.rrd:ds0:ds1 - that's in then out)
       Fix for different C libraries returning something other than NaN for a NaN (thru rrd) - now we look for good data rather than bad data.
@@ -514,7 +539,8 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
       Added TIMEPOS option so *you* get to choose where the timestamp goes, mgb
       Fixed stupid bug in ReadRRDData - Weathermap should follow the data better now. Thanks to 'cl'
 
-0.4 - Changed all internals to deal in bits/sec instead of bytes
+0.4 - 11 May 2005
+      Changed all internals to deal in bits/sec instead of bytes
       Moved timestamp back up to the top-right corner.
       *BREAKAGE* Changed BANDWIDTH to use bits too
       Added support for K,M,G,T suffixes on bandwidth specs
@@ -530,15 +556,18 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
       Moved editor.php out of the way to random-bits
       Included a copy of auto-overlib.pl, just cos it's handy
 
-0.3 - ICON config directive for NODEs added - same effect as jas0420's perl code
+0.3 - Apr 22 2005
+      ICON config directive for NODEs added - same effect as jas0420's perl code
       Fixed WriteConfig a little - TITLEs are written.
       OVERLIBGRAPH config is written for NODES.
       Fixed bug with OVERLIBGRAPH DHTML and NODEs
       Added --image-uri option back in from the perl version
 
-0.2 - NODEs with no label aren't drawn but can still be an endpoint for a LINK.
+0.2 - Apr 21 2005
+      NODEs with no label aren't drawn but can still be an endpoint for a LINK.
       Small bugfixes from mgb
       Included the editor.php for people to see
       Code tidyup for weathermap.php
 
-0.1 - Initial pre-release version
+0.1 - Apr 21 2005
+      Initial pre-release version

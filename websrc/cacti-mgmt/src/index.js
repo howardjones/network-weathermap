@@ -28,6 +28,7 @@ import AddGroup from "./components/AddGroup";
 import CreateMap from "./components/CreateMap";
 import GroupProperties from "./components/GroupProperties";
 import {ModalContainer, ModalRoute} from "react-router-modal";
+import AppSettings from "./components/AppSettings";
 
 const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
 const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
@@ -53,6 +54,7 @@ const AppRoutes = () => (
             <ModalRoute exact path="/group/:id/properties" component={GroupProperties} parentPath='/'/>
             <ModalRoute exact path="/add-group-form" component={AddGroup} parentPath='/'/>
             <ModalRoute exact path="/create-map" component={CreateMap} parentPath='/'/>
+            <ModalRoute exact path="/settings" component={AppSettings} parentPath='/'/>
 
             <ModalContainer bodyModalOpenClassName='wm-modal-open'
                             containerClassName='wm-modal-container'

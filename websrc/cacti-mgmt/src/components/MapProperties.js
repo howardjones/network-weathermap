@@ -28,6 +28,8 @@ class MapProperties extends Component {
             <h3>Map Properties: map #{mapId}</h3>
             <h4>Config file: {myMap.configfile}</h4>
 
+            <p>Maybe need some tabs in here?</p>
+
             <p>Active <select name="active" defaultValue={myMap.active}>
                 <option value='on'>Yes</option>
                 <option value='off'>No</option>

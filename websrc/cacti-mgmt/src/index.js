@@ -22,7 +22,7 @@ import translations from './translations';
 import reducers from './reducers';
 
 import {HashRouter as Router, Route} from 'react-router-dom'
-import FileSelector from "./components/FileSelector";
+import FileSelector from "./components/AddMap";
 import MapProperties from "./components/MapProperties";
 import AddGroup from "./components/AddGroup";
 import CreateMap from "./components/CreateMap";
@@ -45,7 +45,9 @@ const AppRoutes = () => (
                    )}
             />
 
-            <ModalRoute exact path='/add-map-picker' component={FileSelector} parentPath='/'/>
+            <ModalRoute exact path='/add-map-picker' parentPath='/'>
+                <FileSelector store={store}/>
+            </ModalRoute>
 
             <ModalRoute exact path="/map/:id/properties" component={MapProperties} parentPath='/'/>
             <ModalRoute exact path="/group/:id/properties" component={GroupProperties} parentPath='/'/>

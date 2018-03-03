@@ -31,7 +31,7 @@
       "titlecache": "0.97 DS changes",
       "filehash": "f83c3fcea15874bebefb",
       "warncount": "0",
-      "debug": "off",
+      "debug": "once",
       "runtime": "0.34365510940552",
       "lastrun": null,
       "config": "",
@@ -58,7 +58,7 @@
       "thumb_width": "250",
       "thumb_height": "187",
       "schedule": "*",
-      "archiving": "off"
+      "archiving": "on"
     },
     {
       "id": "3",
@@ -71,7 +71,7 @@
       "titlecache": "scriptalert(document.cookie);\/script",
       "filehash": "730ff5e36fd497790c67",
       "warncount": "0",
-      "debug": "off",
+      "debug": "on",
       "runtime": "0.58799004554749",
       "lastrun": null,
       "config": "",
@@ -104,7 +104,7 @@
       "id": "2",
       "sortorder": "2",
       "group_id": "2",
-      "active": "on",
+      "active": "off",
       "configfile": "switch-status.conf",
       "imagefile": "",
       "htmlfile": "",
@@ -136,6 +136,11 @@
       "id": "3",
       "name": "emptygroup",
       "sortorder": "3"
+    }
+  },
+  "global": {
+    "settings": {
+
     }
   }
 }

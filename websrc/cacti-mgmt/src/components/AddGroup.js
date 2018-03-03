@@ -5,8 +5,11 @@ class AddGroup extends Component {
     render() {
         return <div className='wm-add-group-container wm-popup'>
             <h3>Add a new group</h3>
-            <p>Group name: <input /> </p>
-            <p><button>Add group</button><button>Cancel</button></p>
+            <p>Group name: <input id="groupname" defaultValue="new-group"/> </p>
+            <p>
+                <button>Add</button>
+                <button>Cancel</button>
+            </p>
 
         </div>
     }

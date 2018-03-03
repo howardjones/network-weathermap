@@ -8,7 +8,7 @@ class GroupSelector extends Component {
             const item = this.props.groups[key];
             return <option key={item.id} value={item.id}>{item.name}</option>
         });
-        return <select id={this.props.id} >
+        return <select defaultValue={this.props.selected} id={this.props.id} >
             {group_options}
         </select>
     }

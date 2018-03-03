@@ -243,7 +243,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
             'image_url' => $this->makeURL(array("action" => "viewimage")),
             'editor_url' => $this->makeURL(array("action" => "nothing", "mapname" => ""), $this->editorURL),
             'maps_url' => $this->makeURL(array("action" => "dumpmaps")),
-            'docs_url' => 'docs/index.html'
+            'docs_url' => 'docs/index.html',
+            'api_url' => $this->makeURL(array("action" => "")),
+            'management_url' => $this->makeURL(array("action" => ""))
         );
 
         print json_encode($data);

@@ -7,9 +7,10 @@
   "thumb_url": "http://localhost:8016/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=viewthumb&id=",
   "image_url": "http://localhost:8016/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=viewimage&id=",
   "editor_url": "http://localhost:8016/cacti/plugins/weathermap/weathermap-cacti10-plugin-editor.php?fromplug=1&action=nothing&mapname=",
+  "api_url": "http://localhost:8016/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=",
   "maps_url": "static-maps.json",
   "docs_url": "docs\/",
   "theme": "modern",
   "language": "en",
-  "management_url": null
+  "management_url": "http://localhost:8016/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action="
 }

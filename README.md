@@ -62,9 +62,36 @@ If you aren't intended to do any development, run the tests, or contribute patch
 
 * Move to React for Cacti UI, with only JSON/API type stuff in the PHP code
 
+   * Management
+      * Add A Map (with multiples, directly into correct group)
+      * Delete A Map
+      * Enable/Disable Map
+      * Add Group
+      * Update Map (properties page)
+         * Move to new group
+         * Alter schedule
+         * Alter debugging
+         * (Alter archiving)
+      * ~~Edit map~~
+      * Create map (create a blank, ready to edit)
+      * SET Settings editor for global, group and map
+      * Access editor for (group) and map
+      * App Settings editor (for Cacti/host-app settings)
+         
+   * User
+      * ~~Show Thumbnails~~      
+      * ~~Show full size maps~~
+      * "Overlib" replacement for popup graphs      
+      * Cycle mode
+      * Cycle mode fullscreen
+
 * ~~Update Editor to use same UI classes as Cacti (input validation, one method per 'command', testability)~~
 
 * ~~Update Editor Data Picker to use same UI classes as Cacti (input validation, one method per 'command', testability)~~
+
+### Known Issues
+
+* Weathermap management only shows after the *second* click on the Weathermap menu option?
 
 ### Longer-term WIP:
 

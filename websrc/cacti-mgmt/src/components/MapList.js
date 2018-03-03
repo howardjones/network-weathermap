@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {FormattedMessage} from 'react-intl';
 import MapListEntry from "./MapListEntry";
 import MapListHeader from "./MapListHeader";
-import {Link} from "react-router-dom";
 import GroupHeader from "./GroupHeader";
 
 class MapList extends Component {
@@ -17,7 +16,7 @@ class MapList extends Component {
             });
 
             if (mapsInGroup.length === 0) {
-                return <div>
+                return <div key={index}>
                     <GroupHeader group={group}/>
                     <em><FormattedMessage id="no_maps" defaultMessage="No maps in this group"/></em>
                 </div>

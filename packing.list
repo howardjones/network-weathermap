@@ -171,6 +171,7 @@
 ./lib/editor.inc.php
 ./lib/.htaccess
 ./lib/HTML_ImageMap.class.php
+./lib/database.php
 ./lib/geometry.php
 ./lib/index.php
 ./lib/poller-common.php
@@ -231,8 +232,6 @@
 ./cacti-resources/img/exclamation.png
 ./cacti-resources/img/tab_weathermap.gif
 ./cacti-resources/img/tab_weathermap_red.gif
-./vendor/jquery/dist/jquery.min.js
+./vendor/jquery-idletimer/dist/idle-timer.min.js
 ./weathermap-cacti-plugin-editor.php
-./editor-resources/jquery.event.drag-1.0.js
-./editor-resources/jquery.fastTrigger-min.js
 ./editor-resources/oldeditor.css

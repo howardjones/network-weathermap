@@ -302,8 +302,8 @@ function weathermap_setup_table () {
 		}
 		else
 		{
-		    $stmt = $pdo->prepare("show columns from weathermap_maps from ?");
-		    $stmt->execute(array($database_default));
+		    $stmt = $pdo->prepare("show columns from weathermap_maps");
+		    $stmt->execute();
 //			$colsql = "show columns from weathermap_maps from " . $database_default;
 //			$result = mysql_query($colsql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -382,8 +382,8 @@ function weathermap_setup_table () {
 		}
 		else
 		{
-            $stmt = $pdo->prepare("show columns from weathermap_data from ?");
-            $stmt->execute(array($database_default));
+            $stmt = $pdo->prepare("show columns from weathermap_data");
+            $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //			$colsql = "show columns from weathermap_data from " . $database_default;

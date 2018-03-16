@@ -4,6 +4,7 @@ namespace Weathermap\Integrations\Cacti;
 
 require_once dirname(__FILE__) . "/database.php";
 
+use Weathermap\Integrations\ManagementWebAPI;
 use Weathermap\Integrations\MapManager;
 use Weathermap\UI\UIBase;
 use Weathermap\Core\MapUtility;
@@ -26,84 +27,118 @@ class WeatherMapCactiManagementPlugin extends UIBase
     public $basePath;
 
     public $commands = array(
-        'settings' => array('handler' => 'handleSettingsAPI', 'args' => array()),
-        'dumpmaps' => array('handler' => 'handleDumpMapsAPI', 'args' => array()),
-        'mapfiles' => array('handler' => 'handleDumpMapFilesAPI', 'args' => array()),
-        'map_disable' => array('handler' => 'handleMapDisableAPI', 'args' => array(array("id", "int"))),
-        'map_enable' => array('handler' => 'handleMapEnableAPI', 'args' => array(array("id", "int"))),
+        ':: DEFAULT ::' => array('handler' => 'handleManagementMainScreen', 'args' => array()),
 
+        'app_settings' => array('handler' => 'handleSettingsAPI', 'args' => array()),
+        'app_listusers' => array('handler' => '', 'args' => array()),
+        'app_listusergroups' => array('handler' => '', 'args' => array()),
 
-        'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id", "int"))),
-        'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
-        'group_form' => array('handler' => 'handleGroupForm', 'args' => array(array("id", "int"))),
-        'group_update' => array(
-            'handler' => 'handleGroupUpdate',
-            'args' => array(array("id", "int", true), array("gname", "non-empty-string"))
-        ),
-        'move_group_up' => array(
-            'handler' => 'handleGroupOrderUp',
-            'args' => array(array("id", "int"), array("order", "int"))
-        ),
-        'move_group_down' => array(
-            'handler' => 'handleGroupOrderDown',
-            'args' => array(array("id", "int"), array("order", "int"))
-        ),
+        'listmaps' => array('handler' => 'handleDumpMapsAPI', 'args' => array()),
+        'listmapfiles' => array('handler' => 'handleDumpMapFilesAPI', 'args' => array()),
 
-        'chgroup_update' => array(
-            'handler' => 'handleMapChangeGroup',
-            'args' => array(array("map_id", "int"), array("new_group", "int"))
-        ),
-        'chgroup' => array('handler' => 'handleMapGroupChangeForm', 'args' => array(array("id", "int"))),
-
-        'map_settings_delete' => array(
-            'handler' => 'handleMapSettingsDelete',
-            'args' => array(array("mapid", "int"), array("id", "int"))
-        ),
-        'map_settings_form' => array('handler' => 'handleMapSettingsForm', 'args' => array(array("mapid", "int"))),
-        'map_settings' => array('handler' => 'handleMapSettingsPage', 'args' => array(array("id", "int"))),
-        'save' => array(
-            'handler' => 'handleMapSettingsSave',
+        'map_create' => array(
+            'handler' => '',
             'args' => array(
-                array("mapid", "int"),
-                array("id", "int"),
-                array("name", "non-empty-string"),
-                array("value", "string")
+                array('filename', 'mapfile'),
+                array('source', 'mapfile', true),
+                array('add', 'bool', true),
+                array('group_id', 'int')
             )
         ),
 
-        'perms_add_user' => array(
-            'handler' => 'handlePermissionsAddUser',
-            'args' => array(array("mapid", "int"), array("userid", "int"))
+        'map_add' => array(
+            'handler' => 'handleMapAddAPI',
+            'args' => array(
+                array('filename', 'mapfile'),
+                array('group_id', 'int')
+            )
         ),
-        'perms_delete_user' => array(
-            'handler' => 'handlePermissionsDeleteUser',
-            'args' => array(array("mapid", "int"), array("userid", "int"))
-        ),
-        'perms_edit' => array('handler' => 'handlePermissionsPage', 'args' => array(array("id", "int"))),
+        'map_delete' => array('handler' => '', 'args' => array()),
+        'map_update' => array('handler' => '', 'args' => array()),
+        'map_getconfig' => array('handler' => '', 'args' => array()),
 
-        'delete_map' => array('handler' => 'handleDeleteMap', 'args' => array(array("id", "int"))),
-        'deactivate_map' => array('handler' => 'handleDeactivateMap', 'args' => array(array("id", "int"))),
-        'activate_map' => array('handler' => 'handleActivateMap', 'args' => array(array("id", "int"))),
+        'group_add' => array('handler' => '', 'args' => array()),
+        'group_delete' => array('handler' => '', 'args' => array()),
+        'group_update' => array('handler' => '', 'args' => array()),
 
-        'addmap' => array('handler' => 'handleMapListAdd', 'args' => array(array("file", "mapfile"))),
-        'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array(array("show_all", "bool", true))),
+        'settings_add' => array('handler' => '', 'args' => array()),
+        'settings_update' => array('handler' => '', 'args' => array()),
+        'settings_delete' => array('handler' => '', 'args' => array()),
 
-        'move_map_up' => array(
-            'handler' => 'handleMapOrderUp',
-            'args' => array(array("id", "int"), array("order", "int"))
-        ),
-        'move_map_down' => array(
-            'handler' => 'handleMapOrderDown',
-            'args' => array(array("id", "int"), array("order", "int"))
-        ),
+        'perms_add' => array('handler' => '', 'args' => array()),
+        'perms_update' => array('handler' => '', 'args' => array()),
+        'perms_delete' => array('handler' => '', 'args' => array()),
 
-        'viewconfig' => array('handler' => 'handleViewConfig', 'args' => array(array("file", "mapfile"))),
 
-//        'rebuildnow' => array('handler' => 'handleRebuildNowStep1', 'args' => array()),
-//        'rebuildnow2' => array('handler' => 'handleRebuildNowStep2', 'args' => array()),
+//        'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id", "int"))),
+//        'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
+//        'group_form' => array('handler' => 'handleGroupForm', 'args' => array(array("id", "int"))),
+//        'group_update' => array(
+//            'handler' => 'handleGroupUpdate',
+//            'args' => array(array("id", "int", true), array("gname", "non-empty-string"))
+//        ),
+//        'move_group_up' => array(
+//            'handler' => 'handleGroupOrderUp',
+//            'args' => array(array("id", "int"), array("order", "int"))
+//        ),
+//        'move_group_down' => array(
+//            'handler' => 'handleGroupOrderDown',
+//            'args' => array(array("id", "int"), array("order", "int"))
+//        ),
+//
+//        'chgroup_update' => array(
+//            'handler' => 'handleMapChangeGroup',
+//            'args' => array(array("map_id", "int"), array("new_group", "int"))
+//        ),
+//        'chgroup' => array('handler' => 'handleMapGroupChangeForm', 'args' => array(array("id", "int"))),
+//
+//        'map_settings_delete' => array(
+//            'handler' => 'handleMapSettingsDelete',
+//            'args' => array(array("mapid", "int"), array("id", "int"))
+//        ),
+//        'map_settings_form' => array('handler' => 'handleMapSettingsForm', 'args' => array(array("mapid", "int"))),
+//        'map_settings' => array('handler' => 'handleMapSettingsPage', 'args' => array(array("id", "int"))),
+//        'save' => array(
+//            'handler' => 'handleMapSettingsSave',
+//            'args' => array(
+//                array("mapid", "int"),
+//                array("id", "int"),
+//                array("name", "non-empty-string"),
+//                array("value", "string")
+//            )
+//        ),
+//
+//        'perms_add_user' => array(
+//            'handler' => 'handlePermissionsAddUser',
+//            'args' => array(array("mapid", "int"), array("userid", "int"))
+//        ),
+//        'perms_delete_user' => array(
+//            'handler' => 'handlePermissionsDeleteUser',
+//            'args' => array(array("mapid", "int"), array("userid", "int"))
+//        ),
+//        'perms_edit' => array('handler' => 'handlePermissionsPage', 'args' => array(array("id", "int"))),
+//
+//        'delete_map' => array('handler' => 'handleDeleteMap', 'args' => array(array("id", "int"))),
+//        'deactivate_map' => array('handler' => 'handleDeactivateMap', 'args' => array(array("id", "int"))),
+//        'activate_map' => array('handler' => 'handleActivateMap', 'args' => array(array("id", "int"))),
+//
+//        'addmap' => array('handler' => 'handleMapListAdd', 'args' => array(array("file", "mapfile"))),
+//        'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array(array("show_all", "bool", true))),
+//
+//        'move_map_up' => array(
+//            'handler' => 'handleMapOrderUp',
+//            'args' => array(array("id", "int"), array("order", "int"))
+//        ),
+//        'move_map_down' => array(
+//            'handler' => 'handleMapOrderDown',
+//            'args' => array(array("id", "int"), array("order", "int"))
+//        ),
+//
+//        'viewconfig' => array('handler' => 'handleViewConfig', 'args' => array(array("file", "mapfile"))),
+//
+//        'enable_poller_output' => array('handler' => 'handleEnablePollerOutput', 'args' => array()),
 
-        'enable_poller_output' => array('handler' => 'handleEnablePollerOutput', 'args' => array()),
-        ':: DEFAULT ::' => array('handler' => 'handleManagementMainScreen', 'args' => array())
+
     );
 
     public function __construct($config, $basePath)
@@ -119,6 +154,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $pdo = weathermap_get_pdo();
         $cactiInterface = new CactiApplicationInterface($pdo);
         $this->manager = new MapManager($pdo, $this->configPath, $cactiInterface);
+        $this->api = new ManagementWebAPI($this->manager);
     }
 
     public function main($request)
@@ -129,10 +165,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
 
         if ($this->validateRequest($action, $request)) {
-            $result = $this->dispatchRequest($action, $request, null);
+            $result = $this->dispatchRequest($action, $request, $this->manager);
         } else {
             print "INPUT VALIDATION FAIL";
-//            print_r($request);
         }
     }
 
@@ -256,21 +291,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $request,
         $appObject
     ) {
-        header('Content-type: application/json');
-
-        $groups = $this->manager->getGroups();
-        $group_assoc = array();
-
-        foreach ($groups as $group) {
-            $group_assoc[$group->id] = $group;
-        }
-
-        $data = array(
-            'maps' => $this->manager->getMaps(),
-            'groups' => $group_assoc
-        );
-
-        print json_encode($data);
+        $this->api->mapList();
     }
 
     protected

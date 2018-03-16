@@ -15,8 +15,7 @@ require_once './include/config.php';
 
 require_once $config['library_path'] . '/database.php';
 
-require_once dirname(__FILE__)."/lib/all.php";
-
+// require_once dirname(__FILE__)."/lib/all.php";
 
 $cameFromHost = true;
 $hostPluginURL = "weathermap-cacti10-plugin-mgmt.php";

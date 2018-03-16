@@ -962,19 +962,25 @@ class EditorUI extends UIBase
             $mapFileName = $request['mapname'];
 
             if ($action == "newmap" || $action == "newmap_copy") {
-                if (substr($mapFileName, -5, 5) != '.conf') {
+                if (substr($mapFileName, -5, 5) != '.conf' && strlen($mapFileName) > 0) {
                     $mapFileName .= ".conf";
+
+                    // put it back into the request, so that the validation doesn't fail
+                    $request['mapname'] = $mapFileName;
                 }
+
             }
 
             // If there's something funny with the config filename, just stop.
             if ($mapFileName != UIBase::wmeSanitizeConfigFile($mapFileName)) {
-                throw new WeathermapInternalFail("Don't like this config filename");
+                throw new WeathermapInternalFail("Don't like this config filename $mapFileName");
             }
 
             $this->mapFileName = $this->mapDirectory . "/" . $mapFileName;
             $this->mapShortName = $mapFileName;
         }
+
+        $this->setEmbedded($fromPlugin);
 
         if ($mapFileName == '') {
             $this->showStartPage();
@@ -983,7 +989,7 @@ class EditorUI extends UIBase
 
         if ($this->validateRequest($action, $request)) {
             $editor = new Editor();
-            $this->setEmbedded($fromPlugin);
+
             if ($this->isEmbedded()) {
 
             }
@@ -1018,7 +1024,7 @@ class EditorUI extends UIBase
         $tpl = new SimpleTemplate();
 
         $tpl->set("WEATHERMAP_VERSION", WEATHERMAP_VERSION);
-        $tpl->set("fromplug", 1);
+        $tpl->set("fromplug", $this->fromPlugin ? "1" : "0");
 
         list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
 

@@ -27,7 +27,7 @@
             <p>Create A New Map:<br>
                 <form method="GET">Named: <input type="text" name="mapname" size="20"><input name="action" type="hidden"
                                                                                              value="newmap"><input
-                            name="plug" type="hidden" value=""><input type="submit" value="Create">
+                            name="plug" type="hidden" value="<?php echo $fromplug ?>"><input type="submit" value="Create">
             <p>
                 <small>Note: filenames must contain no spaces and end in .conf</small>
             </p>
@@ -35,7 +35,7 @@
             <form method="GET">Named: <input type="text" name="mapname" size="20"> based on <input name="action"
                                                                                                    type="hidden"
                                                                                                    value="newmapcopy"><input
-                        name="plug" type="hidden" value=""><select name="sourcemap">
+                        name="plug" type="hidden" value="<?php echo $fromplug ?>"><select name="sourcemap">
                     <?php foreach ($titles as $file => $title): ?>
                         <option value="<?php echo $file ?>"><?php echo $file ?></option>
                     <?php endforeach ?>

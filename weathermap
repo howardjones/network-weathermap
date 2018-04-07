@@ -96,7 +96,8 @@ try {
 
 // show version and quit
 if ($getOpt->getOption('version')) {
-    echo sprintf('PHP Network Weathermap: %s' . PHP_EOL, \Weathermap\Core\WEATHERMAP_VERSION);
+    // echo sprintf('PHP Network Weathermap: %s' . PHP_EOL, \Weathermap\Core\WEATHERMAP_VERSION);
+    echo sprintf('PHP Network Weathermap: %s' . PHP_EOL, WEATHERMAP_VERSION);
     exit;
 }
 

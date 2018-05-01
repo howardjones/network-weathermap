@@ -243,9 +243,9 @@ class MapRuntime
     }
 
     /**
-     * @param $filename
-     * @param $map
-     * @param $filehash
+     * @param string $filename
+     * @param Map $map
+     * @param string $filehash
      */
     private function writeHTMLFile($filename, $map, $filehash)
     {

@@ -39,7 +39,7 @@ IMPORTANT NOTE for 0.98 and later - you may need to reset permissions on your us
 finally switched to the "new-style" plugin API that's been around for 5+ years. This handles
 permissions differently, unfortunately.
 
-0.98  
+0.98 May 29 2016
     FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.
     FIXED - Editor 'delete link' broken
     FIXED - KILO was ignored when processing %k in special tokens

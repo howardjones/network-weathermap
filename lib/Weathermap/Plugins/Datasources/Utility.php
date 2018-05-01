@@ -26,7 +26,7 @@ class Utility
 
         MapUtility::debug("fetching for $localDataId\n");
 
-        $hintsToSet = getCactiHintData($item, $localDataId);
+        $hintsToSet = self::getCactiHintData($item, $localDataId);
 
         // By now, we have the values, one way or another.
         foreach ($hintsToSet as $name => $value) {
@@ -56,10 +56,10 @@ class Utility
 
         $setSpeed = intval($item->getHint("cacti_use_ifspeed"));
 
-        $hintsToSet = getCactiSnmpCache($localDataId);
+        $hintsToSet = self::getCactiSnmpCache($localDataId);
 
         if ($setSpeed != 0) {
-            determineCactiInterfaceSpeed($item, $hintsToSet);
+            self::determineCactiInterfaceSpeed($item, $hintsToSet);
         }
 
         $results = \db_fetch_row(

@@ -10,6 +10,7 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\Map;
+use Weathermap\Plugins\Datasources\Utility;
 
 /**
  * Get data from rrdtool files (also aggregate data, and also from Cacti's rrd poller cache)
@@ -146,7 +147,7 @@ class RRDTool extends Base
                     // fill all that other information (ifSpeed, etc)
                     // (but only if it's not switched off!)
                     if (($map->getHint("rrdtool_no_cacti_extras") === null) && $ldi > 0) {
-                        updateCactiData($item, $ldi);
+                        Utility::updateCactiData($item, $ldi);
                     }
                 }
             } else {

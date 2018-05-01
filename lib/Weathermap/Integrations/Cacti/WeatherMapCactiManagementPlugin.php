@@ -26,6 +26,8 @@ class WeatherMapCactiManagementPlugin extends UIBase
     public $editorURL;
     public $basePath;
 
+    protected $api;
+
     public $commands = array(
         ':: DEFAULT ::' => array('handler' => 'handleManagementMainScreen', 'args' => array()),
 
@@ -53,13 +55,38 @@ class WeatherMapCactiManagementPlugin extends UIBase
                 array('group_id', 'int')
             )
         ),
-        'map_delete' => array('handler' => '', 'args' => array()),
+
+        'map_delete' => array(
+            'handler' => '',
+            'args' => array(
+                'args' => array(
+                    array('id', 'int')
+                )
+            )
+        ),
         'map_update' => array('handler' => '', 'args' => array()),
         'map_getconfig' => array('handler' => '', 'args' => array()),
 
-        'group_add' => array('handler' => '', 'args' => array()),
-        'group_delete' => array('handler' => '', 'args' => array()),
-        'group_update' => array('handler' => '', 'args' => array()),
+        'group_add' => array(
+            'handler' => 'handleGroupAddAPI',
+            'args' => array(
+                array('name', 'non-empty-string'),
+            )
+        ),
+        'group_delete' => array(
+            'handler' => 'handleGroupDeleteAPI',
+            'args' => array(
+                array('id', 'int')
+            )
+        ),
+        'group_update' => array(
+            'handler' => 'handleGroupUpdateAPI',
+            'args' => array(
+                array('id', 'int'),
+                array('name', 'non-empty-string', true),
+                array('position_after', 'int', true)
+            )
+        ),
 
         'settings_add' => array('handler' => '', 'args' => array()),
         'settings_update' => array('handler' => '', 'args' => array()),
@@ -277,7 +304,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             'thumb_url' => $this->makeURL(array("action" => "viewthumb")),
             'image_url' => $this->makeURL(array("action" => "viewimage")),
             'editor_url' => $this->makeURL(array("action" => "nothing", "mapname" => ""), $this->editorURL),
-            'maps_url' => $this->makeURL(array("action" => "dumpmaps")),
+            'maps_url' => $this->makeURL(array("action" => "listmaps")),
             'docs_url' => 'docs/index.html',
             'api_url' => $this->makeURL(array("action" => "")),
             'management_url' => $this->makeURL(array("action" => ""))
@@ -323,6 +350,34 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header('Content-type: application/json');
         print json_encode($data);
     }
+
+    public function handleGroupAddAPI($request, $appObject)
+    {
+        $this->manager->createGroup($request['name']);
+
+        $data = array("result" => "OK");
+
+        return json_encode($data);
+    }
+
+    public function handleGroupDeleteAPI($request, $appObject)
+    {
+        $this->manager->deleteGroup($request['id']);
+
+        $data = array("result" => "OK");
+
+        return json_encode($data);
+    }
+
+    public function handleMapDeleteAPI($request, $appObject)
+    {
+        $this->manager->deleteMap($request['id']);
+
+        $data = array("result" => "OK");
+
+        return json_encode($data);
+    }
+
 
 // ******************************************************
 

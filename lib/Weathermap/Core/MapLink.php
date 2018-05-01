@@ -178,7 +178,7 @@ class MapLink extends MapDataItem
 
             if ($comment == '') {
                 MapUtility::debug('Link ' . $this->name . " no text for direction $direction\n");
-                break;
+                continue;
             }
 
             list($angle, $edge) = $this->calculateCommentPosition($fontObject, $comment, $direction, $widthList);

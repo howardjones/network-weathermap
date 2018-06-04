@@ -462,7 +462,7 @@ class RRDTool extends Base
             }
         }
 
-        $cfname = intval($map->getHint('rrd_cf'));
+        $cfname = $map->getHint('rrd_cf');
         if ($cfname == '') {
             $cfname = 'AVERAGE';
         }

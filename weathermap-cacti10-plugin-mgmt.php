@@ -1,5 +1,8 @@
 <?php
 
+// Temporary to allow testing
+header("Access-Control-Allow-Origin: *");
+
 chdir('../../');
 include_once './include/auth.php';
 include_once './include/config.php';

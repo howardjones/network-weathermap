@@ -3,7 +3,7 @@ import './App.css';
 import './iconfont/styles.css';
 import {connect} from 'react-redux';
 
-import {loadSettings} from './actions';
+// import {loadSettings} from './actions';
 import MapList from "./components/MapList";
 import Footer from "./components/Footer";
 import ActionBar from "./components/ActionBar";
@@ -11,7 +11,7 @@ import ActionBar from "./components/ActionBar";
 class App extends Component {
 
     componentDidMount() {
-        this.props.loadSettings(this.props.url);
+     //   this.props.loadSettings(this.props.url);
     }
 
 
@@ -34,7 +34,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-    loadSettings,
+    // loadSettings,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

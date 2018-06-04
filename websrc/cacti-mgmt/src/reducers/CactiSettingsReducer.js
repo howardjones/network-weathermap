@@ -1,4 +1,4 @@
-import {SET_SETTINGS} from "../actions";
+import {GET_SETTINGS_SUCCESS} from "../actions";
 
 const INITIAL_STATE = {
     wm_version: '1.0',
@@ -15,16 +15,21 @@ const INITIAL_STATE = {
 
 export default function (state = INITIAL_STATE, action) {
 
-    console.log(action);
+//    console.log(action);
 
     switch (action.type) {
-        case SET_SETTINGS:
-            if (action.settings !== undefined) {
-                return action.settings;
-            } else {
-                console.log("Got undefined settings in SET_SETTINGS");
-                return state;
-            }
+        case GET_SETTINGS_SUCCESS:
+            window.wm_api.setBaseURL(action.data.api_url);
+            window.wm_api.setMapsURL(action.data.maps_url);
+            return action.data;
+
+        // case SET_SETTINGS:
+        //     if (action.settings !== undefined) {
+        //         return action.settings;
+        //     } else {
+        //         console.log("Got undefined settings in SET_SETTINGS");
+        //         return state;
+        //     }
 
         default:
             return state;

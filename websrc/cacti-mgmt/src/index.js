@@ -7,8 +7,11 @@ import App from './App';
 
 import {applyMiddleware, createStore} from 'redux';
 import {Provider} from 'react-redux';
-import thunk from 'redux-thunk';
 import logger from 'redux-logger';
+import createSagaMiddleware from 'redux-saga';
+
+import {HashRouter as Router, Route} from 'react-router-dom'
+import {ModalContainer, ModalRoute} from "react-router-modal";
 
 import {addLocaleData, IntlProvider} from 'react-intl';
 import fr from 'react-intl/locale-data/fr';
@@ -21,17 +24,27 @@ import translations from './translations';
 
 import reducers from './reducers';
 
-import {HashRouter as Router, Route} from 'react-router-dom'
+import rootSaga from './sagas';
+
+import WeathermapAPI from './services/api';
+
+import {getSettings} from "./actions";
+
 import FileSelector from "./components/AddMap";
 import MapProperties from "./components/MapProperties";
 import AddGroup from "./components/AddGroup";
 import CreateMap from "./components/CreateMap";
 import GroupProperties from "./components/GroupProperties";
-import {ModalContainer, ModalRoute} from "react-router-modal";
+
 import AppSettings from "./components/AppSettings";
 
-const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
+
+const sagaMiddleware = createSagaMiddleware();
+
+const createStoreWithMiddleware = applyMiddleware(sagaMiddleware, logger)(createStore);
 const store = createStoreWithMiddleware(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+
+sagaMiddleware.run(rootSaga);
 
 let wm_root = document.getElementById('weathermap-mgmt-root');
 
@@ -66,10 +79,12 @@ const AppRoutes = () => (
 
 const locale = translations.hasOwnProperty(wm_root.dataset['locale']) ? wm_root.dataset['locale'] : 'en';
 
+window.wm_api = new WeathermapAPI();
+
 ReactDOM.render(<Provider store={store}>
     <IntlProvider messages={translations[locale]} locale={locale}>
         <AppRoutes/>
     </IntlProvider>
 </Provider>, wm_root);
 
-
+store.dispatch(getSettings(wm_root.dataset.url));

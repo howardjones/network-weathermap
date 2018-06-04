@@ -20,6 +20,9 @@ class GroupProperties extends Component {
 
         return <div className='wm-group-properties-container wm-popup'>
             <h3>Group Properties for group #{groupId}</h3>
+
+            <p>Name: <input value='name here'/></p>
+
             <p>Group-level map-SET values</p>
             <p>(Maybe group-level access?)</p>
 

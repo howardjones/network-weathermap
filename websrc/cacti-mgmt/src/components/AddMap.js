@@ -24,7 +24,7 @@ class FileSelector extends Component {
 
     refreshList() {
 
-        const api_url = this.props.settings.api_url + 'mapfiles';
+        const api_url = this.props.settings.api_url + 'listmapfiles';
 
         console.log("Loading from " + api_url);
 

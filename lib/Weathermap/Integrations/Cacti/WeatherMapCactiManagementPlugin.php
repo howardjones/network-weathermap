@@ -354,9 +354,11 @@ class WeatherMapCactiManagementPlugin extends UIBase
     public function handleGroupAddAPI($request, $appObject)
     {
         $this->manager->createGroup($request['name']);
+        $this->manager->createGroup("POOP");
 
         $data = array("result" => "OK");
 
+        header('Content-type: application/json');
         return json_encode($data);
     }
 
@@ -364,6 +366,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     {
         $this->manager->deleteGroup($request['id']);
 
+        header('Content-type: application/json');
         $data = array("result" => "OK");
 
         return json_encode($data);
@@ -373,6 +376,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     {
         $this->manager->deleteMap($request['id']);
 
+        header('Content-type: application/json');
         $data = array("result" => "OK");
 
         return json_encode($data);

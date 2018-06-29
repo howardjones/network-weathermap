@@ -212,10 +212,10 @@ class Map extends MapBase
         $this->createDefaultLinks();
         $this->createDefaultNodes();
 
-        assert('is_object($this->nodes[":: DEFAULT ::"])');
-        assert('is_object($this->links[":: DEFAULT ::"])');
-        assert('is_object($this->nodes["DEFAULT"])');
-        assert('is_object($this->links["DEFAULT"])');
+        assert(is_object($this->nodes[":: DEFAULT ::"]));
+        assert(is_object($this->links[":: DEFAULT ::"]));
+        assert(is_object($this->nodes["DEFAULT"]));
+        assert(is_object($this->links["DEFAULT"]));
 
         $this->imap = new HTMLImagemap('weathermap');
 
@@ -432,7 +432,7 @@ class Map extends MapBase
         }
 
 //        $theItem = null;
-//        assert('is_scalar($input)');
+//        assert(is_scalar($input));
 
         $contextType = $this->getProcessStringContextName($context);
 

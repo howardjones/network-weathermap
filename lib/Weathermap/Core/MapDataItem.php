@@ -138,7 +138,7 @@ class MapDataItem extends MapItem
     public function copyFrom(&$source)
     {
         MapUtility::debug("Initialising %s $this->name from $source->name\n", $this->myType());
-        assert('is_object($source)');
+        assert(is_object($source));
 
         foreach (array_keys($this->inheritedFieldList) as $fld) {
             if ($fld != 'template') {

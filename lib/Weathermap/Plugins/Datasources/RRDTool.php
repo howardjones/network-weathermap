@@ -72,7 +72,6 @@ class RRDTool extends Base
         }
 
 
-
         return false;
     }
 
@@ -184,8 +183,6 @@ class RRDTool extends Base
         &$map,
         &$item
     ) {
-        global $php_errormsg;
-
         MapUtility::debug("RRD ReadData: VDEF style, for " . $item->my_type() . " " . $item->name . "\n");
 
         $extraOptions = $map->getHint("rrd_options");
@@ -234,7 +231,8 @@ class RRDTool extends Base
         $lines = array();
 
         if (!isset($pipe)) {
-            MapUtility::warn("RRD Aggregate ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+            $error = error_get_last();
+            MapUtility::warn("RRD Aggregate ReadData: failed to open pipe to RRDTool: " . $error['message'] . " [WMRRD04]\n");
             return;
         }
 
@@ -325,7 +323,8 @@ class RRDTool extends Base
         $linecount = 0;
 
         if (!isset($pipe)) {
-            MapUtility::warn("RRD ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+            $error = error_get_last();
+            MapUtility::warn("RRD ReadData: failed to open pipe to RRDTool: " . $error['message'] . " [WMRRD04]\n");
             return;
         }
         $headings = fgets($pipe, 4096);

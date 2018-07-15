@@ -17,6 +17,8 @@
     "bramus/monolog-colored-line-formatter": "~2.0"
   },
   "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "*",
+    "wimg/php-compatibility": "*",
     "phpunit/dbunit": "*",
     "phpunit/phpunit": "~5",
     "phpmd/phpmd": "*",
@@ -31,6 +33,8 @@
     "phploc/phploc": "^4.0"
   },
   "autoload": {
-    "psr-4": {"Weathermap\\": "lib/Weathermap"}
+    "psr-4": {
+      "Weathermap\\": "lib/Weathermap"
+    }
   }
 }

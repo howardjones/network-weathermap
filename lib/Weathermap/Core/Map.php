@@ -339,20 +339,12 @@ class Map extends MapBase
         // TODO - this should probably be a static, or otherwise cached
         $allItems = array();
 
-        $listOfItemLists = array(&$this->nodes, &$this->links);
-        reset($listOfItemLists);
-
-        while (list($outerListCount,) = each($listOfItemLists)) {
-            unset($itemList);
-            $itemList = &$listOfItemLists[$outerListCount];
-
-            reset($itemList);
-            while (list($innerListCount,) = each($itemList)) {
-                unset($oneMapItem);
-                $oneMapItem = &$itemList[$innerListCount];
-                $allItems [] = $oneMapItem;
+        foreach (array(&$this->nodes, &$this->links) as $innerList) {
+            foreach ($innerList as $item) {
+                $allItems[] = $item;
             }
         }
+
         return $allItems;
     }
 
@@ -1880,7 +1872,7 @@ class Map extends MapBase
 
         foreach ($this->getRealNodes() as $nodename) {
             $node = $this->getNode($nodename);
-            if ($node->iconfile != "" && ! $node->hasArtificialIcon()) {
+            if ($node->iconfile != "" && !$node->hasArtificialIcon()) {
                 $this->usedImages [] = $node->iconfile;
             }
         }

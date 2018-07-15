@@ -55,7 +55,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $polar;
 	var $boundingboxes=array();
 
-	function WeatherMapNode()
+	function __construct()
 	{
 		$this->inherit_fieldlist=array
 			(

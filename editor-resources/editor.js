@@ -41,7 +41,7 @@ var helptexts = {
 };
 
 jQuery(document).ready(initJS);
-jQuery(document).unload(cleanupJS);
+jQuery(document).on('unload', cleanupJS);
 
 function initJS()
     {
@@ -85,11 +85,11 @@ function cleanupJS()
 function attach_click_events()
     {  
 
-    jQuery("area[id^=LINK:]").attr("href","#").click(click_handler);
-    jQuery("area[id^=NODE:]").attr("href","#").click(click_handler);
-    jQuery("area[id^=TIMES]").attr("href","#").click(position_timestamp);
-    jQuery("area[id^=LEGEN]").attr("href","#").click(position_legend);
-    
+      jQuery("area[id^='LINK:']").attr("href", "#").click(click_handler);
+      jQuery("area[id^='NODE:']").attr("href", "#").click(click_handler);
+      jQuery("area[id^='TIMES']").attr("href", "#").click(position_timestamp);
+      jQuery("area[id^='LEGEN']").attr("href", "#").click(position_legend);
+
     if(fromplug===1)
     {
         jQuery("#tb_newfile").html('Return to<br>Cacti').click( function() {window.location = "weathermap-cacti-plugin-mgmt.php";} )

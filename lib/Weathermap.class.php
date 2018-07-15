@@ -264,7 +264,7 @@ class WeatherMap extends WeatherMapBase
     var $warncount = 0;
 
 
-	function WeatherMap()
+	function __construct()
 	{
 		$this->inherit_fieldlist=array
 			(
@@ -437,6 +437,26 @@ class WeatherMap extends WeatherMapBase
 
 		wm_debug("WeatherMap class Reset() complete\n");
 	}
+
+    /**
+     * Create an array of all the nodes and links, mixed together.
+     * readData() makes several passes through this list.
+     *
+     * @return MapDataItem[]
+     */
+    public function buildAllItemsList()
+    {
+        // TODO - this should probably be a static, or otherwise cached
+        $allItems = array();
+
+        foreach (array(&$this->nodes, &$this->links) as $innerList) {
+            foreach ($innerList as $item) {
+                $allItems[] = $item;
+            }
+        }
+
+        return $allItems;
+    }
 
 	function myimagestring($image, $fontnumber, $x, $y, $string, $colour, $angle=0)
 	{
@@ -769,103 +789,91 @@ function DatasourceInit()
 function ProcessTargets()
 {
 	wm_debug("Preprocessing targets\n");
-	
-	$allitems = array(&$this->links, &$this->nodes);
-	reset($allitems);
-	
-	wm_debug("Preprocessing targets\n");
-	
-	while( list($kk,) = each($allitems))
-	{
-		unset($objects);
-		$objects = &$allitems[$kk];
 
-		reset($objects);
-		while (list($k,) = each($objects))
-		{
-			unset($myobj);
-			$myobj = &$objects[$k];
-			
-			$type = $myobj->my_type();
-			$name=$myobj->name;
-			
-			
-			if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
-			{
-				if (count($myobj->targets)>0)
-				{
-					$tindex = 0;
-					foreach ($myobj->targets as $target)
-					{
-						wm_debug ("ProcessTargets: New Target: $target[4]\n");
-						// processstring won't use notes (only hints) for this string
-						
-						$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
-						if($target[4] != $targetstring) wm_debug("Targetstring is now $targetstring\n");
+	$allitems = $this->buildAllItemsList();
 
-						// if the targetstring starts with a -, then we're taking this value OFF the aggregate
-						$multiply = 1;
-						if(preg_match("/^-(.*)/",$targetstring,$matches))
-						{
-							$targetstring = $matches[1];
-							$multiply = -1 * $multiply;
-						}
-						
-						// if the remaining targetstring starts with a number and a *-, then this is a scale factor
-						if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
-						{
-							$targetstring = $matches[2];
-							$multiply = $multiply * floatval($matches[1]);
-						}
-						
-						$matched = FALSE;
-						$matched_by = '';
-						foreach ($this->datasourceclasses as $ds_class)
-						{
-							if(!$matched)
-							{
-								// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
-								$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
+    foreach ($allitems as $myobj)
+    {
+        $type = $myobj->my_type();
+        $name=$myobj->name;
 
-								if( $recognised )
-								{	
-									$matched = TRUE;
-									$matched_by = $ds_class;
-																		
-									if($this->activedatasourceclasses[$ds_class])
-									{
-										$this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
-										if($type == 'NODE')
-										{
-											$this->nodes[$name]->targets[$tindex][1] = $multiply;
-											$this->nodes[$name]->targets[$tindex][0] = $targetstring;
-											$this->nodes[$name]->targets[$tindex][5] = $matched_by;
-										}
-										if($type == 'LINK')
-										{
-											$this->links[$name]->targets[$tindex][1] = $multiply;
-											$this->links[$name]->targets[$tindex][0] = $targetstring;
-											$this->links[$name]->targets[$tindex][5] = $matched_by;
-										}											
-									}
-									else
-									{
-										wm_warn("ProcessTargets: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
-									}
-								}
-							}
-						}
-						if(! $matched)
-						{
-							wm_warn("ProcessTargets: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
-						}							
-						
-						$tindex++;
-					}
-				}
-			}
-		}
-	}
+
+        if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
+        {
+            if (count($myobj->targets)>0)
+            {
+                $tindex = 0;
+                foreach ($myobj->targets as $target)
+                {
+                    wm_debug ("ProcessTargets: New Target: $target[4]\n");
+                    // processstring won't use notes (only hints) for this string
+
+                    $targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
+                    if($target[4] != $targetstring) wm_debug("Targetstring is now $targetstring\n");
+
+                    // if the targetstring starts with a -, then we're taking this value OFF the aggregate
+                    $multiply = 1;
+                    if(preg_match("/^-(.*)/",$targetstring,$matches))
+                    {
+                        $targetstring = $matches[1];
+                        $multiply = -1 * $multiply;
+                    }
+
+                    // if the remaining targetstring starts with a number and a *-, then this is a scale factor
+                    if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
+                    {
+                        $targetstring = $matches[2];
+                        $multiply = $multiply * floatval($matches[1]);
+                    }
+
+                    $matched = FALSE;
+                    $matched_by = '';
+                    foreach ($this->datasourceclasses as $ds_class)
+                    {
+                        if(!$matched)
+                        {
+                            // $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
+                            $recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
+
+                            if( $recognised )
+                            {
+                                $matched = TRUE;
+                                $matched_by = $ds_class;
+
+                                if($this->activedatasourceclasses[$ds_class])
+                                {
+                                    $this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
+                                    if($type == 'NODE')
+                                    {
+                                        $this->nodes[$name]->targets[$tindex][1] = $multiply;
+                                        $this->nodes[$name]->targets[$tindex][0] = $targetstring;
+                                        $this->nodes[$name]->targets[$tindex][5] = $matched_by;
+                                    }
+                                    if($type == 'LINK')
+                                    {
+                                        $this->links[$name]->targets[$tindex][1] = $multiply;
+                                        $this->links[$name]->targets[$tindex][0] = $targetstring;
+                                        $this->links[$name]->targets[$tindex][5] = $matched_by;
+                                    }
+                                }
+                                else
+                                {
+                                    wm_warn("ProcessTargets: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
+                                }
+                            }
+                        }
+                    }
+                    if(! $matched)
+                    {
+                        wm_warn("ProcessTargets: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
+                    }
+
+                    $tindex++;
+                }
+            }
+        }
+    }
+	// }
 }
 
 function ReadData()
@@ -889,20 +897,23 @@ function ReadData()
 		
 		wm_debug ("======================================\n");
 		wm_debug("Starting main collection loop\n");
-		
-		$allitems = array(&$this->links, &$this->nodes);
-		reset($allitems);
-		
-		while( list($kk,) = each($allitems))
-		{
-			unset($objects);
-			$objects = &$allitems[$kk];
 
-			reset($objects);
-			while (list($k,) = each($objects))
+        $allitems = $this->buildAllItemsList();
+
+//		$allitems = array(&$this->links, &$this->nodes);
+//		reset($allitems);
+		
+//		while( list($kk,) = each($allitems))
+//		{
+//			unset($objects);
+//			$objects = &$allitems[$kk];
+
+//			reset($objects);
+//			while (list($k,) = each($objects))
+            foreach ($allitems as $myobj)
 			{
-				unset($myobj);
-				$myobj = &$objects[$k];
+//				unset($myobj);
+//				$myobj = &$objects[$k];
 
 				$type = $myobj->my_type();
 
@@ -1050,9 +1061,9 @@ function ReadData()
 				### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
 
 				wm_debug ("ReadData: Setting $total_in,$total_out\n");
-				unset($myobj);
+//				unset($myobj);
 			}
-		}
+//		}
 		wm_debug ("ReadData Completed.\n");
 		wm_debug("------------------------------\n");
 	}
@@ -3533,149 +3544,138 @@ function PreloadMapHTML()
 		$center_y=$this->height / 2;
 
 		// loop through everything. Figure out along the way if it's a node or a link
-		$allitems = array(&$this->nodes, &$this->links);
-		reset($allitems);
+        $allitems = $this->buildAllItemsList();
 
-		while( list($kk,) = each($allitems))
-		{
-			unset($objects);
-			# $objects = &$this->links;
-			$objects = &$allitems[$kk];
+        foreach ($allitems as $myobj)
+        {
+            $type = $myobj->my_type();
+            $prefix = substr($type,0,1);
 
-			reset($objects);
-			while (list($k,) = each($objects))
-			{
-				unset($myobj);
-				$myobj = &$objects[$k];
+            $dirs = array();
+            //print "\n\nConsidering a $type - ".$myobj->name.".\n";
+            if($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
+            if($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
 
-				$type = $myobj->my_type();
-				$prefix = substr($type,0,1);
+            // check to see if any of the relevant things have a value
+            $change = "";
+            foreach ($dirs as $d=>$parts)
+            {
+                //print "$d - ".join(" ",$parts)."\n";
+                $change .= join('',$myobj->overliburl[$d]);
+                $change .= $myobj->notestext[$d];
+            }
 
-				$dirs = array();
-				//print "\n\nConsidering a $type - ".$myobj->name.".\n";
-				if($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
-				if($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
-				
-				// check to see if any of the relevant things have a value
-				$change = "";
-				foreach ($dirs as $d=>$parts)
-				{
-					//print "$d - ".join(" ",$parts)."\n";
-					$change .= join('',$myobj->overliburl[$d]);
-					$change .= $myobj->notestext[$d];
-				}
-				
-				if ($this->htmlstyle == "overlib")
-				{
-					//print "CHANGE: $change\n";
+            if ($this->htmlstyle == "overlib")
+            {
+                //print "CHANGE: $change\n";
 
-					// skip all this if it's a template node
-					if($type=='LINK' && ! isset($myobj->a->name)) { $change = ''; }
-					if($type=='NODE' && ! isset($myobj->x)) { $change = ''; }
+                // skip all this if it's a template node
+                if($type=='LINK' && ! isset($myobj->a->name)) { $change = ''; }
+                if($type=='NODE' && ! isset($myobj->x)) { $change = ''; }
 
-					if($change != '')
-					{
-						//print "Something to be done.\n";
-						if($type=='NODE')
-						{
-							$mid_x = $myobj->x;
-							$mid_y = $myobj->y;
-						}
-						if($type=='LINK')
-						{
-							$a_x = $this->nodes[$myobj->a->name]->x;
-							$a_y = $this->nodes[$myobj->a->name]->y;
+                if($change != '')
+                {
+                    //print "Something to be done.\n";
+                    if($type=='NODE')
+                    {
+                        $mid_x = $myobj->x;
+                        $mid_y = $myobj->y;
+                    }
+                    if($type=='LINK')
+                    {
+                        $a_x = $this->nodes[$myobj->a->name]->x;
+                        $a_y = $this->nodes[$myobj->a->name]->y;
 
-							$b_x = $this->nodes[$myobj->b->name]->x;
-							$b_y = $this->nodes[$myobj->b->name]->y;
+                        $b_x = $this->nodes[$myobj->b->name]->x;
+                        $b_y = $this->nodes[$myobj->b->name]->y;
 
-							$mid_x=($a_x + $b_x) / 2;
-							$mid_y=($a_y + $b_y) / 2;
-						}
-						$left=""; $above="";
-						$img_extra = "";
-					
-						if ($myobj->overlibwidth != 0)
-						{
-							$left="WIDTH," . $myobj->overlibwidth . ",";
-							$img_extra .= " WIDTH=$myobj->overlibwidth";
+                        $mid_x=($a_x + $b_x) / 2;
+                        $mid_y=($a_y + $b_y) / 2;
+                    }
+                    $left=""; $above="";
+                    $img_extra = "";
 
-							if ($mid_x > $center_x) $left.="LEFT,";
-						}
-						
-						if ($myobj->overlibheight != 0)
-						{
-							$above="HEIGHT," . $myobj->overlibheight . ",";
-							$img_extra .= " HEIGHT=$myobj->overlibheight";
+                    if ($myobj->overlibwidth != 0)
+                    {
+                        $left="WIDTH," . $myobj->overlibwidth . ",";
+                        $img_extra .= " WIDTH=$myobj->overlibwidth";
 
-							if ($mid_y > $center_y) $above.="ABOVE,";
-						}
-						
-						foreach ($dirs as $dir=>$parts)
-						{
-							$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
-							$caption = $this->ProcessString($caption,$myobj);
+                        if ($mid_x > $center_x) $left.="LEFT,";
+                    }
 
-							$overlibhtml = "onmouseover=\"return overlib('";
+                    if ($myobj->overlibheight != 0)
+                    {
+                        $above="HEIGHT," . $myobj->overlibheight . ",";
+                        $img_extra .= " HEIGHT=$myobj->overlibheight";
 
-							$n = 0;
-							if(sizeof($myobj->overliburl[$dir]) > 0)
-							{
-								// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-								foreach ($myobj->overliburl[$dir] as $url)
-								{
-									if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
-									$overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url,$myobj) . "&gt;";
-									$n++;
-								}
-							}
-							# print "Added $n for $dir\n";
-							if(trim($myobj->notestext[$dir]) != '')
-							{
-								# put in a linebreak if there was an image AND notes
-								if($n>0) $overlibhtml .= '&lt;br /&gt;';
-								$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
-								$note = htmlspecialchars($note, ENT_NOQUOTES);
-								$note=str_replace("'", "\\&apos;", $note);
-								$note=str_replace('"', "&quot;", $note);
-								$overlibhtml .= $note;
-							}
-							$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-							. "');\"  onmouseout=\"return nd();\"";
-							
-							foreach ($parts as $part)
-							{
-								$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-								//print "INFOURL for $areaname - ";
-							
-								$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-							}
-						}			
-					} // if change
-				} // overlib?
-				
-				// now look at inforurls
-				foreach ($dirs as $dir=>$parts)
-				{
-					foreach ($parts as $part)
-					{
-						# $areaname = $type.":" . $myobj->name . ":" . $part;
-						$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-						//print "INFOURL for $areaname - ";
-												
-						if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
-							$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
-							//print "Setting.\n";
-						}
-						else
-						{
-							//print "NOT Setting.\n";
-						}
-					}
-				}
-			
-			}
-		}
+                        if ($mid_y > $center_y) $above.="ABOVE,";
+                    }
+
+                    foreach ($dirs as $dir=>$parts)
+                    {
+                        $caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
+                        $caption = $this->ProcessString($caption,$myobj);
+
+                        $overlibhtml = "onmouseover=\"return overlib('";
+
+                        $n = 0;
+                        if(sizeof($myobj->overliburl[$dir]) > 0)
+                        {
+                            // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+                            foreach ($myobj->overliburl[$dir] as $url)
+                            {
+                                if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
+                                $overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url,$myobj) . "&gt;";
+                                $n++;
+                            }
+                        }
+                        # print "Added $n for $dir\n";
+                        if(trim($myobj->notestext[$dir]) != '')
+                        {
+                            # put in a linebreak if there was an image AND notes
+                            if($n>0) $overlibhtml .= '&lt;br /&gt;';
+                            $note = $this->ProcessString($myobj->notestext[$dir],$myobj);
+                            $note = htmlspecialchars($note, ENT_NOQUOTES);
+                            $note=str_replace("'", "\\&apos;", $note);
+                            $note=str_replace('"', "&quot;", $note);
+                            $overlibhtml .= $note;
+                        }
+                        $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
+                        . "');\"  onmouseout=\"return nd();\"";
+
+                        foreach ($parts as $part)
+                        {
+                            $areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
+                            //print "INFOURL for $areaname - ";
+
+                            $this->imap->setProp("extrahtml", $overlibhtml, $areaname);
+                        }
+                    }
+                } // if change
+            } // overlib?
+
+            // now look at inforurls
+            foreach ($dirs as $dir=>$parts)
+            {
+                foreach ($parts as $part)
+                {
+                    # $areaname = $type.":" . $myobj->name . ":" . $part;
+                    $areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
+                    //print "INFOURL for $areaname - ";
+
+                    if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
+                        $this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
+                        //print "Setting.\n";
+                    }
+                    else
+                    {
+                        //print "NOT Setting.\n";
+                    }
+                }
+            }
+
+        }
+//		}
 	
 }
 

@@ -235,3 +235,4 @@
 ./vendor/jquery-idletimer/dist/idle-timer.min.js
 ./weathermap-cacti-plugin-editor.php
 ./editor-resources/oldeditor.css
+./editor-resources/exclamation.png

@@ -1643,7 +1643,7 @@ class Point
 {
 	var $x, $y;
 	
-	function Point($x=0,$y=0)
+	function __construct($x=0,$y=0)
 	{
 		$this->x = $x;
 		$this->y = $y;
@@ -1655,7 +1655,7 @@ class Vector
 {
 	var $dx, $dy;
 	
-	function Vector($dx=0,$dy=0)
+	function __construct($dx=0,$dy=0)
 	{
 		$this->dx = $dx;
 		$this->dy = $dy;
@@ -1690,7 +1690,7 @@ class Colour
 	
 	
 	// take in an existing value and create a Colour object for it
-	function Colour()
+	function __construct()
 	{
 		if(func_num_args() == 3) # a set of 3 colours
 		{

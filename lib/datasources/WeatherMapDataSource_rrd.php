@@ -341,7 +341,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 		else
 		{
-			wm_warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
+		    $error = error_get_last();
+			wm_warn("RRD ReadData: failed to open pipe to RRDTool: ". $error['message']." [WMRRD04]\n");
 		}
 		wm_debug ("RRD ReadDataFromRealRRDAggregate: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 
@@ -484,7 +485,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 		else
 		{
-			wm_warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
+            $error = error_get_last();
+            wm_warn("RRD ReadData: failed to open pipe to RRDTool: ". $error['message']." [WMRRD04]\n");
 		}
 		wm_debug ("RRD ReadDataFromRealRRD: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 	}

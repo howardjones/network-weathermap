@@ -24,7 +24,7 @@
 		die("Couldn't find a usable Cacti config - check the first few lines of ".__FILE__."\n");
 	}
 
-	require_once 'Weathermap.class.php';
+	require_once '../lib/Weathermap.class.php';
 	require_once 'Console/Getopt.php';
 
 	$reverse = 0;
@@ -102,21 +102,11 @@
 
 	$map->DatasourceInit();
 	$map->ProcessTargets();
-	
-	$allitems = array(&$map->links, &$map->nodes);
-	reset($allitems);
-	
-	while( list($kk,) = each($allitems))
-	{
-		unset($objects);
-		$objects = &$allitems[$kk];
 
-		reset($objects);
-		while (list($k,) = each($objects))
+	$allitems = $map->buildAllItemsList();
+
+        foreach ($allitems as $myobj)
 		{
-			unset($myobj);
-			$myobj = &$objects[$k];
-
 			$type = $myobj->my_type();
 
 			$name=$myobj->name;
@@ -302,10 +292,8 @@
 				wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
 			}
 			
-			unset($myobj);
 		}
-	}
-	
+
 	$map->WriteConfig($outputfile);
 
 	print "Wrote new config to $outputfile\n";

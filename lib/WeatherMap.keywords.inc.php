@@ -1,3 +1,4 @@
+<?php
 
 // new version of config_keywords
 // array of contexts, contains an array of keywords, contains a (short) list of regexps as now

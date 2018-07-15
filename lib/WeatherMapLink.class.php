@@ -54,7 +54,10 @@ class WeatherMapLink extends WeatherMapItem
 	var $commentoffset_in, $commentoffset_out;
 	var $template;
 
-	function WeatherMapLink() { $this->inherit_fieldlist=array
+	function __construct()
+    {
+
+	    $this->inherit_fieldlist=array
 		(
 			'my_default' => NULL,
 			'width' => 7,

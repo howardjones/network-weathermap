@@ -8,7 +8,9 @@ require_once 'lib/WMVector.class.php';
 require_once 'lib/WMLine.class.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED=false;
+$ENABLED=true;
+
+$ignore_cacti=TRUE;
 
 // If we're embedded in the Cacti UI (included from weathermap-cacti-plugin-editor.php), then authentication has happened. Enable the editor.
 if (isset($FROM_CACTI) && $FROM_CACTI == true) {
@@ -17,6 +19,7 @@ if (isset($FROM_CACTI) && $FROM_CACTI == true) {
 	$cacti_base = $config["base_path"];
 	$cacti_url = $config['url_path'];
 	$cacti_found = true;
+	$ignore_cacti = FALSE;
 } else {
     $FROM_CACTI = false;
 	$editor_name = "editor.php";
@@ -34,7 +37,6 @@ if(! $ENABLED)
 
 // sensible defaults
 $mapdir='configs';
-$ignore_cacti=FALSE;
 $configerror = '';
 
 // these are all set via the Editor Settings dialog, in the editor, now.

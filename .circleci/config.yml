@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - checkout
-      - run: sudo apt install -y libxslt1.1 xsltproc libxml2-dev libxslt1-dev zlib1g-dev libpng-devel libjpeg-devel
+      - run: sudo apt install -y libxslt1.1 xsltproc libxml2-dev libxslt1-dev zlib1g-dev libpng16-dev libjpeg-dev
       - run: sudo docker-php-ext-install xsl
       - run: sudo docker-php-ext-install gd
       - run: sudo docker-php-ext-install pdo

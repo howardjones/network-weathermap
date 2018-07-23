@@ -16,6 +16,4 @@ pecl install sqlite3
 pecl install ast
 #pecl install xdebug
 
-echo 'date.timezone = "GMT"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-
 

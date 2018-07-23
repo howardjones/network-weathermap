@@ -25,9 +25,12 @@ addons:
       - rrdtool
       - xsltproc
       - fping
+before_script:
+  - mysql weathermaptest < test-suite/data/weathermap-empty.sql
 after_script:
   - vendor/bin/test-reporter
 script:
+  - vendor/bin/parallel-lint --exclude app --exclude vendor .
   - vendor/bin/phpunit --configuration build/phpunit.xml
 notifications:
   webhooks:

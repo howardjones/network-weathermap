@@ -1059,8 +1059,8 @@ class MapNode extends MapDataItem
         $col1 = $this->colours[OUT];
         $col2 = $this->colours[IN];
 
-        assert('!is_null($col1)');
-        assert('!is_null($col2)');
+        assert(!is_null($col1));
+        assert(!is_null($col2));
 
         imagefilledarc(
             $iconImageRef,

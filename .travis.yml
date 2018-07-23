@@ -1,5 +1,6 @@
 sudo: false
 language: php
+dist: trusty
 services: 
   - mysql
 php:
@@ -27,6 +28,7 @@ addons:
       - fping
 before_script:
   - mysql weathermaptest < test-suite/data/weathermap-empty.sql
+  - phpenv config-add dev/ci/travis.ini
 after_script:
   - vendor/bin/test-reporter
 script:

@@ -1,6 +1,5 @@
 sudo: false
 language: php
-dist: trusty
 services: 
   - mysql
 php:

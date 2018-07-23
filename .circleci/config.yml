@@ -7,12 +7,12 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/php:7.0-cli-browsers
+      - image: circleci/php:7.0-cli-node-browsers
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mysql:9.4
+      - image: circleci/mysql:5.7
 
     working_directory: ~/repo
 
@@ -20,6 +20,10 @@ jobs:
       - checkout
       - run: sudo apt install -y libxslt1.1 xsltproc libxml2-dev libxslt1-dev zlib1g-dev
       - run: sudo docker-php-ext-install xsl
+      - run: sudo docker-php-ext-install gd
+      - run: sudo docker-php-ext-install pdo
+      - run: sudo docker-php-ext-install pdo_mysql
+      - run: sudo docker-php-ext-install snmp
       - run: sudo composer self-update
       # Download and cache dependencies
       - restore_cache:

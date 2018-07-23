@@ -10,7 +10,9 @@ WEATHERMAP_VERSION="git"
 PHP_VERSION="5.6"
 
 # Get the common settings (CACTI_VERSION etc)
+if [ -f /vagrant/settings.sh ]; then
 . /vagrant/settings.sh
+fi
 
 sudo add-apt-repository ppa:ondrej/php
 sudo apt-get update -y

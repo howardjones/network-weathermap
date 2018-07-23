@@ -1,17 +1,21 @@
 # weathermap dependencies
 pecl install gd
 pecl install mysql
-pecl install xdebug
 pecl install snmp
 
 # Cacti dependencies
-pecl install mbstring
-pecl install curl
-pecl install ldap
-pecl install gmp
-pecl install xml
-pecl install gettext
+#pecl install mbstring
+#pecl install curl
+#pecl install ldap
+#pecl install gmp
+#pecl install xml
+#pecl install gettext
+
+# used by phpunit or other testing tools
 pecl install sqlite3
 pecl install ast
+#pecl install xdebug
+
+echo 'date.timezone = "GMT"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
 

@@ -32,8 +32,8 @@ class WeatherMapCactiManagementPlugin extends UIBase
         ':: DEFAULT ::' => array('handler' => 'handleManagementMainScreen', 'args' => array()),
 
         'app_settings' => array('handler' => 'handleSettingsAPI', 'args' => array()),
-        'app_listusers' => array('handler' => '', 'args' => array()),
-        'app_listusergroups' => array('handler' => '', 'args' => array()),
+        #'app_listusers' => array('handler' => '', 'args' => array()),
+        #'app_listusergroups' => array('handler' => '', 'args' => array()),
 
         'listmaps' => array('handler' => 'handleDumpMapsAPI', 'args' => array()),
         'listmapfiles' => array('handler' => 'handleDumpMapFilesAPI', 'args' => array()),
@@ -88,13 +88,13 @@ class WeatherMapCactiManagementPlugin extends UIBase
             )
         ),
 
-        'settings_add' => array('handler' => '', 'args' => array()),
-        'settings_update' => array('handler' => '', 'args' => array()),
-        'settings_delete' => array('handler' => '', 'args' => array()),
+   #     'settings_add' => array('handler' => '', 'args' => array()),
+   #     'settings_update' => array('handler' => '', 'args' => array()),
+   #     'settings_delete' => array('handler' => '', 'args' => array()),
 
-        'perms_add' => array('handler' => '', 'args' => array()),
-        'perms_update' => array('handler' => '', 'args' => array()),
-        'perms_delete' => array('handler' => '', 'args' => array()),
+   #     'perms_add' => array('handler' => '', 'args' => array()),
+   #     'perms_update' => array('handler' => '', 'args' => array()),
+   #     'perms_delete' => array('handler' => '', 'args' => array()),
 
 
 //        'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id", "int"))),

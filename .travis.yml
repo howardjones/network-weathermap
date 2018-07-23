@@ -1,5 +1,7 @@
 sudo: false
 language: php
+services: 
+  - mysql
 php:
   - "7.2"
   - "7.1"
@@ -10,6 +12,7 @@ env:
 before_install:
 #  - sudo apt-get update -qq
   - mkdir -p build/log
+  - mysql -e 'CREATE DATABASE weathermaptest; GRANT ALL ON weathermaptest.* TO weathermaptest@localhost identified by "weathermaptest"; FLUSH PRIVILEGES;'
 install:
   - ./dev/ci/travis-dependencies.sh
   - composer install
@@ -21,6 +24,7 @@ addons:
       - imagemagick
       - rrdtool
       - xsltproc
+      - fping
 after_script:
   - vendor/bin/test-reporter
 script:

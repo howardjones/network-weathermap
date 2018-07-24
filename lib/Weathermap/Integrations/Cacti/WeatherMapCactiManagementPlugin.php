@@ -38,35 +38,35 @@ class WeatherMapCactiManagementPlugin extends UIBase
         'listmaps' => array('handler' => 'handleDumpMapsAPI', 'args' => array()),
         'listmapfiles' => array('handler' => 'handleDumpMapFilesAPI', 'args' => array()),
 
-        'map_create' => array(
-            'handler' => '',
-            'args' => array(
-                array('filename', 'mapfile'),
-                array('source', 'mapfile', true),
-                array('add', 'bool', true),
-                array('group_id', 'int')
-            )
-        ),
+//        'map_create' => array(
+//            'handler' => '',
+//            'args' => array(
+//                array('filename', 'mapfile'),
+//                array('source', 'mapfile', true),
+//                array('add', 'bool', true),
+//                array('group_id', 'int')
+//            )
+//        ),
 
-        'map_add' => array(
-            'handler' => 'handleMapAddAPI',
-            'args' => array(
-                array('filename', 'mapfile'),
-                array('group_id', 'int')
-            )
-        ),
-
-        'map_delete' => array(
-            'handler' => '',
-            'args' => array(
-                'args' => array(
-                    array('id', 'int')
-                )
-            )
-        ),
-        'map_update' => array('handler' => '', 'args' => array()),
-        'map_getconfig' => array('handler' => '', 'args' => array()),
-
+//        'map_add' => array(
+//            'handler' => 'handleMapAddAPI',
+//            'args' => array(
+//                array('filename', 'mapfile'),
+//                array('group_id', 'int')
+//            )
+//        ),
+//
+//        'map_delete' => array(
+//            'handler' => '',
+//            'args' => array(
+//                'args' => array(
+//                    array('id', 'int')
+//                )
+//            )
+//        ),
+//        'map_update' => array('handler' => '', 'args' => array()),
+//        'map_getconfig' => array('handler' => '', 'args' => array()),
+//
         'group_add' => array(
             'handler' => 'handleGroupAddAPI',
             'args' => array(
@@ -79,14 +79,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
                 array('id', 'int')
             )
         ),
-        'group_update' => array(
-            'handler' => 'handleGroupUpdateAPI',
-            'args' => array(
-                array('id', 'int'),
-                array('name', 'non-empty-string', true),
-                array('position_after', 'int', true)
-            )
-        ),
+//        'group_update' => array(
+//            'handler' => 'handleGroupUpdateAPI',
+//            'args' => array(
+//                array('id', 'int'),
+//                array('name', 'non-empty-string', true),
+//                array('position_after', 'int', true)
+//            )
+//        ),
 
    #     'settings_add' => array('handler' => '', 'args' => array()),
    #     'settings_update' => array('handler' => '', 'args' => array()),

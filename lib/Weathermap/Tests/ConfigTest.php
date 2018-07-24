@@ -13,8 +13,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     protected static $result1dir;
     protected static $result2dir;
     protected static $referencedir;
+    protected static $os_referencedir;
     protected static $diffdir;
-    protected static $phptag;
+    protected static $php_tag;
+    protected static $os_tag;
 
     protected static $previouswd;
     protected static $compare;
@@ -52,7 +54,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             unlink($compareOutputFileName);
         }
 
-        $this->assertFileExists($referenceImageFileName, "reference image missing");
+        $this->assertFileExists($referenceImageFileName, "reference image $referenceImageFileName missing");
 
         $warningCount = TestSupport::runOutputTest(
             self::$testdir . DIRECTORY_SEPARATOR . $configFileName,
@@ -190,6 +192,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             if (substr($file, -5, 5) == '.conf') {
                 $reference = self::$referencedir . DIRECTORY_SEPARATOR . $file . ".png";
 
+                if (file_exists(self::$os_referencedir . DIRECTORY_SEPARATOR . $file . ".png")) {
+                    $reference = self::$os_referencedir . DIRECTORY_SEPARATOR . $file . ".png";
+                }
+
                 # if (file_exists($reference)) {
                 $configList[$file] = array($file, $reference);
 
@@ -202,7 +208,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                         $file,
                         $file,
                         htmlspecialchars($title),
-                        self::$phptag,
+                        self::$php_tag,
                         $file,
                         $file,
                         $file
@@ -244,22 +250,32 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     private function checkPaths()
     {
         $version = explode('.', PHP_VERSION);
-        $phptag = "php" . $version[0];
+        $php_tag = "php-" . $version[0] . "." . $version[1];
 
-        $here = dirname(__FILE__);
+//        $here = dirname(__FILE__);
         $testSuiteRoot = realpath(dirname(__FILE__) . "/../../../") . "/test-suite";
 //        $testSuiteRoot = $here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "test-suite";
 
-        self::$phptag = "php" . $version[0];
-        self::$result1dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results1-$phptag";
-        self::$result2dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results2-$phptag";
+        self::$php_tag = $php_tag;
+        self::$result1dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results1-$php_tag";
+        self::$result2dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results2-$php_tag";
         self::$diffdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "diffs";
 
         self::$testdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "tests";
         self::$referencedir = $testSuiteRoot . DIRECTORY_SEPARATOR . "references";
+        self::$os_referencedir = "";
+
+        $os_codename = trim(shell_exec("lsb_release -c -s"));
+        $os_tag = "$os_codename-$php_tag";
+
+        self::$os_tag = $os_tag;
+
+        $os_references = $testSuiteRoot . DIRECTORY_SEPARATOR . "references/$os_tag";
+        if (is_dir($os_references)) {
+            self::$os_referencedir = $os_references;
+        }
 
         self::$testsuite = $testSuiteRoot;
-
 
         if (!file_exists(self::$result1dir)) {
             mkdir(self::$result1dir);

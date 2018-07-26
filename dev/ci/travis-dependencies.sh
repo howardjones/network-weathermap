@@ -12,8 +12,9 @@ pecl install snmp
 #pecl install gettext
 
 # used by phpunit or other testing tools
-pecl install sqlite3
+#pecl install sqlite3
 pecl install ast
 #pecl install xdebug
 
+apt-get install php5.6-sqlite3
 

@@ -190,13 +190,18 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         foreach ($testFiles as $file) {
             if (substr($file, -5, 5) == '.conf') {
+
+                $result_url = "results1-" . self::$php_tag . "/" . $file . ".png";
+                $diff_url = "diffs-" . self::$php_tag . "/" . $file . ".png";
+                $reference_url = "references/" . $file . ".png";
+
                 $reference = self::$referencedir . DIRECTORY_SEPARATOR . $file . ".png";
 
                 if (file_exists(self::$os_referencedir . DIRECTORY_SEPARATOR . $file . ".png")) {
                     $reference = self::$os_referencedir . DIRECTORY_SEPARATOR . $file . ".png";
+                    $reference_url = "references/" . self::$os_tag . "/" . $file . ".png";
                 }
 
-                # if (file_exists($reference)) {
                 $configList[$file] = array($file, $reference);
 
                 $title = TestSupport::getMapTitle(self::$testdir . DIRECTORY_SEPARATOR . $file);
@@ -204,18 +209,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 fputs(
                     $fileHandle,
                     sprintf(
-                        "<h4>%s <a href=\"tests/%s\">[conf]</a> <em>%s</em></h4><p><nobr>Out:<img align=middle src='results1-%s/%s.png'> Ref:<img src='references/%s.png' align=middle> Diff:<img align=middle src='diffs/%s.png'></nobr></p>\n",
+                        "<h4>%s <a href=\"tests/%s\">[conf]</a> <em>%s</em></h4><p><nobr>Out:<img align=middle src='%s'> Ref:<img src='%s' align=middle> Diff:<img align=middle src='%s'></nobr></p>\n",
                         $file,
                         $file,
                         htmlspecialchars($title),
-                        self::$php_tag,
-                        $file,
-                        $file,
-                        $file
+                        $result_url,
+                        $reference_url,
+                        $diff_url
                     )
                 );
-
-                # }
             }
         }
 
@@ -259,7 +261,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         self::$php_tag = $php_tag;
         self::$result1dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results1-$php_tag";
         self::$result2dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results2-$php_tag";
-        self::$diffdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "diffs";
+        self::$diffdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "diffs-$php_tag";
 
         self::$testdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "tests";
         self::$referencedir = $testSuiteRoot . DIRECTORY_SEPARATOR . "references";

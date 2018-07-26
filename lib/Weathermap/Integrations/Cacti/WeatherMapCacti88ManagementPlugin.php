@@ -42,6 +42,7 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
         $locale = $this->manager->application->getLocale();
 
         print "<h3>This is the React UI below here</h3>";
+        print "<h1>INCOMPLETE</h1>";
         print '<style src="cacti-resources/mgmt/main.css"></style>';
         print "<div id='weathermap-mgmt-root' data-locale='" . $locale . "' data-url='" . $this->makeURL(array("action" => "settings")) . "'></div>";
         print '<script type="text/javascript" src="cacti-resources/mgmt/main.js"></script>';

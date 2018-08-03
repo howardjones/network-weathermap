@@ -39,20 +39,23 @@ plugin does, too.
 
 ### Using the dev version
 
-This git repo deliberately DOES NOT contain third party libraries (and if it does now, it won't soon).
+For development, you have to ensure you have:
+* nodejs
+* bower (npm install -g bower)
+* composer (https://getcomposer.org/)
+* some editor ;-)
 
-Dependencies are managed with bower. If you have never used it before, you will need to:
+These tools are installed inside the vagrant as well.
 
-* Install nodejs (and npm - which should come with it)
-* Install bower: `npm install -g bower`
-* Install [composer](https://getcomposer.org/)
-* Go to the weathermap checkout directory
-* Make sure that directory is called `weathermap` and not `network-weathermap` (which git will default to) or Cacti will not recognise it properly.
-* `bower install` should install all the necessary javascript dependencies to the vendor/ directory.
-* `composer update` will grab the PHP dependencies for both the runtime and testing environments
+The general setup is:
+* start vagrant
+* change the file permissions to world readable on 'output' and 'configs' directories.
+* In case you add javascript libraries: `bower install` should install all the necessary javascript dependencies to the vendor/ directory.
+* In acse you add PHP dependencies: `composer update` will grab the PHP dependencies for both the runtime and testing environments.
+
 The release process collects up these files and puts them in the zip file, via the packing.list file(s). You only need to do this if you are working with the current development code.
 
-If you aren't intended to do any development, run the tests, or contribute patches (why not? It's fun!) then you can use `composer update --no-dev` above, and reduce the number of PHP packages installed significantly.
+If you are not intended to do any development, run the tests, or contribute patches (why not? It's fun!) then you can use `composer update --no-dev` above, and reduce the number of PHP packages installed significantly.
 
 ### Work currently in progress:
 

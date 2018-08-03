@@ -16,6 +16,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		config.cache.enable :apt
 	end
 
+  if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false
+  end
+
+
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.synced_folder "../../", "/network-weathermap"
 	config.vm.synced_folder "../../", "/var/www/html/cacti/plugins/weathermap"
@@ -23,8 +28,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # just the specialisations for each OS-specific box
   config.vm.define :develop do |develop|
 
-	  develop.vm.provision :shell, :path => "vagrant-cacti-develop.sh", privileged: false
+	  develop.vm.provision :shell, :path => "vagrant-cacti-develop.sh", privileged: true
 	  develop.vm.box = "ubuntu/xenial64"
+	  develop.vm.box_version = "20180802.0.0"
 
 	  # Forward apache.
 	  develop.vm.network "forwarded_port", guest:80, host: 8016

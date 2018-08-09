@@ -35,9 +35,9 @@ class SingleMap extends Component {
     if (this.props.maps && this.props.settings) {
       if (!this.state.selectedMap) {
         this.props.maps.filter(map => map.filehash === this.props.match.params.map_id).map(map => {
-            this.setState({
-              selectedMap: map
-            }, );
+          return this.setState({
+            selectedMap: map
+          },);
         });
       }
       if (this.state.selectedMap && this.props.settings.map_selector && !this.state.selectOptions) {

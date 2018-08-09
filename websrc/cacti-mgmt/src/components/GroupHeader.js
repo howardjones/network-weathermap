@@ -7,9 +7,8 @@ class GroupHeader extends Component {
         const props_url = `/group/${this.props.group.id}/properties`;
 
         return <h3>{this.props.group.name}
-            <small>{this.props.group.sortorder}</small>
             <Link to={props_url}>
-                <button>...</button>
+                <button>Edit</button>
             </Link>
         </h3>
 

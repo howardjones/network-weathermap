@@ -1,7 +1,6 @@
 import {all, call, put, apply, takeEvery, takeLatest} from 'redux-saga/effects'
 
 import {
-    addGroup,
     ADD_GROUP,
     ADD_GROUP_ERROR,
     ADD_GROUP_SUCCESS,
@@ -22,17 +21,17 @@ import {
     REMOVE_GROUP_SUCCESS
 } from './actions';
 
-import {getMaps, getSettings} from './services/api';
+import {getSettings} from './services/api';
 
 
 function* getSettingsSaga(action) {
-    console.log("SAGA will get settings")
+    console.log("SAGA will get settings");
 
     try {
-        const response = yield call(getSettings, action.api_url)
+        const response = yield call(getSettings, action.api_url);
         // yield delay(500)
-        const data = response.data
-        yield put({type: GET_SETTINGS_SUCCESS, data})
+        const data = response.data;
+        yield put({type: GET_SETTINGS_SUCCESS, data});
         yield put({type: GET_MAPS, api_url: data.maps_url})
     } catch (error) {
         yield put({type: GET_SETTINGS_ERROR, error})
@@ -40,7 +39,7 @@ function* getSettingsSaga(action) {
 }
 
 function* getMapsSaga(action) {
-    console.log("SAGA will get maps")
+    console.log("SAGA will get maps");
 
     let api = window.wm_api;
 

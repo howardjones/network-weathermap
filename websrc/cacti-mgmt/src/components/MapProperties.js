@@ -1,19 +1,31 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import GroupSelector from "./GroupSelector";
 import ScheduleEditor from "./ScheduleEditor";
 import AccessEditor from "./AccessEditor";
 import SetEditor from "./SetEditor";
+import {FormattedMessage} from 'react-intl';
+import {removeMap} from '../actions';
+import Selector from "./Selector";
 
 class MapProperties extends Component {
+
+    constructor() {
+        super();
+
+        this.removeMap = this.removeMap.bind(this);
+    }
+
+    removeMap(event) {
+        event.preventDefault();
+
+        this.props.removeMap(this.props.match.params.id);
+        this.props.closeModal();
+    }
 
     render() {
         const mapId = this.props.match.params.id;
 
         const mapList = this.props.maps.filter(map => map.id === mapId);
-
-        console.log(mapList);
-        console.log(mapId);
 
         const myMap = mapList[0];
 
@@ -35,7 +47,12 @@ class MapProperties extends Component {
                 <option value='off'>No</option>
             </select></p>
 
-            <p>Group <GroupSelector selected={myMap.group_id}/></p>
+            <p>Group <Selector id="groupselector"
+                options={Object.values(this.props.groups)}
+                value={myMap.group_id}
+                defaultOption="select Group"
+                callbackFn={this.updateSelectedGroup}/>
+            </p>
 
             <p>Archive <select name="archiving" defaultValue={myMap.archiving}>
                 <option value='on'>Yes</option>
@@ -54,6 +71,7 @@ class MapProperties extends Component {
 
             <p>Per-Map SET Settings -</p><SetEditor scope="map" id={myMap.id}/>
 
+            <button onClick={this.removeMap}><FormattedMessage id="remove_map" defaultMessage="Remove Map from group"/></button>
 
         </div>
     }
@@ -65,4 +83,11 @@ const mapStateToProps = (state) => {
 };
 
 
-export default connect(mapStateToProps)(MapProperties);
+const mapDispatchToProps = dispatch => ({
+    removeMap: (mapId) => {
+        dispatch(removeMap(mapId));
+    }
+});
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(MapProperties);

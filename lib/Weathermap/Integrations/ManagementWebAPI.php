@@ -34,7 +34,6 @@ class ManagementWebAPI
 
     public function mapEnable($id)
     {
-        
     }
 
 

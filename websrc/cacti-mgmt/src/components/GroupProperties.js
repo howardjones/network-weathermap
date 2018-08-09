@@ -1,23 +1,29 @@
 import React, {Component} from 'react';
 import AccessEditor from "./AccessEditor";
 import SetEditor from "./SetEditor";
+import {removeGroup} from '../actions';
+import {FormattedMessage} from "react-intl";
+import {connect} from "react-redux";
 
 class GroupProperties extends Component {
+
+    constructor() {
+        super();
+
+        this.removeGroup = this.removeGroup.bind(this);
+    }
+
+    removeGroup(event) {
+        event.preventDefault();
+        console.log("removing group");
+        console.log("group id: " + this.props.match.params.id);
+        this.props.removeGroup(this.props.match.params.id);
+        this.props.closeModal();
+    }
 
     render() {
 
         const groupId = this.props.match.params.id;
-
-        // const groupList = this.props.groups.filter(map => map.id === groupId);
-        //
-        // console.log(groupList);
-        // console.log(groupId);
-        //
-        // const myGroup = groupList[0];
-        //
-        // console.log("myGroup is:");
-        // console.log(myGroup);
-
         return <div className='wm-group-properties-container wm-popup'>
             <h3>Group Properties for group #{groupId}</h3>
 
@@ -29,8 +35,20 @@ class GroupProperties extends Component {
             <SetEditor scope="group" id={groupId}/>
             <AccessEditor/>
 
+            <button onClick={this.removeGroup}><FormattedMessage id="remove_group" defaultMessage="Remove group"/></button>
+
         </div>
     }
 }
 
-export default GroupProperties;
+const mapStateToProps = (state) => {
+    return state;
+};
+
+const mapDispatchToProps = dispatch => ({
+    removeGroup: (groupId) => {
+        dispatch(removeGroup(groupId));
+    }
+});
+
+export default connect(mapStateToProps,mapDispatchToProps)(GroupProperties);

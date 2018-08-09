@@ -26,11 +26,13 @@
     "redux-saga": "latest"
   },
   "devDependencies": {
-    "react-scripts": "1.0.14"
+    "react-scripts": "1.0.14",
+    "watch": "^1.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "dev": "watch 'npm run build' src",
     "postbuild": "node postbuild.js",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"

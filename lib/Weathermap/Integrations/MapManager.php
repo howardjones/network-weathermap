@@ -479,6 +479,10 @@ class MapManager
         $statement->execute(array($groupId));
         $newId = $statement->fetchColumn();
 
+        if ($newId == null) {
+            return false;
+        }
+
         # move any maps out of this group into a still-existing one
         $this->pdo->prepare("UPDATE weathermap_maps SET group_id=? WHERE group_id=?")->execute(array($newId, $groupId));
 
@@ -488,6 +492,8 @@ class MapManager
         # Finally, resort, just in case
         $this->resortGroups();
         $this->resortMaps();
+
+        return true;
     }
 
     public function renameGroup($groupId, $newName)
@@ -543,9 +549,10 @@ class MapManager
      * Add a map to the maplist
      *
      * @param string $mapFilename
+     * @param int $groupId
      * @throws \Exception
      */
-    public function addMap($mapFilename)
+    public function addMap($mapFilename, $groupId = 0)
     {
         chdir($this->configDirectory);
 
@@ -561,8 +568,8 @@ class MapManager
             $realfile = $this->configDirectory . DIRECTORY_SEPARATOR . $mapFilename;
             $title = $this->extractMapTitle($realfile);
 
-            $statement = $this->pdo->prepare("INSERT INTO weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES (?,?,'on','','','','')");
-            $statement->execute(array($mapFilename, $title));
+            $statement = $this->pdo->prepare("INSERT INTO weathermap_maps (group_id,configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES (?,?,?,'on','','','','')");
+            $statement->execute(array($groupId, $mapFilename, $title));
             $newMapId = $this->pdo->lastInsertId();
 
             // add auth for 'current user'

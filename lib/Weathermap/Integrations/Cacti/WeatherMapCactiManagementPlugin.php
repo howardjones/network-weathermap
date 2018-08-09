@@ -56,6 +56,29 @@ class WeatherMapCactiManagementPlugin extends UIBase
 //            )
 //        ),
 //
+
+        'maps_add' => array(
+            'handler' => 'handleMapsListAdd',
+            'args' => array(
+                array('maps', 'mapfilelist'),
+                array('group_id', 'int')
+            )
+        ),
+
+        'enable_map' => array(
+            'handler' => 'handleMapEnableAPI',
+            'args' => array(
+                array('id', 'int'),
+            )
+        ),
+
+        'disable_map' => array(
+            'handler' => 'handleMapDisableAPI',
+            'args' => array(
+                array('id', 'int'),
+            )
+        ),
+//
 //        'map_delete' => array(
 //            'handler' => '',
 //            'args' => array(
@@ -145,11 +168,15 @@ class WeatherMapCactiManagementPlugin extends UIBase
 //        ),
 //        'perms_edit' => array('handler' => 'handlePermissionsPage', 'args' => array(array("id", "int"))),
 //
-//        'delete_map' => array('handler' => 'handleDeleteMap', 'args' => array(array("id", "int"))),
+        'delete_map' => array('handler' => 'handleDeleteMap', 'args' => array(array("id", "int"))),
 //        'deactivate_map' => array('handler' => 'handleDeactivateMap', 'args' => array(array("id", "int"))),
 //        'activate_map' => array('handler' => 'handleActivateMap', 'args' => array(array("id", "int"))),
 //
-//        'addmap' => array('handler' => 'handleMapListAdd', 'args' => array(array("file", "mapfile"))),
+//        'addmap' => array(
+//            'handler' => 'handleMapListAdd',
+//            'args' => array(
+//                array("file", "mapfile")
+//            )),
 //        'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array(array("show_all", "bool", true))),
 //
 //        'move_map_up' => array(
@@ -193,6 +220,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
         if ($this->validateRequest($action, $request)) {
             $result = $this->dispatchRequest($action, $request, $this->manager);
+            print $result;
         } else {
             print "INPUT VALIDATION FAIL";
         }
@@ -354,7 +382,6 @@ class WeatherMapCactiManagementPlugin extends UIBase
     public function handleGroupAddAPI($request, $appObject)
     {
         $this->manager->createGroup($request['name']);
-        $this->manager->createGroup("POOP");
 
         $data = array("result" => "OK");
 
@@ -364,10 +391,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
     public function handleGroupDeleteAPI($request, $appObject)
     {
-        $this->manager->deleteGroup($request['id']);
+        $successful = $this->manager->deleteGroup($request['id']);
 
         header('Content-type: application/json');
-        $data = array("result" => "OK");
+        if ($successful) {
+            $data = array("result" => "OK");
+        } else {
+            $data = array("result" => "FAIL");
+        }
 
         return json_encode($data);
     }
@@ -621,6 +652,23 @@ class WeatherMapCactiManagementPlugin extends UIBase
     ) {
         if (isset($request['file'])) {
             $this->manager->addMap($request['file']);
+            header("Location: " . $this->makeURL(array("header" => "false")));
+        } else {
+            print __("No such file.");
+        }
+    }
+
+
+    protected
+    function handleMapsListAdd(
+        $request,
+        $appObject
+    ) {
+        if (isset($request['maps'])) {
+            $maps = explode(',', $request['maps']);
+            foreach ($maps as $map) {
+                $this->manager->addMap($map, $request['group_id']);
+            }
             header("Location: " . $this->makeURL(array("header" => "false")));
         } else {
             print __("No such file.");

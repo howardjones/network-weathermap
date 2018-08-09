@@ -1,13 +1,35 @@
+# Default settings for all test environments
+#
+# File should be renamed into 'settings.sh.default' (or similar) to reflect that these settings are the defaults used in the
+# vagrant setup.
 
-# Common settings for all test environments
-# CACTI_VERSION="0.8.8h"
-CACTI_VERSION="1.1.29"
+# Select which cacti version is active.
+# One of '0.8.8h' or '1.1.38'.
+CACTI_VERSION="1.1.38"
 
+# How to install weathermap.
+#
+# One of '<release version>', 'git', 'rsync' or 'mount'.
+#
 # WEATHERMAP_VERSION can also be 'git' to clone from the local repository on the host
 # or 'rsync' to rsync local directory on host (even with no git commits)
 # if it is a version number, it looks for the LOCAL zip file with that version number in the releases/ directory
-WEATHERMAP_VERSION="rsync"
-
-# Select which php is active (5.6 or 7.1)
 #
-PHP_VERSION="5.6"
+# If setting the version to MOUNT, change the vagrant file.
+WEATHERMAP_VERSION="mount"
+
+# Select which php is active.
+# One of '5.6' or '7.1'
+PHP_VERSION="7.1"
+
+# The selected timezone.
+TIMEZONE="Europe/Amsterdam"
+
+# Install spine, one of 'yes' or 'no'.
+WITH_SPINE="yes"
+
+# The place where cacti will be installed.
+# Don't change unless you know how to modify the apache setup, etc.
+WEBROOT="/var/www/html"
+
+

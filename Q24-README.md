@@ -17,6 +17,14 @@ Prerequisites:
 * Vagrant (>2.x)
 * node (>8.x)
 
+### File permissions
+It is necessary to change the file permissions:
+```bash
+chmod -R oug+rwx configs
+chmod -R oug+rwx output
+```
+
+### Start vagrant
 From the `dev/Vagrant` directory, initialize the vagrant box:
 ```bash
 $ vagrant up

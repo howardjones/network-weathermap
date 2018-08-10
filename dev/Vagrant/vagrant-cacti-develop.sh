@@ -33,42 +33,45 @@ timedatectl set-timezone ${TIMEZONE}
 add-apt-repository ppa:ondrej/php
 apt-get update -y
 ## For 'real' install:
-apt-get install -y mysql-server-5.7 snmp rrdtool php7.0 php7.1 php5.6 php5.6-common php5.6-cli php5.6-mysql apache2 libapache2-mod-php5.6 libapache2-mod-php7.0 unzip php5.6-snmp php5.6-gd php-gettext php5.6-mbstring php-xdebug unzip php5.6-xml php7.0-xml php7.0-mbstring php7.0-curl  php7.0-gd  php7.0-mysql php7.0-cli php7.1-xml php7.1-mbstring php7.1-curl  php7.1-gd  php7.1-mysql php7.1-cli php7.1-ldap php7.1-snmp php7.1-gmp
-# ## For dev/test, we need these too
-apt-get install -y git subversion make xsltproc imagemagick zip curl phpunit nodejs npm pandoc rsync nodejs-legacy php5.6-sqlite3 php7.0-sqlite3 php7.1-sqlite3 php-ast
-# ## For composer
-apt-get install -y php-mbstring php5.6-curl php7.0-curl php7.1-curl
+apt-get install -y mysql-server-5.7 snmp rrdtool apache2 php-gettext php-xdebug unzip
+for PHP_VERSION in ${PHP_VERSIONS}; do
+  echo "Installing PHP ${PHP_VERSION}."
+  apt-get install -y \
+    php${PHP_VERSION} php${PHP_VERSION}-common php${PHP_VERSION}-cli \
+    php${PHP_VERSION}-mysql php${PHP_VERSION}-snmp php${PHP_VERSION}-gd php${PHP_VERSION}-mbstring php${PHP_VERSION}-xml \
+    php${PHP_VERSION}-curl libapache2-mod-php${PHP_VERSION}
 
-echo "Adding php error logs"
+  # disable the php version
+  a2dismod php${PHP_VERSION}
+
+  echo "  Modifying PHP configuration."
 sed -i -e "s|;error_log = syslog|;error_log = syslog\\nerror_log = ${CACTI_HOME}/log/php_errors.log|" \
  -e "s|;date.timezone =|;date.timezone =\\ndate.timezone = ${TIMEZONE}|" \
  /etc/php/${PHP_VERSION}/apache2/php.ini
 
-#Change to selected php
-a2dismod php7.0
-a2dismod php7.1
-a2dismod php5.6
+  sed -i -e "s|;error_log = syslog|;error_log = syslog\\nerror_log = ${CACTI_HOME}/log/php_errors.log|" \
+   -e "s|;date.timezone =|;date.timezone =\\ndate.timezone = ${TIMEZONE}|" \
+   /etc/php/${PHP_VERSION}/cli/php.ini
+
+done
+
+echo "Enabling PHP ${PHP_VERSION}"
 a2enmod php${PHP_VERSION}
 rm /etc/alternatives/php
 ln -s /usr/bin/php${PHP_VERSION} /etc/alternatives/php
 
-bash -c "cat > /etc/php/${PHP_VERSION}/cli/conf.d/99-cacti.ini" <<'EOF'
-[Date]
-EOF
-
-cp /etc/php/${PHP_VERSION}/cli/conf.d/99-cacti.ini /etc/php/${PHP_VERSION}/apache2/conf.d/99-cacti.ini
+# ## For dev/test, we need these too
+apt-get install -y git subversion make xsltproc imagemagick zip curl phpunit nodejs npm pandoc rsync nodejs-legacy php-ast
+for PHP_VERSION in ${PHP_VERSIONS}; do
+  echo "Installing development dependencies for PHP ${PHP_VERSION}."
+  apt-get install -y php${PHP_VERSION}-sqlite3
+done
 
 service apache2 restart
 
-echo "Installing bower and updating weathermap project."
-#Install and run bower
+echo "Installing bower"
 npm install -g bower
-# ln -s /usr/bin/nodejs /usr/bin/node
-cd /network-weathermap
-su -c 'bower install' - vagrant
 
-
-#Install and run composer (this requires a swap partition for memory as well..)
 echo "Installing swap"
 dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
 mkswap /var/swap.1
@@ -79,24 +82,15 @@ cd /tmp
 curl -sS https://getcomposer.org/installer -o composer-setup.php
 php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
-cd /network-weathermap
-su -c 'composer update' - vagrant
-
 echo "Starting installation for Cacti ${CACTI_VERSION}"
 
 mkdir ${CACTI_HOME}
-
-useradd -d ${CACTI_HOME} cacti
-
 if [ ! -f /vagrant/cacti-${CACTI_VERSION}.tar.gz ]; then
    wget http://www.cacti.net/downloads/cacti-${CACTI_VERSION}.tar.gz -O /vagrant/cacti-${CACTI_VERSION}.tar.gz
 fi
 
 echo "Unpacking Cacti"
 tar --strip-components 1 --directory=${CACTI_HOME} -xvf /vagrant/cacti-${CACTI_VERSION}.tar.gz
-#touch ${CACTI_HOME}/log/cacti.log
-#chown -R cacti ${CACTI_HOME}/rra
-#chown -R cacti ${CACTI_HOME}/log
 
 mysql -uroot <<EOF
 SET GLOBAL sql_mode = 'ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
@@ -119,9 +113,10 @@ if [[ ${CACTI_VERSION} == 1.* ]]; then
     echo "Adding mysql timezones"
     mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
-
-    # Cacti 1.x also makes a few optional modules required.
-    apt-get install -y php5.6-ldap php7.0-ldap php5.6-gmp php7.0-gmp php7.1-gmp php7.1-ldap
+    for PHP_VERSION in ${PHP_VERSIONS}; do
+      echo "Installing Cacti dependencies for PHP ${PHP_VERSION}."
+      apt-get install -y php${PHP_VERSION}-ldap php${PHP_VERSION}-gmp
+    done
 
     mysql -uroot <<EOF
 grant select on mysql.time_zone_name to cactiuser@localhost identified by 'cactiuser';
@@ -147,8 +142,8 @@ fi
 
 # this isn't in the recommendations, but otherwise you get no logs!
 touch ${CACTI_HOME}/log/cacti.log
-chown -R www-data:cacti ${CACTI_HOME}
 chmod -R oug+rwx ${CACTI_HOME}/log
+chown -R vagrant:www-data ${CACTI_HOME}
 
 # optionally seed database with "pre-installed" data instead of empty - can skip the install steps
 echo "Loading cacti database"
@@ -160,41 +155,46 @@ fi
 
 
 if [ -f /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip ]; then
-  # Install Network Weathermap from release zip
   echo "Unzipping weathermap from local release zip"
   unzip /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip -d ${CACTI_HOME}plugins/
-  chown -R cacti ${CACTI_PLUGINS}/weathermap
+  chown -R vagrant:www-data ${CACTI_PLUGINS}/weathermap
 fi
 
 if [ "${WEATHERMAP_VERSION}" == "git" ]; then
   echo "Cloning weathermap from local git"
-  git clone -b database-refactor /network-weathermap ${CACTI_HOME}plugins/weathermap
-  cd ${CACTI_PLUGINS}/weathermap
-  bower install
-  composer install
-  chown -R cacti ${CACTI_PLUGINS}/weathermap
+  git clone -b database-refactor /network-weathermap ${CACTI_PLUGINS}/weathermap
+
+  chown -R vagrant:www-data ${CACTI_PLUGINS}/weathermap
+  su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
+  su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
+  su -c "${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 
 if [ "${WEATHERMAP_VERSION}" == "rsync" ]; then
   echo "rsyncing weathermap from local dir"
   mkdir ${CACTI_PLUGINS}/weathermap
   rsync -a --exclude=composer.lock --exclude=vendor/ /network-weathermap/ ${CACTI_PLUGINS}/weathermap/
-  cd ${CACTI_PLUGINS}/weathermap
-  bower install
-  composer install
-  chown -R cacti ${CACTI_PLUGINS}/weathermap
+
+  chown -R vagrant:www-data ${CACTI_PLUGINS}/weathermap
+  su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
+  su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
+  su -c "${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 
 if [ "${WEATHERMAP_VERSION}" == "mount" ]; then
-  echo "Using symlink"
-  #  ln -s /network-weathermap ${CACTI_PLUGINS}/weathermap
+  echo "Mounting weathermap from vagrant host"
+
+  chown -R vagrant:www-data ${CACTI_PLUGINS}/weathermap
+  su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
+  su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
+  su -c "cd ${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 
 echo "Adding cron job"
-echo "*/5 * * * * cacti /usr/bin/php ${CACTI_HOME}/poller.php > ${CACTI_HOME}/last-cacti-poll.txt 2>&1" > /etc/cron.d/cacti
+echo "*/5 * * * * vagrant /usr/bin/php ${CACTI_HOME}/poller.php > ${CACTI_HOME}/last-cacti-poll.txt 2>&1" > /etc/cron.d/cacti
 # create the 'last poll' log file
 touch ${CACTI_HOME}/last-cacti-poll.txt
-chown cacti: ${CACTI_HOME}/last-cacti-poll.txt
+chown vagrant:www-data ${CACTI_HOME}/last-cacti-poll.txt
 
 # create the database content for the phpunit database tests, if there is now a weathermap installation with tests
 if [ -d ${CACTI_HOME}plugins/weathermap/test-suite ]; then
@@ -202,13 +202,8 @@ if [ -d ${CACTI_HOME}plugins/weathermap/test-suite ]; then
   mysql -uroot weathermaptest < ${CACTI_PLUGINS}/weathermap/test-suite/data/weathermap-empty.sql
 fi
 
-# so that the editor and poller don't immediately complain
-chown cacti ${CACTI_PLUGINS}/weathermap/output
-chown www-data ${CACTI_PLUGINS}/weathermap/configs
-
-
-if [ "${WITH_SPINE}" == "YUIOyes" ]; then
-  apt install -y build-essential dos2unix dh-autoreconf help2man libssl-dev libmysql++-dev  librrds-perl libsnmp-dev libmysqlclient-dev libmysqld-dev
+if [ "${WITH_SPINE}" == "yes" ]; then
+  apt-get install -y build-essential dos2unix dh-autoreconf help2man libssl-dev libmysql++-dev librrds-perl libsnmp-dev libmysqlclient-dev libmysqld-dev
 
   cd /vagrant
   if [ ! -f /vagrant/cacti-spine-${CACTI_VERSION}.tar.gz ]; then

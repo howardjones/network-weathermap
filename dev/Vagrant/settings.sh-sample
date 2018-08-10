@@ -18,9 +18,13 @@ CACTI_VERSION="1.1.38"
 # If setting the version to MOUNT, change the vagrant file.
 WEATHERMAP_VERSION="mount"
 
+# The list of to be installed PHP versions. All will be disabled.
+#
+PHP_VERSIONS="5.6 7.0 7.1 7.2"
+
 # Select which php is active.
-# One of '5.6' or '7.1'
-PHP_VERSION="7.1"
+# One of PHP_VERSIONS
+PHP_VERSION="7.2"
 
 # The selected timezone.
 TIMEZONE="Europe/Amsterdam"

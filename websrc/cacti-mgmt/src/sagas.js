@@ -18,7 +18,13 @@ import {
     REMOVE_MAP_SUCCESS,
     REMOVE_GROUP,
     REMOVE_GROUP_ERROR,
-    REMOVE_GROUP_SUCCESS
+    REMOVE_GROUP_SUCCESS,
+    ENABLE_MAP,
+    ENABLE_MAP_ERROR,
+    ENABLE_MAP_SUCCESS,
+    DISABLE_MAP,
+    DISABLE_MAP_ERROR,
+    DISABLE_MAP_SUCCESS
 } from './actions';
 
 import {getSettings} from './services/api';
@@ -118,6 +124,38 @@ function* removeMapSaga(action) {
     }
 }
 
+function* enableMapSaga(action) {
+    console.log(`SAGA will enable map ${action.mapId}`);
+
+    let api = window.wm_api;
+
+    try {
+        const response = yield apply(api, api.enableMap, [action.mapId]);
+        // yield delay(500)
+        const data = response.data;
+        yield put({type: ENABLE_MAP_SUCCESS, data});
+        yield put({type: GET_MAPS})
+    } catch (error) {
+        yield put({type: ENABLE_MAP_ERROR, error})
+    }
+}
+
+function* disableMapSaga(action) {
+    console.log(`SAGA will disable map ${action.mapId}`);
+
+    let api = window.wm_api;
+
+    try {
+        const response = yield apply(api, api.disableMap, [action.mapId]);
+        // yield delay(500)
+        const data = response.data;
+        yield put({type: DISABLE_MAP_SUCCESS, data});
+        yield put({type: GET_MAPS})
+    } catch (error) {
+        yield put({type: DISABLE_MAP_ERROR, error})
+    }
+}
+
 // we only export the rootSaga
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
@@ -128,5 +166,7 @@ export default function* rootSaga() {
         takeEvery(REMOVE_GROUP, removeGroupSaga),
         takeEvery(ADD_MAPS, addMapsSaga),
         takeEvery(REMOVE_MAP, removeMapSaga),
+        takeEvery(ENABLE_MAP, enableMapSaga),
+        takeEvery(DISABLE_MAP, disableMapSaga)
     ])
 }

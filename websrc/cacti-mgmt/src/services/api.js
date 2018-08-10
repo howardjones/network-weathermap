@@ -85,6 +85,34 @@ class WeathermapAPI {
         return axios.post(source_url, data, config)
     }
 
+    enableMap(mapId) {
+        const source_url = this.base_url + "enable_map";
+        console.log(`API enabling map with id ${mapId} via ${source_url}`);
+
+        const config = {headers: {'Content-Type': 'multipart/form-data', withCredentials: true}};
+
+
+        let data = new FormData();
+        data.append('id', mapId);
+        data.append(window.csrfMagicName, window.csrfMagicToken);
+
+        return axios.post(source_url, data, config)
+    }
+
+    disableMap(mapId) {
+        const source_url = this.base_url + "disable_map";
+        console.log(`API disabling map with id ${mapId} via ${source_url}`);
+
+        const config = {headers: {'Content-Type': 'multipart/form-data', withCredentials: true}};
+
+
+        let data = new FormData();
+        data.append('id', mapId);
+        data.append(window.csrfMagicName, window.csrfMagicToken);
+
+        return axios.post(source_url, data, config)
+    }
+
     setBaseURL(management_url) {
         this.base_url = management_url;
     }

@@ -88,7 +88,6 @@ class SingleMap extends Component {
 }
 
 function mapStateToProps(state) {
-  console.log('hbfierbfk', state, state.maps);
   return {settings: state.settings, groups: state.groups, maps: state.maps};
 }
 

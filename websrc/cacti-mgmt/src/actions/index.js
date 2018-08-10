@@ -26,6 +26,14 @@ export const REMOVE_GROUP = 'REMOVE_GROUP';
 export const REMOVE_GROUP_ERROR = 'REMOVE_GROUP_ERROR';
 export const REMOVE_GROUP_SUCCESS = 'REMOVE_GROUP_SUCCESS';
 
+export const ENABLE_MAP = 'ENABLE_MAP';
+export const ENABLE_MAP_ERROR = 'ENABLE_MAP_ERROR';
+export const ENABLE_MAP_SUCCESS = 'ENABLE_MAP_SUCCESS';
+
+export const DISABLE_MAP = 'DISABLE_MAP';
+export const DISABLE_MAP_ERROR = 'DISABLE_MAP_ERROR';
+export const DISABLE_MAP_SUCCESS = 'DISABLE_MAP_SUCCESS';
+
 export function getSettings(api_url) {
     return {type: GET_SETTINGS, api_url: api_url};
 }
@@ -43,6 +51,14 @@ export function addMaps(maps, groupId) {
 }
 
 export function removeMap(mapId) {
-  return {type: REMOVE_MAP, mapId: mapId};
+    return {type: REMOVE_MAP, mapId: mapId};
+}
+
+export function enableMap(mapId) {
+    return {type: ENABLE_MAP, mapId: mapId};
+}
+
+export function disableMap(mapId) {
+    return {type: DISABLE_MAP, mapId: mapId};
 }
 

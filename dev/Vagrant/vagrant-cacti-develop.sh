@@ -44,8 +44,8 @@ for PHP_VERSION in ${PHP_VERSIONS}; do
   # disable the php version
   a2dismod php${PHP_VERSION}
 
-  echo "  Modifying PHP configuration."
-sed -i -e "s|;error_log = syslog|;error_log = syslog\\nerror_log = ${CACTI_HOME}/log/php_errors.log|" \
+  echo "Modifying PHP configuration."
+  sed -i -e "s|;error_log = syslog|;error_log = syslog\\nerror_log = ${CACTI_HOME}/log/php_errors.log|" \
  -e "s|;date.timezone =|;date.timezone =\\ndate.timezone = ${TIMEZONE}|" \
  /etc/php/${PHP_VERSION}/apache2/php.ini
 

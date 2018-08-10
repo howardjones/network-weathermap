@@ -42,7 +42,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	  #config.vm.network "forwarded_port", guest: 3306, host: 3306
 
 	  develop.vm.hostname = "weathermap-dev-3"
-	  develop.vm.post_up_message = "Cacti should be available on http://localhost:8016/"
+	  develop.vm.post_up_message = "Cacti should be available on http://localhost:8016/cacti"
   end
 
   config.vm.provider "virtualbox" do |vb|

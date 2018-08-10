@@ -50,10 +50,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 5000 ]
 
     # The memory to use.
-    vb.memory = "2048"
+    vb.memory = 2048
 
     # The number of CPUs
     vb.cpus = 2
+
+    # The virtual box name
+    vb.name = "weathermap-dev"
   end
 
 #  config.vm.define :guitest do |guitest|

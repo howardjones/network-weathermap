@@ -44,8 +44,8 @@ for PHP_VERSION in ${PHP_VERSIONS}; do
   # disable the php version
   a2dismod php${PHP_VERSION}
 
-  echo "  Modifying PHP configuration."
-sed -i -e "s|;error_log = syslog|;error_log = syslog\\nerror_log = ${CACTI_HOME}/log/php_errors.log|" \
+  echo "Modifying PHP configuration."
+  sed -i -e "s|;error_log = syslog|;error_log = syslog\\nerror_log = ${CACTI_HOME}/log/php_errors.log|" \
  -e "s|;date.timezone =|;date.timezone =\\ndate.timezone = ${TIMEZONE}|" \
  /etc/php/${PHP_VERSION}/apache2/php.ini
 
@@ -66,6 +66,12 @@ for PHP_VERSION in ${PHP_VERSIONS}; do
   echo "Installing development dependencies for PHP ${PHP_VERSION}."
   apt-get install -y php${PHP_VERSION}-sqlite3
 done
+
+# Again this is not recommended. However otherwise there are file permission issues.
+echo "Changing apache user to 'vagrant'."
+sed -i -e "s|export APACHE_RUN_USER=www-data|export APACHE_RUN_USER=vagrant|" \
+  -e "s|export APACHE_RUN_GROUP=www-data|export APACHE_RUN_GROUP=vagrant|" \
+  /etc/apache2/envvars
 
 service apache2 restart
 
@@ -143,7 +149,7 @@ fi
 # this isn't in the recommendations, but otherwise you get no logs!
 touch ${CACTI_HOME}/log/cacti.log
 chmod -R oug+rwx ${CACTI_HOME}/log
-chown -R vagrant:www-data ${CACTI_HOME}
+chown -R vagrant ${CACTI_HOME}
 
 # optionally seed database with "pre-installed" data instead of empty - can skip the install steps
 echo "Loading cacti database"
@@ -157,14 +163,14 @@ fi
 if [ -f /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip ]; then
   echo "Unzipping weathermap from local release zip"
   unzip /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip -d ${CACTI_HOME}plugins/
-  chown -R vagrant:www-data ${CACTI_PLUGINS}/weathermap
+  chown -R vagrant ${CACTI_PLUGINS}/weathermap
 fi
 
 if [ "${WEATHERMAP_VERSION}" == "git" ]; then
   echo "Cloning weathermap from local git"
   git clone -b database-refactor /network-weathermap ${CACTI_PLUGINS}/weathermap
 
-  chown -R vagrant:www-data ${CACTI_PLUGINS}/weathermap
+  chown -R vagrant ${CACTI_PLUGINS}/weathermap
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
   su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
   su -c "${CACTI_PLUGINS}/weathermap && composer install" - vagrant
@@ -175,7 +181,7 @@ if [ "${WEATHERMAP_VERSION}" == "rsync" ]; then
   mkdir ${CACTI_PLUGINS}/weathermap
   rsync -a --exclude=composer.lock --exclude=vendor/ /network-weathermap/ ${CACTI_PLUGINS}/weathermap/
 
-  chown -R vagrant:www-data ${CACTI_PLUGINS}/weathermap
+  chown -R vagrant ${CACTI_PLUGINS}/weathermap
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
   su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
   su -c "${CACTI_PLUGINS}/weathermap && composer install" - vagrant
@@ -184,7 +190,7 @@ fi
 if [ "${WEATHERMAP_VERSION}" == "mount" ]; then
   echo "Mounting weathermap from vagrant host"
 
-  chown -R vagrant:www-data ${CACTI_PLUGINS}/weathermap
+  chown -R vagrant ${CACTI_PLUGINS}/weathermap
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
   su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer install" - vagrant
@@ -194,7 +200,7 @@ echo "Adding cron job"
 echo "*/5 * * * * vagrant /usr/bin/php ${CACTI_HOME}/poller.php > ${CACTI_HOME}/last-cacti-poll.txt 2>&1" > /etc/cron.d/cacti
 # create the 'last poll' log file
 touch ${CACTI_HOME}/last-cacti-poll.txt
-chown vagrant:www-data ${CACTI_HOME}/last-cacti-poll.txt
+chown vagrant ${CACTI_HOME}/last-cacti-poll.txt
 
 # create the database content for the phpunit database tests, if there is now a weathermap installation with tests
 if [ -d ${CACTI_HOME}plugins/weathermap/test-suite ]; then

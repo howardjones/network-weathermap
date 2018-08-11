@@ -22,8 +22,8 @@ addons:
   artifacts:
     debug: true
     paths:
-    - ./test-suite/
-    working_dir: WORKING_DIR
+    - ./travis-test-results-${TRAVIS_BUILD_ID}-${TRAVIS_BUILD_NUMBER}.zip
+    working_dir: $WORKING_DIR
     bucket: weathermap-test-output2
     s3_region: eu-west-1
   apt:
@@ -38,7 +38,7 @@ before_script:
 - phpenv config-add dev/ci/travis.ini
 after_script:
 - vendor/bin/test-reporter
-- zip -r travis-test-results-${TRAVIS_BUILD_ID}-${TRAVIS_BUILD_NUMBER}.zip
+- zip -r travis-test-results-${TRAVIS_BUILD_ID}-${TRAVIS_BUILD_NUMBER}.zip test-suite
 script:
 - vendor/bin/parallel-lint --exclude app --exclude vendor .
 - vendor/bin/phpunit --configuration build/phpunit.xml

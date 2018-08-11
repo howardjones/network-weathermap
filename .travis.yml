@@ -24,8 +24,8 @@ addons:
     paths:
     - ./test-suite/
     working_dir: WORKING_DIR
-    bucket: weathermap-test-output
-    s3_region: eu-west-2
+    bucket: weathermap-test-output2
+    s3_region: eu-west-1
   apt:
     packages:
     - imagemagick

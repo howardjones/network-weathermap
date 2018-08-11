@@ -1,42 +1,45 @@
 sudo: false
 language: php
-services: 
-  - mysql
+services:
+- mysql
 php:
-  - "7.2"
-  - "7.1"
-  - "7.0"
-  - "5.6"
+- '7.2'
+- '7.1'
+- '7.0'
+- '5.6'
 env:
-  - DB=mysql
+- DB=mysql
 before_install:
-#  - sudo apt-get update -qq
-  - mkdir -p build/log
-  - mysql -e 'CREATE DATABASE weathermaptest; GRANT ALL ON weathermaptest.* TO weathermaptest@localhost identified by "weathermaptest"; FLUSH PRIVILEGES;'
+- mkdir -p build/log
+- mysql -e 'CREATE DATABASE weathermaptest; GRANT ALL ON weathermaptest.* TO weathermaptest@localhost
+  identified by "weathermaptest"; FLUSH PRIVILEGES;'
 install:
-  - ./dev/ci/travis-dependencies.sh
-  - composer install
+- sudo ./dev/ci/travis-dependencies.sh
+- composer install
 addons:
   code_climate:
     repo_token: 858ba1f597a441ed0b8abfefb2db2ecc09309285da99bd165ebcf1b580ced776
+  artifacts:
+    debug: true
+    paths:
+    - ./test-suite/
+    target_paths: $TRAVIS_BUILD_NUMBER
+    working_dir: WORKING_DIR
+    bucket: weathermap-test-output
+    s3_region: eu-west-2
   apt:
     packages:
-      - imagemagick
-      - rrdtool
-      - xsltproc
-      - fping
+    - imagemagick
+    - rrdtool
+    - xsltproc
+    - fping
+    - zip
 before_script:
-  - mysql weathermaptest < test-suite/data/weathermap-empty.sql
-  - phpenv config-add dev/ci/travis.ini
+- mysql weathermaptest < test-suite/data/weathermap-empty.sql
+- phpenv config-add dev/ci/travis.ini
 after_script:
-  - vendor/bin/test-reporter
+- vendor/bin/test-reporter
+- zip -r travis-test-results-${TRAVIS_BUILD_ID}-${TRAVIS_BUILD_NUMBER}.zip
 script:
-  - vendor/bin/parallel-lint --exclude app --exclude vendor .
-  - vendor/bin/phpunit --configuration build/phpunit.xml
-notifications:
-  webhooks:
-    urls:
-      - https://webhooks.gitter.im/e/7094f12e4b57b80da9ef
-    on_success: change
-    on_failure: change
-    on_start: never
+- vendor/bin/parallel-lint --exclude app --exclude vendor .
+- vendor/bin/phpunit --configuration build/phpunit.xml

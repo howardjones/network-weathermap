@@ -1,7 +1,7 @@
 # weathermap dependencies
-pecl install gd
-pecl install mysql
-pecl install snmp
+#pecl install gd
+#pecl install mysql
+#pecl install snmp
 
 # Cacti dependencies
 #pecl install mbstring
@@ -13,8 +13,8 @@ pecl install snmp
 
 # used by phpunit or other testing tools
 #pecl install sqlite3
-pecl install ast
+#pecl install ast
 #pecl install xdebug
 
-apt-get install php5.6-sqlite3
+#apt-get install php5.6-sqlite3
 

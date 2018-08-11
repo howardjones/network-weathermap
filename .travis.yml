@@ -23,7 +23,6 @@ addons:
     debug: true
     paths:
     - ./test-suite/
-    target_paths: $TRAVIS_BUILD_NUMBER
     working_dir: WORKING_DIR
     bucket: weathermap-test-output
     s3_region: eu-west-2

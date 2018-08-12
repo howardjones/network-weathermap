@@ -22,7 +22,7 @@ addons:
   artifacts:
     debug: true
     paths:
-    - ./travis-test-results-${TRAVIS_BUILD_ID}-${TRAVIS_BUILD_NUMBER}.zip
+    - ./travis-test-results-${TRAVIS_BUILD_NUMBER}-${TRAVIS_JOB_NUMBER}.zip
     s3_region: eu-west-1
   apt:
     packages:
@@ -37,7 +37,7 @@ before_script:
 after_script:
 - vendor/bin/test-reporter
 - php test-suite/make-failing-summary.php > test-suite/summary-failing.html
-- zip -r travis-test-results-${TRAVIS_BUILD_ID}-${TRAVIS_BUILD_NUMBER}.zip test-suite
+- zip -r travis-test-results-${TRAVIS_BUILD_NUMBER}-${TRAVIS_JOB_NUMBER}.zip test-suite
 script:
 - vendor/bin/parallel-lint --exclude app --exclude vendor .
 - vendor/bin/phpunit --configuration build/phpunit.xml

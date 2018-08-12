@@ -21,8 +21,10 @@ addons:
     repo_token: 858ba1f597a441ed0b8abfefb2db2ecc09309285da99bd165ebcf1b580ced776
   artifacts:
     debug: true
+    target_paths:
+    - /${TRAVIS_REPO_SLUG}/${TRAVIS_BUILD_NUMBER}
     paths:
-    - ./travis-test-results-${TRAVIS_BUILD_NUMBER}-${TRAVIS_JOB_NUMBER}.zip
+    - ./travis-test-results-${TRAVIS_JOB_NUMBER}.zip
     s3_region: eu-west-1
   apt:
     packages:
@@ -37,7 +39,7 @@ before_script:
 after_script:
 - vendor/bin/test-reporter
 - php test-suite/make-failing-summary.php > test-suite/summary-failing.html
-- zip -r travis-test-results-${TRAVIS_BUILD_NUMBER}-${TRAVIS_JOB_NUMBER}.zip test-suite
+- zip -r travis-test-results-${TRAVIS_JOB_NUMBER}.zip test-suite
 script:
 - vendor/bin/parallel-lint --exclude app --exclude vendor .
 - vendor/bin/phpunit --configuration build/phpunit.xml

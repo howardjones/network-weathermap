@@ -23,8 +23,6 @@ addons:
     debug: true
     paths:
     - ./travis-test-results-${TRAVIS_BUILD_ID}-${TRAVIS_BUILD_NUMBER}.zip
-    working_dir: $WORKING_DIR
-    bucket: weathermap-test-output2
     s3_region: eu-west-1
   apt:
     packages:

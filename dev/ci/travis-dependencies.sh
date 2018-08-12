@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # weathermap dependencies
 #pecl install gd
 #pecl install mysql

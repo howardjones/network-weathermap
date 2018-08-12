@@ -170,7 +170,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         }
         fputs(
             $fileHandle,
-            "<html><head><title>Test summary for $os_tag</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n"
+            "<html><head><title>Test summary for $os_tag</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary for $os_tag</h3>(result - reference - diff)<br/>\n"
         );
         fputs($fileHandle, "<p>" . date("Y-m-d H:i:s") . "</p>\n");
 
@@ -248,6 +248,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         chdir($this->projectRoot);
     }
 
+    private function gen_slug($str)
+    {
+        # special accents
+        return strtolower(preg_replace(array('/[^a-zA-Z0-9 -]/', '/[ -]+/', '/^-|-$/'), array('', '-', ''), $str));
+    }
+
     // this has to happen before the dataprovider runs, but
     // setUp and setUpBeforeClass are both called *after* the dataprovider
     private function checkPaths()
@@ -270,7 +276,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $os_codename = trim(shell_exec("lsb_release -c -s"));
         if ($os_codename == "") {
-            $os_codename = PHP_OS;
+            $os_codename = $this->gen_slug(PHP_OS);
         }
         $os_tag = "$os_codename-$php_tag";
         self::$os_tag = $os_tag;

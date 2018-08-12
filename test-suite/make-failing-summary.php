@@ -10,7 +10,10 @@
 
 print "Creating summary info from ConfigTest failures...\n";
 
-$dir = "test-suite/diffs";
+$version = explode('.', PHP_VERSION);
+$php_tag = "php-" . $version[0] . "." . $version[1];
+
+$dir = "test-suite/diffs-" . $php_tag;
 $summaryFile = "test-suite/summary.html";
 
 $failCount = 0;
@@ -31,7 +34,7 @@ if (is_dir($dir)) {
                         if (preg_match('/^Output: \|(\d+)\|/', $line, $matches)) {
                             if ($matches[1] != '0') {
                                 $realfilename = str_replace(".png.txt", "", $file);
-                                $realfilename = str_replace("test-suite/diffs/", "", $realfilename);
+                                $realfilename = str_replace($dir . "/", "", $realfilename);
                                 $fails[$realfilename] = 1;
                                 $failCount++;
                                 $different[$realfilename] = intval($matches[1]);
@@ -62,7 +65,7 @@ while (!feof($f)) {
         if (array_key_exists($conf, $fails) && $fails[$conf] == 1) {
             print $line;
 
-            $diffFile = "test-suite/diffs/" . $conf . ".png.txt";
+            $diffFile = $dir . "/" . $conf . ".png.txt";
             $referenceFile = "test-suite/references/" . $conf . ".png";
 
             $pixelsDifferent = $different[$conf];
@@ -87,7 +90,7 @@ while (!feof($f)) {
         print $line;
     }
 }
-
+print "<hr>";
 fclose($f);
 
 $c = count($percents);

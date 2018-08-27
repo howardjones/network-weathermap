@@ -91,7 +91,9 @@ If you aren't intended to do any development, run the tests, or contribute patch
 
 ### Known Issues
 
-* Weathermap management only shows after the *second* click on the Weathermap menu option?
+* Weathermap management only shows after the *second* click on the Weathermap menu option? Something to do with relative URLs and Cacti's partial loading
+
+* Bower is deprecated. Need to move to using npm directly
 
 ### Longer-term WIP:
 

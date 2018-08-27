@@ -197,8 +197,11 @@ if [ "${WEATHERMAP_VERSION}" == "mount" ]; then
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 
-echo "Adding cron job"
-echo "*/5 * * * * vagrant /usr/bin/php ${CACTI_HOME}/poller.php > ${CACTI_HOME}/last-cacti-poll.txt 2>&1" > /etc/cron.d/cacti
+# cronjob added but disabled (to enable testing of install process)
+# use post-install.sh to override this if required
+echo "Adding cron job (disabled)"
+echo "# */5 * * * * vagrant /usr/bin/php ${CACTI_HOME}/poller.php > ${CACTI_HOME}/last-cacti-poll.txt 2>&1" > /etc/cron.d/cacti
+
 # create the 'last poll' log file
 touch ${CACTI_HOME}/last-cacti-poll.txt
 chown vagrant ${CACTI_HOME}/last-cacti-poll.txt

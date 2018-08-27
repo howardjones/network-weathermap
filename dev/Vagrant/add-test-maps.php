@@ -26,7 +26,14 @@ $manager = new MapManager(weathermap_get_pdo(), $configDirectory, $app);
 print_r($manager->getMaps());
 
 $manager->addMap("simple.conf");
-$manager->addMap("weathermap.conf");
+$manager->addMap("quick-test.conf");
+
+$groupid = $manager->createGroup("Other Maps");
+$mapid = $manager->addMap("weathermap.conf");
+
+$manager->updateMap($mapid, array("group_id"=>$groupid));
+
+$groupid = $manager->createGroup("Empty Group");
 
 print_r($manager->getMaps());
 

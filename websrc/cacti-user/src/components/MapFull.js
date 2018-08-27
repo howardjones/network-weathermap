@@ -40,7 +40,7 @@ class MapFull extends Component {
     return (
         <div className="MapFull layoutbox">
           <h3>FULL: {this.props.map.title}</h3>
-          <div id="overDiv" style={{position: 'absolute', visibility: 'hide', zIndex: 1}}></div>
+          <div id="overDiv" style={{position: 'fixed', visibility: 'hide', zIndex: 1}}></div>
 
           <div>
             {this.state.htmlContent ? <div>

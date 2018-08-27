@@ -1,5 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
+*.iml
+
+# Build process artifacts:
 build
 build/*
 dist/*
@@ -11,26 +14,8 @@ composer.lock
 !build/phpcs.xml
 !build/network-weathermap.doxy
 vendor/*
-dev/generated/
-dev/docs/
-dev/phpcs/
-dev/vagrant-testers/*.zip
 node_modules/
-reports/
-output/*
-test-suite/results*
-test-suite/diffs/*
-test-suite/summary.html
-test-suite/summary-failing.html
-test-suite/failing-images.txt
-dev/vagrant-testers/.vagrant/
-releases
-releases/*
-.phan
-*.tar.gz
-dev/Vagrant/settings.sh
-dev/Vagrant/.vagrant
-dev/Vagrant/*.log
+
 websrc/cacti-mgmt/node_modules
 websrc/cacti-mgmt/build
 websrc/cacti-mgmt/*.log
@@ -39,3 +24,36 @@ websrc/cacti-user/node_modules
 websrc/cacti-user/yarn.lock
 websrc/cacti-user/build
 websrc/cacti-user/*.log
+
+# Test artifacts
+test-suite/results*
+test-suite/diffs/*
+test-suite/summary.html
+test-suite/summary-failing.html
+test-suite/failing-images.txt
+
+reports/
+
+# Generated output:
+output/*
+simple2.png
+simple2.html
+weathermap.html
+
+releases
+releases/*
+.phan
+*.tar.gz
+
+dev/generated/
+dev/docs/
+dev/phpcs/
+
+# Vagrant generated files:
+dev/Vagrant/settings.sh
+dev/Vagrant/.vagrant
+dev/Vagrant/*.log
+dev/vagrant-testers/*.zip
+dev/vagrant-testers/.vagrant/
+
+

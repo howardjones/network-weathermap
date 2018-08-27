@@ -5,7 +5,7 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  
+
 	# If you have the vagrant-cachier plugin installed, it can cache apt packages between rebuilds for you
 	# vagrant plugin install vagrant-cachier
 	if Vagrant.has_plugin?("vagrant-cachier")
@@ -16,19 +16,47 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		config.cache.enable :apt
 	end
 
-  # Every Vagrant virtual environment requires a box to build off of.  
+  if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false
+  end
+
+
+  #
+  # For WEATHERMAP_VERSION="rsync | git":
 	config.vm.synced_folder "../../", "/network-weathermap"
-  
-  # just the specialisations for each OS-specific box
-  
+
+	#
+	# For WEATHERMAP_VERSION="mount":
+	config.vm.synced_folder "../../", "/var/www/html/cacti/plugins/weathermap"
 
   config.vm.define :develop do |develop|
-	  develop.vm.provision :shell, :path => "vagrant-cacti-develop.sh", privileged: false
-	  develop.vm.box = "ubuntu/xenial64"
-	  develop.vm.network "forwarded_port", guest:80, host: 8016
-	  develop.vm.hostname = "weathermap-dev"
-	  develop.vm.post_up_message = "Cacti should be available on http://localhost:8016/"
 
+	  develop.vm.provision :shell, :path => "vagrant-cacti-develop.sh", privileged: true
+	  develop.vm.box = "ubuntu/xenial64"
+	  develop.vm.box_version = "20180802.0.0"
+
+	  # Forward apache.
+	  develop.vm.network "forwarded_port", guest:80, host: 8016
+
+	  # Forward MySQL.
+	  #config.vm.network "forwarded_port", guest: 3306, host: 3306
+
+	  develop.vm.hostname = "weathermap-dev-3"
+	  develop.vm.post_up_message = "Cacti should be available on http://localhost:8016/cacti"
+  end
+
+  config.vm.provider "virtualbox" do |vb|
+    # Force time synchronisation between host and guest, if the clock is more than 5 seconds out of sync.
+    vb.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 5000 ]
+
+    # The memory to use.
+    vb.memory = 2048
+
+    # The number of CPUs
+    vb.cpus = 2
+
+    # The virtual box name
+    vb.name = "weathermap-dev"
   end
 
 #  config.vm.define :guitest do |guitest|

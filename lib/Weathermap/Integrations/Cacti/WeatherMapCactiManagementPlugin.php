@@ -354,7 +354,6 @@ class WeatherMapCactiManagementPlugin extends UIBase
     public function handleGroupAddAPI($request, $appObject)
     {
         $this->manager->createGroup($request['name']);
-        $this->manager->createGroup("POOP");
 
         $data = array("result" => "OK");
 

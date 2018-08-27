@@ -95,6 +95,8 @@ If you aren't intended to do any development, run the tests, or contribute patch
 
 * Bower is deprecated. Need to move to using npm directly
 
+* Judging from the memory logging, there's a memory leak (300-500KB per map).
+
 ### Longer-term WIP:
 
 * Break down 'monster methods' into simpler ones. Identify groups within the larger classes for refactoring (e.g. plugin-related stuff in Map)

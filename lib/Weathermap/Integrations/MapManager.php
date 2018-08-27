@@ -4,6 +4,7 @@ namespace Weathermap\Integrations;
 
 use PDOException;
 use PDO;
+use phpDocumentor\Reflection\Types\Null_;
 
 /**
  * All the database-access functions extracted from the old Cacti plugin.
@@ -205,6 +206,16 @@ class MapManager
     {
         $this->updateMap($mapId, array('group_id' => $groupId));
         $this->resortMaps();
+    }
+
+    public function mapExists($mapId)
+    {
+        $statement = $this->pdo->prepare("SELECT id FROM weathermap_maps WHERE id = ?");
+        $statement->execute(array($mapId));
+        if ($statement->rowCount() == 1) {
+            return true;
+        }
+        return false;
     }
 
     public function deleteMap($id)
@@ -471,6 +482,8 @@ class MapManager
                 $sortOrder
             )
         );
+
+        return $this->pdo->lastInsertId();
     }
 
     public function deleteGroup($groupId)
@@ -488,6 +501,16 @@ class MapManager
         # Finally, resort, just in case
         $this->resortGroups();
         $this->resortMaps();
+    }
+
+    public function groupExists($groupId)
+    {
+        $statement = $this->pdo->prepare("SELECT id FROM weathermap_groups WHERE id = ?");
+        $statement->execute(array($groupId));
+        if ($statement->rowCount() == 1) {
+            return true;
+        }
+        return false;
     }
 
     public function renameGroup($groupId, $newName)
@@ -543,6 +566,7 @@ class MapManager
      * Add a map to the maplist
      *
      * @param string $mapFilename
+     * @return null|int The database ID of the new map
      * @throws \Exception
      */
     public function addMap($mapFilename)
@@ -576,7 +600,11 @@ class MapManager
             $statement->execute(array($newMapId));
 
             $this->resortMaps();
+
+            return $newMapId;
         }
+
+        return null;
     }
 
     public function getMapAuthUsers($mapId)
@@ -597,6 +625,7 @@ class MapManager
 
         return $result;
     }
+
 
     /**
      * Convert a data_base_field_name to a DataBaseFieldName

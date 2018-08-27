@@ -3,6 +3,7 @@
 namespace Weathermap\Poller;
 
 use Weathermap\Core\MapUtility;
+use Weathermap\Core\StringUtility;
 use Weathermap\Integrations\MapManager;
 use Weathermap\Core\Utility;
 use Weathermap\Core\Map;
@@ -90,7 +91,7 @@ class MapRuntime
 
     private function memoryStamp($name)
     {
-        $this->memory[$name] = Utility::buildMemoryCheckString($name);
+        $this->memory[$name] = StringUtility::formatNumberWithMetricSuffix(memory_get_usage());
     }
 
     private function checkCron()
@@ -119,6 +120,7 @@ class MapRuntime
             true);
         $this->manager->application->setAppSetting("weathermap_last_started_file", $this->description);
 
+        $this->memory['_limit_'] = $memAllowed = ini_get("memory_limit");
         $this->checkPoint("start");
 
         $map = new Map;

@@ -9,8 +9,8 @@
 # Perhaps tell apt that we're non interactive?
 export DEBIAN_FRONTEND=noninteractive
 
-
-. /vagrant/settings.sh-sample
+# Use the sample file as default values
+. /vagrant/settings.sh.sample
 
 # Get the common settings (CACTI_VERSION etc)
 if [ -f /vagrant/settings.sh ]; then
@@ -27,8 +27,9 @@ apt-get -y install dos2unix
 echo "Setting system locale"
 cp /vagrant/locale /etc/default/locale
 dos2unix -q /etc/default/locale
-locale-gen en_US.UTF-8
-timedatectl set-timezone ${TIMEZONE}
+. /vagrant/locale
+locale-gen $LANG
+timedatectl set-timezone $TIMEZONE
 
 add-apt-repository ppa:ondrej/php
 apt-get update -y
@@ -159,7 +160,7 @@ else
   mysql -uroot cacti < ${CACTI_HOME}/cacti.sql
 fi
 
-
+# if WEATHERMAP_VERSION is a version number, this will look for locally-made release files (for pre-release tests)
 if [ -f /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip ]; then
   echo "Unzipping weathermap from local release zip"
   unzip /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip -d ${CACTI_HOME}plugins/
@@ -229,7 +230,7 @@ if [ "${WITH_SPINE}" == "yes" ]; then
   rm -rf /vagrant/cacti-spine-${CACTI_VERSION}/
 fi
 
-# any local tweaks can be added to post-install.sh (which needs to be marked executable)
+# any local tweaks can be added to post-install.sh
 if [ -x /vagrant/post-install.sh ]; then
-    /vagrant/post-install.sh
+    . /vagrant/post-install.sh
 fi

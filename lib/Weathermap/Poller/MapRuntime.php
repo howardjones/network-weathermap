@@ -143,8 +143,10 @@ class MapRuntime
 
         $this->checkPoint("data-read");
 
+//        MapUtility::debug("ImageURI is " . $map->imageuri);
         $configuredImageURI = $map->imageuri;
         $map->imageuri = $this->manager->application->getMapImageURL($this->mapConfig->filehash);
+//        MapUtility::debug("Generated ImageURI is " . $map->imageuri);
 
         $note = Utility::buildMemoryCheckString("");
         MapUtility::notice(
@@ -180,11 +182,14 @@ class MapRuntime
 
         // if an htmloutputfile was configured, output the HTML there too but using the configured imageuri and imagefilename
         if ($map->htmloutputfile != "") {
+            MapUtility::debug("Writing additional HTML file to " . $map->htmloutputfile);
+//            MapUtility::debug("Restored ImageURI is " . $map->imageuri);
             $this->writeHTMLFile($map->htmloutputfile, $map, $this->mapConfig->filehash);
         }
 
         if ($map->imageoutputfile != "" && $map->imageoutputfile != "weathermap.png" && file_exists($this->imageOutputFileName)) {
             // copy the existing image file to the configured location too
+            MapUtility::debug("Writing additional Image file to " . $map->imageoutputfile);
             @copy($this->imageOutputFileName, $map->imageoutputfile);
         }
 

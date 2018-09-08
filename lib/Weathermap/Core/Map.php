@@ -1215,7 +1215,9 @@ class Map extends MapBase
 
         $html = '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: ' . $this->width . 'px;" >';
 
-        $image = $this->imageuri ?: $this->imagefile;
+        $image = $this->imageuri != "" ? $this->imageuri : $this->imageoutputfile;
+        MapUtility::debug("makeHTML ImageURI is '$image'");
+//        MapUtility::debug("makeHTML ImageURI imagefile is '$this->imageoutputfile'");
 
         $html .= sprintf(
             '<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s" />',

@@ -7,10 +7,6 @@ namespace Weathermap\Core;
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-use Weathermap\Core\HTMLImagemap;
-use Weathermap\Core\PluginManager;
-use Weathermap\Core\Legend;
-
 /**
  * The top-level Weathermap object. Does way more than it should.
  *
@@ -1269,8 +1265,11 @@ class Map extends MapBase
                     $overlibhtml = $this->buildOverlibHTML($mapItem, $dir, $imageExtraHTML, $left, $above,
                         $caption);
 
+                    // This needs to only modify the areas for the correct dir
                     foreach ($mapItem->imagemapAreas as $area) {
-                        $area->extrahtml = $overlibhtml;
+                        if ($area->info['direction'] == $dir) {
+                            $area->extrahtml = $overlibhtml;
+                        }
                     }
                 }
             } // overlib?

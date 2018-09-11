@@ -15,8 +15,6 @@ namespace Weathermap\Core;
 //
 //
 
-use Weathermap\Core\HTMLImagemapArea;
-
 /**
  * The base class that contains the ImagemapArea objects, and produces the map HTML. (UNUSED?)
  *

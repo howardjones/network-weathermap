@@ -32,6 +32,8 @@ class HTMLImagemapAreaCircle extends HTMLImagemapArea
 
     public function __construct($coords, $name = '', $href = '')
     {
+        parent::__construct();
+
         $c = $coords[0];
 
         $this->name = $name;

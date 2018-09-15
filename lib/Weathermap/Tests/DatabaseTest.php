@@ -46,7 +46,7 @@ class DatabaseTest extends PHPUnit_Extensions_Database_TestCase
         return $this->createDefaultDBConnection($pdo, $GLOBALS['DB_DBNAME']);
     }
 
-    // FIXME This test only works when embedded in a Cacti installation
+// FIXME This test only works when embedded in a Cacti installation
 
 //    public function testGetPDO()
 //    {

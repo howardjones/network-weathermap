@@ -3,9 +3,6 @@
 namespace Weathermap\Core;
 
 
-use Weathermap\Core\StringUtility;
-use Weathermap\Core\MapUtility;
-
 /**
  * utility functions, mainly for poller
  */

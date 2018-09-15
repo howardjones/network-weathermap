@@ -34,7 +34,7 @@ class DocsTest extends \PHPUnit_Framework_TestCase
         foreach ($keywords as $scopeKeyword) {
             $p = explode("_", $scopeKeyword);
             $scope = $p[0];
-            $keyword = $p[1];
+//            $keyword = $p[1];
 
             $file = $this->docsRoot . "/" . $scopeKeyword . ".xml";
 

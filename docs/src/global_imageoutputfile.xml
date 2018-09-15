@@ -13,17 +13,20 @@
 
     <description xmlns="http://www.w3.org/1999/xhtml">
         <p>This specifies the name of the PNG, JPEG or GIF file that will be generated.
-        The format chosen is based on the file-extension. </p>
+            The format chosen is based on the file-extension.
+        </p>
 
         <p>The equivalent command-line option takes precedence over this configuration
-        line, if both are used. </p>
+            line, if both are used.
+        </p>
     </description>
 
     <changes>
-        <change version="0.98">This now creates a second copy of the file in the location specified, when using the Cacti plugin.</change>
+        <change version="0.98">This now creates a second copy of the file in the location specified, when using the
+            Cacti plugin.
+        </change>
         <change version="0.9">Added JPEG and GIF support.
         </change>
-
         <change version="0.7">Added IMAGEOUTPUTFILE.
         </change>
     </changes>

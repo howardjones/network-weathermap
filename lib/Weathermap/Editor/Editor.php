@@ -5,7 +5,6 @@
 // Released under the GNU Public License
 namespace Weathermap\Editor;
 
-use Weathermap\Core\BoundingBox;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapNode;
 use Weathermap\Core\MapLink;
@@ -13,7 +12,6 @@ use Weathermap\Core\Rectangle;
 use Weathermap\Core\WeathermapInternalFail;
 use Weathermap\Core\Point;
 use Weathermap\Core\MathUtility;
-use Weathermap\Core\MapUtility;
 use Weathermap\Core\Target;
 use Weathermap\Core\StringUtility;
 use Weathermap\UI\UIBase;

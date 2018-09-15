@@ -16,11 +16,15 @@
     "glopgar/monolog-timer-processor": "^0.1.1",
     "bramus/monolog-colored-line-formatter": "~2.0",
     "ext-json": "*",
+    "ext-pdo": "*",
+    "ext-posix": "*",
+    "ext-snmp": "*",
     "ext-gd": "*"
   },
   "require-dev": {
+    "slevomat/coding-standard": "^4.7",
     "dealerdirect/phpcodesniffer-composer-installer": "*",
-    "wimg/php-compatibility": "*",
+    "phpcompatibility/php-compatibility": "*",
     "phpunit/dbunit": "*",
     "phpunit/phpunit": "~5",
     "phpmd/phpmd": "*",

@@ -8,8 +8,6 @@
 
 namespace Weathermap\Core;
 
-use Weathermap\Core\Point;
-
 /**
  * Class SpineElement - a single item in a spine.
  *

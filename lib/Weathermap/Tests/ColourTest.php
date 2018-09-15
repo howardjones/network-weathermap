@@ -85,6 +85,6 @@ class ColourTest extends \PHPUnit_Framework_TestCase
      */
     public function testException()
     {
-        $c = new Colour("scooby");
+        new Colour("scooby");
     }
 }

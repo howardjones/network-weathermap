@@ -41,7 +41,7 @@ class ImageUtility
 
     /**
      * @param resource $gdImage
-     * @param resource $colour
+     * @param int $colour
      * @param Point $point
      * @param float $size
      * @param float[][] $relativeMoves

@@ -21,6 +21,8 @@ class MapBase
     public $imagemapAreas = array();
     public $parent;
 
+    public $name;
+
     protected $config = array();
     protected $descendents = array();
     protected $dependencies = array();
@@ -30,6 +32,7 @@ class MapBase
         $this->config = array();
         $this->descendents = array();
         $this->dependencies = array();
+        $this->name = null;
     }
 
     public function __toString()
@@ -44,7 +47,7 @@ class MapBase
 
     public function addNote($name, $value)
     {
-        MapUtility::debug("Adding note $name='$value' to " . $this->name . "\n");
+        MapUtility::debug("Adding note $name='$value' to " . $this . "\n");
         $this->notes[$name] = $value;
     }
 
@@ -59,7 +62,7 @@ class MapBase
 
     public function addHint($name, $value)
     {
-        MapUtility::debug("Adding hint $name='$value' to " . $this->name . "\n");
+        MapUtility::debug("Adding hint $name='$value' to " . $this . "\n");
         $this->hints[$name] = $value;
     }
 

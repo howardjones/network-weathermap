@@ -4,7 +4,6 @@ namespace Weathermap\Poller;
 
 use Weathermap\Integrations\MapManager;
 use Weathermap\Core\MapUtility;
-use Weathermap\Poller\PollerConfig;
 
 /**
  *

@@ -21,6 +21,7 @@ class MapItem extends MapBase
     public $definedIn;
     public $name;
     public $configOverride;    # used by the editor to allow text-editing
+    /** @var HTMLImagemapArea[] $imagemapAreas */
     public $imagemapAreas;
     public $zorder;
     protected $descendents = array();

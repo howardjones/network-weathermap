@@ -2,11 +2,6 @@
 
 namespace Weathermap\Core;
 
-use Weathermap\Core\MapUtility;
-use Weathermap\Core\Target;
-use Weathermap\Core\MapDataItem;
-use Weathermap\Core\Plugin;
-
 /**
  * Handle everything related to the various plugin types, including finding and loading them, and calling their methods.
  *

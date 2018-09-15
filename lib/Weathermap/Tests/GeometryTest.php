@@ -12,8 +12,6 @@ use Weathermap\Core\BoundingBox;
 use Weathermap\Core\CatmullRom1D;
 use Weathermap\Core\MathUtility;
 
-use Weathermap\Core\WeathermapInternalFail;
-
 class GeometryTest extends \PHPUnit_Framework_TestCase
 {
 

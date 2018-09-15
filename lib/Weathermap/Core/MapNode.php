@@ -7,8 +7,6 @@
 
 namespace Weathermap\Core;
 
-use Weathermap\Core\ImageUtility;
-
 /**
  * A single node on a map. Handles drawing, creation and generating config for getConfig()
  *

@@ -26,7 +26,7 @@ class ApplicationInterface
         return "en";
     }
 
-    public function getAppSetting($name, $defaultValue)
+    public function getAppSetting($name, $defaultValue = "")
     {
         return $defaultValue;
     }
@@ -39,7 +39,7 @@ class ApplicationInterface
     {
     }
 
-    public function getUserList()
+    public function getUserList($includeAnyone = false)
     {
         return array();
     }

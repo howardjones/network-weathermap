@@ -2,8 +2,6 @@
 
 namespace Weathermap\Core;
 
-use Weathermap\Core\MapUtility;
-
 /**
  * Class WeatherMapDataItem - Everything that collects data from DS plugins,
  * uses scales, etc, inherits from here.

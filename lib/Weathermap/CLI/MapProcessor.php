@@ -6,7 +6,6 @@ use GetOpt\GetOpt;
 use GetOpt\Option;
 use GetOpt\ArgumentException;
 use Weathermap\Core\Map;
-use Weathermap\Core\MapUtility;
 
 /**
  * A base class for various command-line tools that take in a map config file, process it, and spit out a new one.
@@ -40,7 +39,7 @@ class MapProcessor
 
     private function getOptions()
     {
-        $this->getOpt = new \GetOpt\GetOpt(null, [\GetOpt\GetOpt::SETTING_STRICT_OPERANDS => true]);
+        $this->getOpt = new GetOpt(null, [GetOpt::SETTING_STRICT_OPERANDS => true]);
 
         $this->addOptions();
 

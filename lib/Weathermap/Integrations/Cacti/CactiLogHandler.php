@@ -4,9 +4,6 @@
 
 namespace Weathermap\Integrations\Cacti;
 
-use Monolog\Logger;
-use Monolog\Handler;
-
 /**
  * UNUSED YET. A monolog handler to pass log lines to cacti_log()
  *

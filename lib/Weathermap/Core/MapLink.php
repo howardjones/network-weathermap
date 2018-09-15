@@ -6,8 +6,6 @@
 
 namespace Weathermap\Core;
 
-use Weathermap\Core\Point;
-
 /**
  * A single link on a map. Handles drawing, creation and generating config for getConfig()
  *
@@ -302,6 +300,7 @@ class MapLink extends MapDataItem
             $polyPoints = $this->geometry->getDrawnPolygon($direction);
 
             $newArea = new HTMLImagemapAreaPolygon(array($polyPoints), $areaName, '');
+            $newArea->info['direction'] = $direction;
             MapUtility::debug("Adding Poly imagemap for %s\n", $areaName);
 
             $this->imagemapAreas[] = $newArea;
@@ -434,8 +433,10 @@ class MapLink extends MapDataItem
             $rectanglePoints[] = max($points[1], $points[3]);
             $newArea = new HTMLImagemapAreaRectangle(array($rectanglePoints), $areaName, '');
             MapUtility::debug("Adding Rectangle imagemap for $areaName\n");
+            $newArea->info['direction'] = $direction;
         } else {
             $newArea = new HTMLImagemapAreaPolygon(array($points), $areaName, '');
+            $newArea->info['direction'] = $direction;
             MapUtility::debug("Adding Poly imagemap for $areaName\n");
         }
         // Make a note that we added this area

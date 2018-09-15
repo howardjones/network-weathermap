@@ -603,7 +603,6 @@ class MapManager
 
             return $newMapId;
         }
-
         return null;
     }
 

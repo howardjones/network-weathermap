@@ -7,6 +7,8 @@ use Weathermap\Integrations\Cacti\WeatherMapCacti10ManagementPlugin;
 
 class Cacti10ManagementTest extends \PHPUnit_Framework_TestCase
 {
+    private $object;
+
     public function setUp()
     {
         $dummyConfig = array("base_path" => "/tmp");

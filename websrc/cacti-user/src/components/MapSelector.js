@@ -1,9 +1,5 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
-
-import MapFull from './MapFull';
-import LinksFooter from './LinksFooter';
-
 
 const MapSelector = ({maps}) => {
 
@@ -14,7 +10,7 @@ const MapSelector = ({maps}) => {
     return <select>
         {options}
     </select>;
-}
+};
 
 
 function mapStateToProps(state) {

@@ -2,6 +2,9 @@
 .idea/
 *.iml
 
+tmp/
+dev/Vagrant/post-install.sh
+
 # Build process artifacts:
 build
 build/*

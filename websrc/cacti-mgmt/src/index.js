@@ -30,7 +30,7 @@ import WeathermapAPI from './services/api';
 
 import {getSettings} from "./actions";
 
-import FileSelector from "./components/AddMap";
+import AddMap from "./components/AddMap";
 import MapProperties from "./components/MapProperties";
 import AddGroup from "./components/AddGroup";
 import CreateMap from "./components/CreateMap";
@@ -48,6 +48,7 @@ sagaMiddleware.run(rootSaga);
 
 let wm_root = document.getElementById('weathermap-mgmt-root');
 
+
 addLocaleData([...en, ...fr, ...es, ...pt, ...ru]);
 
 const AppRoutes = () => (
@@ -60,7 +61,7 @@ const AppRoutes = () => (
             />
 
             <ModalRoute exact path='/add-map-picker' parentPath='/'>
-                <FileSelector store={store}/>
+                <AddMap store={store}/>
             </ModalRoute>
 
             <ModalRoute exact path="/map/:id/properties" component={MapProperties} parentPath='/'/>
@@ -69,7 +70,8 @@ const AppRoutes = () => (
             <ModalRoute exact path="/create-map" component={CreateMap} parentPath='/'/>
             <ModalRoute exact path="/settings" component={AppSettings} parentPath='/'/>
 
-            <ModalContainer bodyModalOpenClassName='wm-modal-open'
+            <ModalContainer bodyModal
+                            OpenClassName='wm-modal-open'
                             containerClassName='wm-modal-container'
                             backdropClassName='wm-modal-backdrop'
                             modalClassName='wm-modal'/>

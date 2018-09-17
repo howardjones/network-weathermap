@@ -1,4 +1,3 @@
-import {GET_MAPS_SUCCESS} from "../actions";
 
 const INITIAL_STATE = [];
 

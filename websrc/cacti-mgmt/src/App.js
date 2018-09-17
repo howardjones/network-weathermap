@@ -11,9 +11,8 @@ import ActionBar from "./components/ActionBar";
 class App extends Component {
 
     componentDidMount() {
-     //   this.props.loadSettings(this.props.url);
+      //   this.props.loadSettings(this.props.url);
     }
-
 
     render() {
         return (

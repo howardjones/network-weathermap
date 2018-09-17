@@ -21,32 +21,39 @@ code {
   color: #e73a37;
 }
 
-.layoutbox {
-  border: 1px solid lightgray;
-  padding: 5px;
-  margin: 5px;
+small {
+  display: block;
+  color: gray;
 }
 
 .tab {
+  background-color: white;
+  display: inline-block;
   padding: 10px;
-  margin: 2px;
-  border: 1px solid gray;
+  margin: 0 2px 0 0;
+  border: 1px solid #ccc;
+  border-bottom-color: transparent;
   text-decoration: none;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
+.tab:hover {
+  background-color: #dee2f5;
+}
 
-.tab.active {
+.tab.active,
+.tab.active:hover {
   background-color: blue;
+  border-bottom: 1px solid blue;
   color: white;
   font-weight: bold;
 }
 
 .wm_thumbcontainer {
-  margin: 2px;
-  border: 1px solid #bbbbbb;
-  padding: 2px;
-  float:left;
+  margin: 0 .5em;
+  border: 1px solid #dee2f5;
+  padding: 4px;
+  float: left;
 }
 .wm_thumbtitle {
   font-size: 1.2em;
@@ -59,6 +66,16 @@ code {
   border: 0;
 }
 
+.MapCollection {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  margin-bottom: 2em;
+  padding: 1em .5em;
+}
 .MapCollection_clear {
   clear: both;
+}
+
+.ModeSelector {
+  margin-top: 1em;
 }

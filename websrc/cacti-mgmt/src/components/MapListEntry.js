@@ -29,8 +29,8 @@ class MapListEntry extends Component {
 
         return (<tr key={item.id}>
             <td><Link to={props_url}>
-                <button>...</button>
-            </Link>{item.id}</td>
+                <button>Edit</button>
+            </Link></td>
             <td>
                 <small>{item.sortorder}</small>
             </td>

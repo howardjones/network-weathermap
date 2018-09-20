@@ -100,7 +100,7 @@ class UIBase
         }
 
         if ($type != "") {
-            throw new WeathermapInternalFail("ValidateArgs saw unknown type '$type'");
+            throw new WeathermapInternalFail("ValidateArgs saw unknown type $type");
         }
         return false;
     }

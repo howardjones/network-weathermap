@@ -26,7 +26,9 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
     {
         global $wm_showOldUI, $config;
 
-        $cactiResourcePath = $config['url_path'] . 'plugins/weathermap/cacti-resources/';
+        $weathermapPath = $config['url_path'] . 'plugins/weathermap/';
+        $cactiResourcePath = $weathermapPath . 'cacti-resources/';
+
         $this->cactiHeader();
 
         if ($wm_showOldUI) {

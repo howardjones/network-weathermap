@@ -220,7 +220,10 @@ class WeatherMapCactiUserPlugin extends UIBase
 
     public function handleDefaultView($request, $appObject)
     {
-        global $wm_showOldUI;
+        global $wm_showOldUI, $config;
+
+        $weathermapPath = $config['url_path'] . 'plugins/weathermap/';
+        $cactiResourcePath = $weathermapPath . 'cacti-resources/';
 
         $this->cactiHeader();
 
@@ -258,11 +261,11 @@ class WeatherMapCactiUserPlugin extends UIBase
 
         print "<small>This is the React UI below here</small>";
         print "<h1>INCOMPLETE</h1>";
-        print '<style>@import "cacti-resources/user/main.css"</style>';
-        print '<script type="text/javascript" src="overlib.js"></script>';
+        print '<style>@import "' . $cactiResourcePath . 'user/main.css"</style>';
+        print '<script type="text/javascript" src="' . $weathermapPath . 'overlib.js"></script>';
 
         print "<div id='weathermap-user-root' data-locale='" . $locale . "' data-url='" . $this->makeURL(array("action" => "settings")) . "'></div>";
-        print '<script type="text/javascript" src="cacti-resources/user/main.js"></script>';
+        print '<script type="text/javascript" src="' . $cactiResourcePath . 'user/main.js"></script>';
 
         print "<hr />";
 

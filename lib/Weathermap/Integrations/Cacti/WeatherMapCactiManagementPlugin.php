@@ -303,8 +303,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         return $files;
     }
 
-    public
-    function handleSettingsAPI(
+    public function handleSettingsAPI(
         $request,
         $appObject
     ) {
@@ -341,16 +340,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
         print json_encode($data);
     }
 
-    public
-    function handleDumpMapsAPI(
+    public function handleDumpMapsAPI(
         $request,
         $appObject
     ) {
         $this->api->mapList();
     }
 
-    protected
-    function handleMapEnableAPI(
+    protected function handleMapEnableAPI(
         $request,
         $appObject
     ) {
@@ -364,8 +361,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         print json_encode($data);
     }
 
-    protected
-    function handleMapDisableAPI(
+    protected function handleMapDisableAPI(
         $request,
         $appObject
     ) {
@@ -417,8 +413,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
 // ******************************************************
 
 
-    public
-    function handleEnablePollerOutput(
+    public function handleEnablePollerOutput(
         $request,
         $appObject
     ) {
@@ -426,8 +421,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array("action" => "map_settings", "id" => 0)));
     }
 
-    public
-    function handleGroupDelete(
+    public function handleGroupDelete(
         $request,
         $appObject
     ) {
@@ -443,8 +437,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array("action" => "groupadmin", "header" => "false")));
     }
 
-    public
-    function handleGroupUpdate(
+    public function handleGroupUpdate(
         $request,
         $appObject
     ) {
@@ -470,8 +463,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     /**
      * @param $request
      */
-    protected
-    function handleGroupOrderUp(
+    protected function handleGroupOrderUp(
         $request,
         $appObject
     ) {
@@ -486,8 +478,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     /**
      * @param $request
      */
-    protected
-    function handleGroupOrderDown(
+    protected function handleGroupOrderDown(
         $request,
         $appObject
     ) {
@@ -499,8 +490,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array("action" => "groupadmin", "header" => "false")));
     }
 
-    public
-    function handleMapChangeGroup(
+    public function handleMapChangeGroup(
         $request,
         $appObject
     ) {
@@ -521,8 +511,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array()));
     }
 
-    public
-    function handleMapSettingsDelete(
+    public function handleMapSettingsDelete(
         $request,
         $appObject
     ) {
@@ -546,8 +535,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             )));
     }
 
-    public
-    function handleMapSettingsSave(
+    public function handleMapSettingsSave(
         $request,
         $appObject
     ) {
@@ -586,8 +574,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             )));
     }
 
-    protected
-    function handlePermissionsAddUser(
+    protected function handlePermissionsAddUser(
         $request,
         $appObject
     ) {
@@ -599,8 +586,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
     }
 
-    protected
-    function handlePermissionsDeleteUser(
+    protected function handlePermissionsDeleteUser(
         $request,
         $appObject
     ) {
@@ -612,8 +598,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
     }
 
-    protected
-    function handleDeleteMap(
+    protected function handleDeleteMap(
         $request,
         $appObject
     ) {
@@ -623,8 +608,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array("header" => "false")));
     }
 
-    protected
-    function handleDeactivateMap(
+    protected function handleDeactivateMap(
         $request,
         $appObject
     ) {
@@ -634,8 +618,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array("header" => "false")));
     }
 
-    protected
-    function handleActivateMap(
+    protected function handleActivateMap(
         $request,
         $appObject
     ) {
@@ -645,8 +628,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array("header" => "false")));
     }
 
-    protected
-    function handleMapListAdd(
+    protected function handleMapListAdd(
         $request,
         $appObject
     ) {
@@ -659,8 +641,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     }
 
 
-    protected
-    function handleMapsListAdd(
+    protected function handleMapsListAdd(
         $request,
         $appObject
     ) {
@@ -675,8 +656,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
     }
 
-    protected
-    function handleMapOrderUp(
+    protected function handleMapOrderUp(
         $request
     ) {
         if (isset($request['id']) && is_numeric($request['id']) &&
@@ -690,8 +670,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     /**
      * @param $request
      */
-    protected
-    function handleMapOrderDown(
+    protected function handleMapOrderDown(
         $request,
         $appObject
     ) {
@@ -706,8 +685,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
 // *****************************************************************************************
 // These ones need overrides (UI stuff)
-    public
-    function handleMapSettingsForm(
+    public function handleMapSettingsForm(
         $request,
         $appObject
     ) {
@@ -716,8 +694,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    public
-    function handleGroupSelect(
+    public function handleGroupSelect(
         $request,
         $appObject
     ) {
@@ -789,8 +766,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    public
-    function handleGroupForm(
+    public function handleGroupForm(
         $request,
         $appObject
     ) {
@@ -830,8 +806,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    public
-    function handleMapGroupChangeForm(
+    public function handleMapGroupChangeForm(
         $request,
         $appObject
     ) {
@@ -898,8 +873,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    protected
-    function handleMapSettingsPage(
+    protected function handleMapSettingsPage(
         $request,
         $appObject
     ) {
@@ -912,8 +886,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
     }
 
-    protected
-    function handlePermissionsPage(
+    protected function handlePermissionsPage(
         $request,
         $appObject
     ) {
@@ -926,8 +899,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    protected
-    function handleViewConfig(
+    protected function handleViewConfig(
         $request,
         $appObject
     ) {
@@ -936,8 +908,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    protected
-    function handleMapPicker(
+    protected function handleMapPicker(
         $request,
         $appObject
     ) {
@@ -951,8 +922,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     }
 
 
-    public
-    function handleManagementMainScreen(
+    public function handleManagementMainScreen(
         $request,
         $appObject
     ) {
@@ -963,8 +933,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
 // *****************************************************************************************
 
-    protected
-    function maplistWarnings()
+    protected function maplistWarnings()
     {
         if (!MapUtility::moduleChecks()) {
             print '<div align="center" class="wm_warning"><p>';
@@ -1017,8 +986,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
     }
 
-    protected
-    function maplist()
+    protected function maplist()
     {
         \html_start_box(__('Weathermaps'), '100%', '', '3', 'center',
             $this->makeURL(array("action" => "addmap_picker")));
@@ -1199,8 +1167,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     }
 
 
-    protected
-    function previewConfig(
+    protected function previewConfig(
         $file
     ) {
         chdir($this->configPath);
@@ -1235,8 +1202,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
     }
 
-    protected
-    function addmapPicker(
+    protected function addmapPicker(
         $showAllFiles = false
     ) {
         $loaded = array();
@@ -1343,8 +1309,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
     }
 
-    public
-    function permissionsList(
+    public function permissionsList(
         $id
     ) {
         $map = $this->manager->getMap($id);
@@ -1422,8 +1387,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     }
 
 
-    public
-    function mapSettings(
+    public function mapSettings(
         $id
     ) {
         if ($id == 0) {
@@ -1512,8 +1476,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         print '</div>';
     }
 
-    public
-    function mapReadOnlySettings(
+    public function mapReadOnlySettings(
         $id,
         $title = ''
     ) {
@@ -1554,26 +1517,22 @@ class WeatherMapCactiManagementPlugin extends UIBase
         \html_end_box();
     }
 
-    public
-    function cactiFooter()
+    public function cactiFooter()
     {
         print "OVERRIDE ME";
     }
 
-    public
-    function cactiHeader()
+    public function cactiHeader()
     {
         print "OVERRIDE ME";
     }
 
-    public
-    function cactiRowStart(
+    public function cactiRowStart(
         $i
     ) {
     }
 
-    public
-    function footerLinks()
+    public function footerLinks()
     {
         $html = "";
 

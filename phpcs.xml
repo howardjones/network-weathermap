@@ -26,7 +26,7 @@
 
 
 
-    <config name="installed_paths" value="vendor/slevomat/coding-standard,vendor/phpcompatibility/php-compatibility"/>
+    <config name="installed_paths" value="vendor/phpcompatibility/php-compatibility"/>
 
     <!-- don't allow commented out code -->
     <rule ref="Squiz.PHP.CommentedOutCode"/>
@@ -76,7 +76,8 @@
 
     <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash"/>
     <rule ref="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration"/>
--->
+
     <rule ref="SlevomatCodingStandard.Namespaces.MultipleUsesPerLine"/>
     <rule ref="SlevomatCodingStandard.ControlStructures.LanguageConstructWithParentheses"/>
+    -->
 </ruleset>

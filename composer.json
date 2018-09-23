@@ -21,8 +21,7 @@
     "ext-gd": "*"
   },
   "require-dev": {
-    "slevomat/coding-standard": "^4.7",
-    "dealerdirect/phpcodesniffer-composer-installer": "*",
+g    "dealerdirect/phpcodesniffer-composer-installer": "*",
     "phpcompatibility/php-compatibility": "*",
     "phpunit/dbunit": "*",
     "phpunit/phpunit": "~5",

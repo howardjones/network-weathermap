@@ -4,12 +4,12 @@
 
 require_once dirname(__FILE__) . '/lib/all.php';
 
-//require_once dirname(__FILE__) . '/lib/EditorUI.php';
-
 use Weathermap\Editor\EditorUI;
 
 // so that you can't have the editor active, and not know about it.
 $editorEnabled = false;
+
+// For Cacti, this file is included in weathermap-cactiXX-plugin-editor.php - that will define these variables
 
 // If we're embedded in the Cacti UI (included from weathermap-cacti-plugin-editor.php), then authentication has happened. Enable the editor.
 if (isset($cameFromHost) && $cameFromHost == true) {

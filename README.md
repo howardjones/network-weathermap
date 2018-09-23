@@ -158,7 +158,7 @@ See the docs sub-directory for full HTML documentation, FAQ and example config.
 
 See CHANGES for the most recent updates, listed by version.
 
-See COPYING for the license under which php-weathermap is released.
+See LICENSE for the license under which php-weathermap is released.
 
 There is much more information, tutorials and updates available at:
     http://www.network-weathermap.com/

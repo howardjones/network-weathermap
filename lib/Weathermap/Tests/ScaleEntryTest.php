@@ -58,14 +58,20 @@ class ScaleEntryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals("\tSCALE DEFAULT 0    10     0 0 0   \n", $entry1->asConfig("DEFAULT", 1000, "."));
         $this->assertEquals("\tSCALE DEFAULT -220 10     0 0 0   TAG\n", $entry2->asConfig("DEFAULT", 1000, "."));
-        $this->assertEquals("\tSCALE DEFAULT 0    5      0 0 0  100 100 100   \n",
-            $entry3->asConfig("DEFAULT", 1000, "."));
-        $this->assertEquals("\tSCALE DEFAULT 0    5      0 0 0  100 100 100   MY TAG\n",
-            $entry4->asConfig("DEFAULT", 1000, "."));
+        $this->assertEquals(
+            "\tSCALE DEFAULT 0    5      0 0 0  100 100 100   \n",
+            $entry3->asConfig("DEFAULT", 1000, ".")
+        );
+        $this->assertEquals(
+            "\tSCALE DEFAULT 0    5      0 0 0  100 100 100   MY TAG\n",
+            $entry4->asConfig("DEFAULT", 1000, ".")
+        );
 
         $entry5 = new ScaleEntry(2500, 5000, new Colour(0, 0, 0), new Colour(100, 100, 100), "MY TAG");
-        $this->assertEquals("\tSCALE DEFAULT 2.5K 5K     0 0 0  100 100 100   MY TAG\n",
-            $entry5->asConfig("DEFAULT", 1000, "."));
+        $this->assertEquals(
+            "\tSCALE DEFAULT 2.5K 5K     0 0 0  100 100 100   MY TAG\n",
+            $entry5->asConfig("DEFAULT", 1000, ".")
+        );
     }
 
     public function testCompare()
@@ -105,7 +111,6 @@ class ScaleEntryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($entry2->hit(10.1));
         $this->assertFalse($entry2->hit(-310.1));
         $this->assertFalse($entry2->hit(-220.1));
-
     }
 
     public function testSpan()

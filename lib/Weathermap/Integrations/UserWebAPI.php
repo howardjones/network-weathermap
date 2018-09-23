@@ -2,7 +2,6 @@
 
 namespace Weathermap\Integrations;
 
-
 class UserWebAPI
 {
     /** @var MapManager $manager */
@@ -12,5 +11,4 @@ class UserWebAPI
     {
         $this->manager = $manager;
     }
-
 }

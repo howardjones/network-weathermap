@@ -101,7 +101,8 @@ class FPing extends Base
         $lineCount = 0;
         $hitCount = 0;
 
-        $command = sprintf("%s  -t100 -r1 -p20 -u -C %d -i100 -q %s 2>&1",
+        $command = sprintf(
+            "%s  -t100 -r1 -p20 -u -C %d -i100 -q %s 2>&1",
             escapeshellcmd($this->fpingCommand),
             $pingCount,
             escapeshellarg($targetAddress)

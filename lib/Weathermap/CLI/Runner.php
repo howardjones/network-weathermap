@@ -78,7 +78,8 @@ class Runner
      */
     private function addMainOptions($opt)
     {
-        $opt->addOptions(array(
+        $opt->addOptions(
+            array(
                 Option::create(null, 'version', GetOpt::NO_ARGUMENT)
                     ->setDescription('Show version info and quit'),
                 Option::create('h', 'help', GetOpt::NO_ARGUMENT)
@@ -108,7 +109,8 @@ class Runner
      */
     private function addExpertOptions($opt)
     {
-        $opt->addOptions(array(
+        $opt->addOptions(
+            array(
             Option::create(null, 'define', GetOpt::MULTIPLE_ARGUMENT)
                 ->setArgumentName('name=value')
                 ->setDescription('Define internal variables (equivalent to global SET in config file)'),
@@ -125,7 +127,8 @@ class Runner
             Option::create(null, 'no-warn', GetOpt::REQUIRED_ARGUMENT)
                 ->setDescription('suppress warnings with listed errorcodes (comma-separated)')
                 ->setArgumentName('WMxxx_errorcode'),
-        ));
+            )
+        );
     }
 
     /**
@@ -133,7 +136,8 @@ class Runner
      */
     private function addDevOptions($opt)
     {
-        $opt->addOptions(array(
+        $opt->addOptions(
+            array(
             Option::create(null, 'randomdata', GetOpt::NO_ARGUMENT)
                 ->setDescription('skip the data-reading process, generate random data'),
             Option::create(null, 'uberdebug', GetOpt::NO_ARGUMENT)
@@ -147,7 +151,8 @@ class Runner
             Option::create(null, 'dump-json', GetOpt::REQUIRED_ARGUMENT)
                 ->setArgumentName('filename')
                 ->setDescription('(development) dump JSON config to a new file'),
-        ));
+            )
+        );
     }
 
     private function translateRuntimeOptionsToSettings()
@@ -289,25 +294,37 @@ class Runner
             MapUtility::debug("Writing HTML to $this->htmlfile\n");
 
             $fd = fopen($this->htmlfile, 'w');
-            fwrite($fd,
-                '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
+            fwrite(
+                $fd,
+                '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>'
+            );
             if ($this->map->htmlstylesheet != '') {
                 fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $this->map->htmlstylesheet . '" />');
             }
-            fwrite($fd,
-                '<meta http-equiv="refresh" content="300" /><title>' . $this->map->processString($this->map->title,
-                    $this->map) . '</title></head><body>');
+            fwrite(
+                $fd,
+                '<meta http-equiv="refresh" content="300" /><title>' . $this->map->processString(
+                    $this->map->title,
+                    $this->map
+                ) . '</title></head><body>'
+            );
 
             if ($this->map->htmlstyle == "overlib") {
-                fwrite($fd,
-                    "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
-                fwrite($fd,
-                    "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
+                fwrite(
+                    $fd,
+                    "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n"
+                );
+                fwrite(
+                    $fd,
+                    "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n"
+                );
             }
 
             fwrite($fd, $this->map->makeHTML());
-            fwrite($fd,
-                '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs=' . WEATHERMAP_VERSION . '">PHP Network Weathermap v' . WEATHERMAP_VERSION . '</a></span></body></html>');
+            fwrite(
+                $fd,
+                '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs=' . WEATHERMAP_VERSION . '">PHP Network Weathermap v' . WEATHERMAP_VERSION . '</a></span></body></html>'
+            );
             fclose($fd);
         }
     }

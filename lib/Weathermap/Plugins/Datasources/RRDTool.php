@@ -115,8 +115,12 @@ class RRDTool extends Base
                             $fields[] = $result['data_source_name'];
                         }
                         if (count($fields) > 0) {
-                            MapUtility::warn("RRD ReadData: poller_output: " . $dsnames[$dir] . " is not a valid DS name for $databaseRRDName - valid names are: " . join(", ",
-                                    $fields) . " [WMRRD07]\n");
+                            MapUtility::warn(
+                                "RRD ReadData: poller_output: " . $dsnames[$dir] . " is not a valid DS name for $databaseRRDName - valid names are: " . join(
+                                    ", ",
+                                    $fields
+                                ) . " [WMRRD07]\n"
+                            );
                         } else {
                             MapUtility::warn("RRD ReadData: poller_output: $databaseRRDName is not a valid RRD filename within this Cacti install. <path_rra> is $pathRRA [WMRRD08]\n");
                         }
@@ -349,8 +353,10 @@ class RRDTool extends Base
         MapUtility::debug("RRD ReadData: Read $linecount lines from rrdtool\n");
         MapUtility::debug("RRD ReadData: Headings are: $headings\n");
 
-        if ((in_array($dsnames[IN], $heads) || $dsnames[IN] == '-') && (in_array($dsnames[OUT],
-                    $heads) || $dsnames[OUT] == '-')) {
+        if ((in_array($dsnames[IN], $heads) || $dsnames[IN] == '-') && (in_array(
+            $dsnames[OUT],
+            $heads
+        ) || $dsnames[OUT] == '-')) {
             // deal with the data, starting with the last line of output
             $rlines = array_reverse($lines);
 
@@ -504,8 +510,16 @@ class RRDTool extends Base
                 MapUtility::debug("RRD ReadData: Target DS names are " . $dsnames[IN] . " and " . $dsnames[OUT] . "\n");
 
                 if ($aggregateFunction != '') {
-                    RRDTool::readFromRealRRDtoolWithAggregate($rrdfile, $cfname, $aggregateFunction, $start, $end,
-                        $dsnames, $map, $item);
+                    RRDTool::readFromRealRRDtoolWithAggregate(
+                        $rrdfile,
+                        $cfname,
+                        $aggregateFunction,
+                        $start,
+                        $end,
+                        $dsnames,
+                        $map,
+                        $item
+                    );
                 } else {
                     // do this the tried and trusted old-fashioned way
                     RRDTool::readFromRealRRDtool($rrdfile, $cfname, $start, $end, $dsnames, $map, $item);

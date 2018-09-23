@@ -112,7 +112,6 @@ class SNMP3 extends Base
             $oids = array(IN => $matches[3], OUT => $matches[4]);
 
             if ($this->isHostAborted($host)) {
-
                 $this->prepareSNMPGlobals();
                 $params = $this->buildSNMPParams($map, $profileName);
 

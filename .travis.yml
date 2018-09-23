@@ -33,6 +33,7 @@ addons:
     - xsltproc
     - fping
     - zip
+    - php-snmp
 before_script:
 - mysql weathermaptest < test-suite/data/weathermap-empty.sql
 - phpenv config-add dev/ci/travis.ini

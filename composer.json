@@ -18,7 +18,6 @@
     "ext-json": "*",
     "ext-pdo": "*",
     "ext-posix": "*",
-    "ext-snmp": "*",
     "ext-gd": "*"
   },
   "require-dev": {

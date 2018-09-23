@@ -9,20 +9,20 @@ namespace Weathermap\Tests;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $testdir;
-    protected static $result1dir;
-    protected static $result2dir;
-    protected static $referencedir;
-    protected static $os_referencedir;
-    protected static $diffdir;
-    protected static $php_tag;
-    protected static $os_tag;
+    protected static $testsDirectory;
+    protected static $result1Directory;
+    protected static $result2Directory;
+    protected static $referenceDirectory;
+    protected static $osSpecificReferenceDirectory;
+    protected static $diffsDirectory;
+    protected static $phpTag;
+    protected static $osTag;
 
-    protected static $previouswd;
+    protected static $previousWorkingDirectory;
     protected static $compare;
 
-    protected static $testsuite;
-    protected static $confdir;
+    protected static $testSuiteDirectory;
+//    protected static $confdir;
 
     protected $projectRoot;
 
@@ -45,9 +45,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testConfigOutput($configFileName, $referenceImageFileName)
     {
-        $outputImageFileName = self::$result1dir . DIRECTORY_SEPARATOR . $configFileName . ".png";
-        $comparisonImageFileName = self::$diffdir . DIRECTORY_SEPARATOR . $configFileName . ".png";
-        $outputHTMLFileName = self::$result1dir . DIRECTORY_SEPARATOR . $configFileName . ".html";
+        $outputImageFileName = self::$result1Directory . DIRECTORY_SEPARATOR . $configFileName . ".png";
+        $comparisonImageFileName = self::$diffsDirectory . DIRECTORY_SEPARATOR . $configFileName . ".png";
+        $outputHTMLFileName = self::$result1Directory . DIRECTORY_SEPARATOR . $configFileName . ".html";
 
         $compareOutputFileName = $comparisonImageFileName . ".txt";
         if (file_exists($compareOutputFileName)) {
@@ -57,7 +57,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($referenceImageFileName, "reference image $referenceImageFileName missing");
 
         $warningCount = TestSupport::runOutputTest(
-            self::$testdir . DIRECTORY_SEPARATOR . $configFileName,
+            self::$testsDirectory . DIRECTORY_SEPARATOR . $configFileName,
             $outputImageFileName,
             $outputHTMLFileName,
             ''
@@ -130,19 +130,19 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testWriteConfigConsistency($configFileName, $referenceImageFileName)
     {
-        $outputImageFileName1 = self::$result1dir . DIRECTORY_SEPARATOR . $configFileName . ".png";
-        $outputImageFileName2 = self::$result2dir . DIRECTORY_SEPARATOR . $configFileName . ".png";
+        $outputImageFileName1 = self::$result1Directory . DIRECTORY_SEPARATOR . $configFileName . ".png";
+        $outputImageFileName2 = self::$result2Directory . DIRECTORY_SEPARATOR . $configFileName . ".png";
 
-        $outputConfigFileName = self::$result1dir . DIRECTORY_SEPARATOR . $configFileName;
+        $outputConfigFileName = self::$result1Directory . DIRECTORY_SEPARATOR . $configFileName;
 
         TestSupport::runOutputTest(
-            self::$testdir . DIRECTORY_SEPARATOR . $configFileName,
+            self::$testsDirectory . DIRECTORY_SEPARATOR . $configFileName,
             $outputImageFileName1,
             '',
             $outputConfigFileName
         );
         TestSupport::runOutputTest(
-            self::$result1dir . DIRECTORY_SEPARATOR . $configFileName,
+            self::$result1Directory . DIRECTORY_SEPARATOR . $configFileName,
             $outputImageFileName2,
             '',
             ''
@@ -162,23 +162,23 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         self::checkPaths();
 
-        $summaryFileName = self::$testsuite . DIRECTORY_SEPARATOR . "summary.html";
-        $os_tag = self::$os_tag;
+        $summaryFileName = self::$testSuiteDirectory . DIRECTORY_SEPARATOR . "summary.html";
+        $osTag = self::$osTag;
         $fileHandle = fopen($summaryFileName, "w");
         if ($fileHandle === false) {
             throw new \Exception("Failed to open summary file: $summaryFileName");
         }
         fputs(
             $fileHandle,
-            "<html><head><title>Test summary for $os_tag</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary for $os_tag</h3>(result - reference - diff)<br/>\n"
+            "<html><head><title>Test summary for $osTag</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary for $osTag</h3>(result - reference - diff)<br/>\n"
         );
         fputs($fileHandle, "<p>" . date("Y-m-d H:i:s") . "</p>\n");
 
         $configList = array();
 
         $testFiles = array();
-        if (is_dir(self::$testdir)) {
-            $dh = opendir(self::$testdir);
+        if (is_dir(self::$testsDirectory)) {
+            $dh = opendir(self::$testsDirectory);
 
             while (false !== ($entry = readdir($dh))) {
                 $testFiles[] = $entry;
@@ -186,26 +186,25 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             sort($testFiles);
             closedir($dh);
         } else {
-            throw new Exception("Test directory " . self::$testdir . " doesn't exist!");
+            throw new Exception("Test directory " . self::$testsDirectory . " doesn't exist!");
         }
 
         foreach ($testFiles as $file) {
             if (substr($file, -5, 5) == '.conf') {
+                $resultURL = "results1-" . self::$phpTag . "/" . $file . ".png";
+                $diffURL = "diffs-" . self::$phpTag . "/" . $file . ".png";
+                $referenceURL = "references/" . $file . ".png";
 
-                $result_url = "results1-" . self::$php_tag . "/" . $file . ".png";
-                $diff_url = "diffs-" . self::$php_tag . "/" . $file . ".png";
-                $reference_url = "references/" . $file . ".png";
+                $reference = self::$referenceDirectory . DIRECTORY_SEPARATOR . $file . ".png";
 
-                $reference = self::$referencedir . DIRECTORY_SEPARATOR . $file . ".png";
-
-                if (file_exists(self::$os_referencedir . DIRECTORY_SEPARATOR . $file . ".png")) {
-                    $reference = self::$os_referencedir . DIRECTORY_SEPARATOR . $file . ".png";
-                    $reference_url = "references/" . self::$os_tag . "/" . $file . ".png";
+                if (file_exists(self::$osSpecificReferenceDirectory . DIRECTORY_SEPARATOR . $file . ".png")) {
+                    $reference = self::$osSpecificReferenceDirectory . DIRECTORY_SEPARATOR . $file . ".png";
+                    $referenceURL = "references/" . self::$osTag . "/" . $file . ".png";
                 }
 
                 $configList[$file] = array($file, $reference);
 
-                $title = TestSupport::getMapTitle(self::$testdir . DIRECTORY_SEPARATOR . $file);
+                $title = TestSupport::getMapTitle(self::$testsDirectory . DIRECTORY_SEPARATOR . $file);
 
                 fputs(
                     $fileHandle,
@@ -214,9 +213,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                         $file,
                         $file,
                         htmlspecialchars($title),
-                        $result_url,
-                        $reference_url,
-                        $diff_url
+                        $resultURL,
+                        $referenceURL,
+                        $diffURL
                     )
                 );
             }
@@ -230,7 +229,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        chdir(self::$previouswd);
+        chdir(self::$previousWorkingDirectory);
     }
 
     protected function setUp()
@@ -244,11 +243,11 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         // sometimes useful to figure out what's going on!
         $WEATHERMAP_DEBUGGING = false;
 
-        self::$previouswd = getcwd();
+        self::$previousWorkingDirectory = getcwd();
         chdir($this->projectRoot);
     }
 
-    private function gen_slug($str)
+    private function generateSlug($str)
     {
         # special accents
         return strtolower(preg_replace(array('/[^a-zA-Z0-9 -]/', '/[ -]+/', '/^-|-$/'), array('', '-', ''), $str));
@@ -259,43 +258,41 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     private function checkPaths()
     {
         $version = explode('.', PHP_VERSION);
-        $php_tag = "php-" . $version[0] . "." . $version[1];
+        self::$phpTag = "php-" . $version[0] . "." . $version[1];
 
-//        $here = dirname(__FILE__);
         $testSuiteRoot = realpath(dirname(__FILE__) . "/../../../") . "/test-suite";
-//        $testSuiteRoot = $here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "test-suite";
 
-        self::$php_tag = $php_tag;
-        self::$result1dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results1-$php_tag";
-        self::$result2dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results2-$php_tag";
-        self::$diffdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "diffs-$php_tag";
+//        self::$phpTag = $phpTag;
+        self::$result1Directory = $testSuiteRoot . DIRECTORY_SEPARATOR . "results1-" . self::$phpTag;
+        self::$result2Directory = $testSuiteRoot . DIRECTORY_SEPARATOR . "results2-" . self::$phpTag;
+        self::$diffsDirectory = $testSuiteRoot . DIRECTORY_SEPARATOR . "diffs-" . self::$phpTag;
 
-        self::$testdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "tests";
-        self::$referencedir = $testSuiteRoot . DIRECTORY_SEPARATOR . "references";
-        self::$os_referencedir = "";
+        self::$testsDirectory = $testSuiteRoot . DIRECTORY_SEPARATOR . "tests";
+        self::$referenceDirectory = $testSuiteRoot . DIRECTORY_SEPARATOR . "references";
+        self::$osSpecificReferenceDirectory = "";
 
-        $os_codename = trim(shell_exec("lsb_release -c -s"));
-        if ($os_codename == "") {
-            $os_codename = $this->gen_slug(PHP_OS);
+        $osCodename = trim(shell_exec("lsb_release -c -s"));
+        if ($osCodename == "") {
+            $osCodename = $this->generateSlug(PHP_OS);
         }
-        $os_tag = "$os_codename-$php_tag";
-        self::$os_tag = $os_tag;
+//        $osTag = $osCodename . "-" . self::$phpTag;
+        self::$osTag = $osCodename . "-" . self::$phpTag;
 
-        $os_references = $testSuiteRoot . DIRECTORY_SEPARATOR . "references/$os_tag";
-        if (is_dir($os_references)) {
-            self::$os_referencedir = $os_references;
+        $osSpecificReferences = $testSuiteRoot . DIRECTORY_SEPARATOR . "references/" . self::$osTag;
+        if (is_dir($osSpecificReferences)) {
+            self::$osSpecificReferenceDirectory = $osSpecificReferences;
         }
 
-        self::$testsuite = $testSuiteRoot;
+        self::$testSuiteDirectory = $testSuiteRoot;
 
-        if (!file_exists(self::$result1dir)) {
-            mkdir(self::$result1dir);
+        if (!file_exists(self::$result1Directory)) {
+            mkdir(self::$result1Directory);
         }
-        if (!file_exists(self::$result2dir)) {
-            mkdir(self::$result2dir);
+        if (!file_exists(self::$result2Directory)) {
+            mkdir(self::$result2Directory);
         }
-        if (!file_exists(self::$diffdir)) {
-            mkdir(self::$diffdir);
+        if (!file_exists(self::$diffsDirectory)) {
+            mkdir(self::$diffsDirectory);
         }
 
         self::$compare = null;

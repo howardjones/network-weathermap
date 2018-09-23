@@ -468,7 +468,7 @@ class MapLink extends MapDataItem
             array('duplex', 'DUPLEX', self::CONFIG_TYPE_LITERAL),
             array('commentStyle', 'COMMENTSTYLE', self::CONFIG_TYPE_LITERAL),
             array('labelBoxStyle', 'BWSTYLE', self::CONFIG_TYPE_LITERAL),
-            //		array('usescale','USESCALE',self::CONFIG_TYPE_LITERAL),
+            //      array('usescale','USESCALE',self::CONFIG_TYPE_LITERAL),
 
             array('bwfont', 'BWFONT', self::CONFIG_TYPE_LITERAL),
             array('commentfont', 'COMMENTFONT', self::CONFIG_TYPE_LITERAL),

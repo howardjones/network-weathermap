@@ -70,8 +70,12 @@ class MapRuntime
 
     public function __toString()
     {
-        return sprintf("Runtime: %s -> %s & %s", $this->mapConfigFileName, $this->htmlOutputFileName,
-            $this->imageOutputFileName);
+        return sprintf(
+            "Runtime: %s -> %s & %s",
+            $this->mapConfigFileName,
+            $this->htmlOutputFileName,
+            $this->imageOutputFileName
+        );
     }
 
     private function preChecks()
@@ -116,8 +120,10 @@ class MapRuntime
             return false;
         }
 
-        MapUtility::notice("Map: $this->mapConfigFileName -> $this->htmlOutputFileName & $this->imageOutputFileName\n",
-            true);
+        MapUtility::notice(
+            "Map: $this->mapConfigFileName -> $this->htmlOutputFileName & $this->imageOutputFileName\n",
+            true
+        );
         $this->manager->application->setAppSetting("weathermap_last_started_file", $this->description);
 
         $this->memory['_limit_'] = $memAllowed = ini_get("memory_limit");

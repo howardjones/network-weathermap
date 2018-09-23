@@ -40,7 +40,7 @@ class MapUtility
             if (function_exists('debug_backtrace')) {
                 $bt = debug_backtrace();
                 $index = 1;
-                # 	$class = (isset($bt[$index]['class']) ? $bt[$index]['class'] : '');
+                #   $class = (isset($bt[$index]['class']) ? $bt[$index]['class'] : '');
                 $function = (isset($bt[$index]['function']) ? $bt[$index]['function'] : '');
                 $index = 0;
                 $file = (isset($bt[$index]['file']) ? basename($bt[$index]['file']) : '');
@@ -49,9 +49,9 @@ class MapUtility
                 $callingFunction = " [$function@$file:$line]";
 
                 if (is_array($weathermap_debug_suppress) && in_array(
-                        strtolower($function),
-                        $weathermap_debug_suppress
-                    )) {
+                    strtolower($function),
+                    $weathermap_debug_suppress
+                )) {
                     return;
                 }
             }

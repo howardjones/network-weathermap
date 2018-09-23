@@ -2,7 +2,6 @@
 
 namespace Weathermap\Core;
 
-
 use Weathermap\Plugins\Datasources\Base;
 
 /**

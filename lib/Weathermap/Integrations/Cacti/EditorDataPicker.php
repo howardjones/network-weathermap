@@ -260,7 +260,7 @@ class EditorDataPicker extends UIBase
      * @arg $b - the second string to compare
      * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
      * $b is equal to $b */
-    function usortNaturalNames($a, $b)
+    public function usortNaturalNames($a, $b)
     {
         return strnatcasecmp($a['name'], $b['name']);
     }
@@ -270,9 +270,8 @@ class EditorDataPicker extends UIBase
      * @arg $b - the second string to compare
      * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
      * $b is equal to $b */
-    function usortNaturalDescriptions($a, $b)
+    public function usortNaturalDescriptions($a, $b)
     {
         return strnatcasecmp($a['description'], $b['description']);
     }
-
 }

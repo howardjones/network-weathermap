@@ -71,7 +71,6 @@ function weathermap_show_tab()
     global $config, $user_auth_realm_filenames;
 
     if (api_plugin_user_realm_auth('weathermap-cacti10-plugin.php')) {
-
         $tabstyle = intval(read_config_option('superlinks_tabstyle'));
 
         if ($tabstyle > 0) {
@@ -102,12 +101,12 @@ function weathermap_config_arrays()
 {
     global $menu;
 
-    $wm_menu = array(
+    $ourMenu = array(
         'plugins/weathermap/weathermap-cacti10-plugin-mgmt.php' => __('Weathermaps', 'weathermap'),
         'plugins/weathermap/weathermap-cacti10-plugin-mgmt-groups.php' => __('Groups', 'weathermap')
     );
 
-    $menu[__('Management')]['plugins/weathermap/weathermap-cacti10-plugin-mgmt.php'] = $wm_menu;
+    $menu[__('Management')]['plugins/weathermap/weathermap-cacti10-plugin-mgmt.php'] = $ourMenu;
 }
 
 function weathermap_config_settings()

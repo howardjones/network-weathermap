@@ -429,7 +429,7 @@ class ConfigReader
             ),
 //            'ORIGIN' => array(
 //                array(
-//                    
+//
 //                    '/^ORIGIN\s+(C|NE|SE|NW|SW|N|S|E|W)/i',
 //                    array('position_origin' => 1)
 //                )
@@ -1698,8 +1698,11 @@ class ConfigReader
 
         if (!isset($this->mapObject->scales[$scaleName])) {
             $this->mapObject->scales[$scaleName] = new MapScale($scaleName, $this->mapObject);
-            $this->mapObject->legends[$scaleName] = new Legend($scaleName, $this->mapObject,
-                $this->mapObject->scales[$scaleName]);
+            $this->mapObject->legends[$scaleName] = new Legend(
+                $scaleName,
+                $this->mapObject,
+                $this->mapObject->scales[$scaleName]
+            );
         }
         $newScale = $this->mapObject->scales[$scaleName];
 
@@ -1902,7 +1905,6 @@ class ConfigReader
         foreach ($this->configKeywords as $scope => $keywords) {
             foreach ($keywords as $keyword => $matches) {
                 foreach ($matches as $match) {
-
                     # $match[0] is a regexp or string match
                     // TODO - can we validate a regexp?
 
@@ -1926,7 +1928,6 @@ class ConfigReader
                             $result = false;
                         }
                     }
-
                 }
             }
         }

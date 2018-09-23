@@ -968,7 +968,6 @@ class EditorUI extends UIBase
                     // put it back into the request, so that the validation doesn't fail
                     $request['mapname'] = $mapFileName;
                 }
-
             }
 
             // If there's something funny with the config filename, just stop.
@@ -990,9 +989,7 @@ class EditorUI extends UIBase
         if ($this->validateRequest($action, $request)) {
             $editor = new Editor();
 
-            if ($this->isEmbedded()) {
-
-            }
+            // if ($this->isEmbedded()) {}
 
             if (!isset($this->commands[$action]['late_load'])) {
                 $editor->loadConfig($this->mapFileName);

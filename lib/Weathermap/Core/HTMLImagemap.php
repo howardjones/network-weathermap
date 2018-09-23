@@ -72,8 +72,7 @@ class HTMLImagemap
 // update a property on all elements in the map that match a name
 // (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
 // returns the number of elements that were matched/changed
-    public
-    function setProp(
+    public function setProp(
         $which,
         $what,
         $where
@@ -101,8 +100,7 @@ class HTMLImagemap
 // update a property on all elements in the map that match a name as a substring
 // (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
 // returns the number of elements that were matched/changed
-    public
-    function setPropSub(
+    public function setPropSub(
         $which,
         $what,
         $where
@@ -124,15 +122,13 @@ class HTMLImagemap
         return $count;
     }
 
-    public
-    function getByName(
+    public function getByName(
         $name
     ) {
         return $this->shapes[$name];
     }
 
-    public
-    function getBySubstring(
+    public function getBySubstring(
         $nameFilter,
         $reverseOrder = false
     ) {
@@ -152,8 +148,7 @@ class HTMLImagemap
     }
 
 // Return the imagemap as an HTML client-side imagemap for inclusion in a page
-    public
-    function asHTML()
+    public function asHTML()
     {
         $html = '<map';
         if ($this->name != '') {
@@ -169,8 +164,7 @@ class HTMLImagemap
         return $html;
     }
 
-    public
-    function exactHTML(
+    public function exactHTML(
         $name = '',
         $skipNoLinks = false
     ) {

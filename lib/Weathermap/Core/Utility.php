@@ -2,7 +2,6 @@
 
 namespace Weathermap\Core;
 
-
 /**
  * utility functions, mainly for poller
  */
@@ -100,5 +99,4 @@ class Utility
 
         return $matched;
     }
-
 }

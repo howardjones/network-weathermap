@@ -154,8 +154,10 @@ class MapDataItem extends MapItem
     public function updateMaxValues($kilo)
     {
         foreach ($this->getChannelList() as $const) {
-            $this->maxValues[$const] = StringUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const],
-                $kilo);
+            $this->maxValues[$const] = StringUtility::interpretNumberWithMetricSuffix(
+                $this->maxValuesConfigured[$const],
+                $kilo
+            );
         }
 
         MapUtility::debug(

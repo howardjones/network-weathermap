@@ -877,8 +877,13 @@ class Map extends MapBase
                 $prefix = substr($mapItem->myType(), 0, 1);
                 fputs(
                     $fileHandle,
-                    sprintf("%s\t%f\t%f\r\n", $prefix, $mapItem->name, $mapItem->absoluteUsages[IN],
-                        $mapItem->absoluteUsages[OUT])
+                    sprintf(
+                        "%s\t%f\t%f\r\n",
+                        $prefix,
+                        $mapItem->name,
+                        $mapItem->absoluteUsages[IN],
+                        $mapItem->absoluteUsages[OUT]
+                    )
                 );
             }
         }
@@ -1023,7 +1028,6 @@ class Map extends MapBase
 
         MapUtility::warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
         return false;
-
     }
 
     /**
@@ -1251,19 +1255,29 @@ class Map extends MapBase
             $key = $mapItem->getOverlibDataKey();
 
             if ($this->htmlstyle == 'overlib' && $key != '' && count($dirs) > 0) {
-
                 list($midX, $midY) = $mapItem->getOverlibCentre();
 
-                list($left, $above, $imageExtraHTML) = $this->buildOverlibPositioning($mapItem, $midX, $mapCentreX,
-                    $midY, $mapCentreY);
+                list($left, $above, $imageExtraHTML) = $this->buildOverlibPositioning(
+                    $mapItem,
+                    $midX,
+                    $mapCentreX,
+                    $midY,
+                    $mapCentreY
+                );
 
                 // TODO - does this even work for IN vs OUT OVERLIB?? (seems to just overwrite one with other)
                 foreach ($dirs as $dir) {
                     $caption = ($mapItem->overlibcaption[$dir] != '' ? $mapItem->overlibcaption[$dir] : $mapItem->name);
                     $caption = $this->processString($caption, $mapItem);
 
-                    $overlibhtml = $this->buildOverlibHTML($mapItem, $dir, $imageExtraHTML, $left, $above,
-                        $caption);
+                    $overlibhtml = $this->buildOverlibHTML(
+                        $mapItem,
+                        $dir,
+                        $imageExtraHTML,
+                        $left,
+                        $above,
+                        $caption
+                    );
 
                     // This needs to only modify the areas for the correct dir
                     foreach ($mapItem->imagemapAreas as $area) {
@@ -1400,7 +1414,6 @@ class Map extends MapBase
 //                        }
 //                        $html .= "\n";
 //                    }
-
                 }
 
 
@@ -1877,8 +1890,6 @@ class Map extends MapBase
                 $this->usedImages [] = $node->iconfile;
             }
         }
-
     }
-
 }
 // vim:ts=4:sw=4:

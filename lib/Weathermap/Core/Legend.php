@@ -616,5 +616,4 @@ class Legend extends MapItem
     {
         return false;
     }
-
 }

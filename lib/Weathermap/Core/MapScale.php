@@ -2,7 +2,6 @@
 
 namespace Weathermap\Core;
 
-
 /**
  * A collection of ScaleEntries, maps a value to a colour (and tag)
  *
@@ -240,5 +239,4 @@ class MapScale extends MapItem
     {
         return sprintf("[SCALE %s]", $this->name);
     }
-
 }

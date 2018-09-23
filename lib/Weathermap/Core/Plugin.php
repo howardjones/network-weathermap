@@ -49,5 +49,4 @@ class Plugin
     {
         return sprintf("[PLUGIN %s %s%s]", $this->type, $this->name, $this->active ? "" : " (disabled)");
     }
-
 }

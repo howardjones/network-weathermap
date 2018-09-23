@@ -28,8 +28,8 @@ function runMaps($mydir)
     }
 
     $pollerConfig = new PollerConfig();
-    $pollerConfig->rrdtoolFileName = $manager->application->getAppSetting("path_rrdtool","rrdtool");
-    $pollerConfig->imageFormat = strtolower($manager->application->getAppSetting("weathermap_output_format","png"));
+    $pollerConfig->rrdtoolFileName = $manager->application->getAppSetting("path_rrdtool", "rrdtool");
+    $pollerConfig->imageFormat = strtolower($manager->application->getAppSetting("weathermap_output_format", "png"));
     $pollerConfig->configDirectory = $configDirectory;
     $pollerConfig->outputDirectory = $outputDirectory;
     $pollerConfig->thumbnailSize = $manager->application->getAppSetting("weathermap_thumbsize", "200");
@@ -48,7 +48,7 @@ function runMaps($mydir)
     } else {
         $modeMessage = "Normal logging mode. Turn on DEBUG in Cacti for more information";
     }
-    $quietLogging = $manager->application->getAppSetting("weathermap_quiet_logging",0);
+    $quietLogging = $manager->application->getAppSetting("weathermap_quiet_logging", 0);
     // moved this outside the module_checks, so there should always be something in the logs!
     if ($quietLogging == 0) {
         MapUtility::notice("Weathermap " . WEATHERMAP_VERSION . " starting - $modeMessage\n", true);

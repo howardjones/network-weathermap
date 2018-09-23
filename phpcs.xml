@@ -8,7 +8,7 @@
 
     <exclude-pattern>vendor/*</exclude-pattern>
 
-    <arg name="colors" />
+    <arg name="colors"/>
     <arg value="np"/>
 
     <!-- Don't hide tokenizer exceptions -->
@@ -25,16 +25,15 @@
     <rule ref="Generic.PHP.ForbiddenFunctions"/>
 
 
-    <config name="installed_paths" value="vendor/slevomat/coding-standard"/>
-    <config name="installed_paths" value="vendor/phpcompatibility/php-compatibility"/>
 
+    <config name="installed_paths" value="vendor/slevomat/coding-standard,vendor/phpcompatibility/php-compatibility"/>
 
     <!-- don't allow commented out code -->
-    <rule ref="Squiz.PHP.CommentedOutCode" />
+    <rule ref="Squiz.PHP.CommentedOutCode"/>
 
 
     <!-- Check var names, but we don't want leading underscores for private vars -->
-    <rule ref="Squiz.NamingConventions.ValidVariableName" />
+    <rule ref="Squiz.NamingConventions.ValidVariableName"/>
     <rule ref="Squiz.NamingConventions.ValidVariableName.PrivateNoUnderscore">
         <severity>0</severity>
     </rule>

@@ -20,9 +20,21 @@ treat it as a failure - either the feature is too complicated, or the manual doe
 explain it well enough. Possibly, the user has totally misunderstood what should
 happen, in which case I let myself off the hook, but that's not the default position.
 
+## Code Standards ##
+
+I try to stick to PSR-2 for coding formatting type stuff. The only exceptions are:
+
+* Line-length (slavishly following this one makes for strange formatting, IMO)
+* camelCase variable names where we're talking to Cacti. Cacti doesn't use this naming 
+style, so some things *can't* follow it 
+
+There's a `phpcs.xml` in the repo's root directory, that I use to check and fix the 
+layout from time to time. You should be able to use `vendor/bin/phpcs` to do the same
+checks (and `vendor/bin/phpcbf` to fix anything that can be fixed automatically)
+
 ## Testing ##
 
-### Functional & Tests (automated) ###
+### Functional & Config-based Tests (automated) ###
 
 The subversion repo includes tests for phpunit. You can run them all in one go
 by running ./test.sh in the weathermap folder. This runs phpunit, and then compiles

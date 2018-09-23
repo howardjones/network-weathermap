@@ -21,7 +21,7 @@
     "ext-gd": "*"
   },
   "require-dev": {
-g    "dealerdirect/phpcodesniffer-composer-installer": "*",
+    "dealerdirect/phpcodesniffer-composer-installer": "*",
     "phpcompatibility/php-compatibility": "*",
     "phpunit/dbunit": "*",
     "phpunit/phpunit": "~5",

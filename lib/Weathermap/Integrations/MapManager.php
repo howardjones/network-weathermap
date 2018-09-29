@@ -732,10 +732,16 @@ class MapManager
 
         if (!in_array('weathermap_data', $tables)) {
             $databaseUpdates[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id INT(11) NOT NULL AUTO_INCREMENT,
-                                rrdfile VARCHAR(190) NOT NULL,data_source_name VARCHAR(19) NOT NULL,
-                                  last_time INT(11) NOT NULL,last_value VARCHAR(190) NOT NULL,
-                                last_calc VARCHAR(190) NOT NULL, sequence INT(11) NOT NULL, local_data_id INT(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
-                                  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) )";
+                                rrdfile VARCHAR(190) NOT NULL,
+                                data_source_name VARCHAR(19) NOT NULL,
+                                last_time INT(11) NOT NULL,
+                                last_value VARCHAR(190) NOT NULL,
+                                last_calc VARCHAR(190) NOT NULL, 
+                                sequence INT(11) NOT NULL, 
+                                local_data_id INT(11) NOT NULL DEFAULT 0, 
+                                last_used DATETIME DEFAULT '1900-01-01 00:00:00',
+                                PRIMARY KEY  (id), KEY rrdfile (rrdfile),
+                                  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) ENGINE=Memory";
         }
 
         return $databaseUpdates;
@@ -808,10 +814,14 @@ class MapManager
                 # if there is existing data without a local_data_id, ditch it
                 $databaseUpdates[] = "DELETE FROM weathermap_data";
             }
+            if (!in_array('last_used', $columns)) {
+                $databaseUpdates[] = "ALTER TABLE weathermap_data ADD last_used DATETIME DEFAULT '1900-01-01 00:00:00' AFTER local_data_id";
+                $databaseUpdates[] = "ALTER TABLE weathermap_data ENGINE=Memory";
+            }
         }
 
         // patch up the sortorder for any maps that don't have one.
-        $databaseUpdates[] = "UPDATE weathermap_maps SET sortorder=id WHERE sortorder IS NULL OR sortorder=0;";
+        $databaseUpdates[] = "UPDATE weathermap_maps SET sortorder = id WHERE sortorder IS null OR sortorder = 0;";
 
         if (!empty($databaseUpdates)) {
             for ($a = 0; $a < count($databaseUpdates); $a++) {

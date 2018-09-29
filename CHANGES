@@ -7,7 +7,7 @@ more PHP 4 support. Sorry to CentOS 4 users! PHP 5.3 was an option, but that's a
 and makes using current development tools (like phpunit) more difficult.
 
 1.0.0
-    Special thanks to arjanoosting, YATV and hawson for code contributions on github, and especially
+    Special thanks to Rutger, arjanoosting, YATV and hawson for code contributions on github, and especially
     Martin (malgoe) for working on Vagrant and documentation to enable other contributors, and netniV
     for development support.
 

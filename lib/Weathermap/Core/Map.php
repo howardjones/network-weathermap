@@ -1265,7 +1265,6 @@ class Map extends MapBase
                     $mapCentreY
                 );
 
-                // TODO - does this even work for IN vs OUT OVERLIB?? (seems to just overwrite one with other)
                 foreach ($dirs as $dir) {
                     $caption = ($mapItem->overlibcaption[$dir] != '' ? $mapItem->overlibcaption[$dir] : $mapItem->name);
                     $caption = $this->processString($caption, $mapItem);
@@ -1405,18 +1404,7 @@ class Map extends MapBase
                         );
                         $html .= "\n";
                     }
-
-                    // TODO: Same for Legends - add them to the zItems
-//                    foreach ($this->scales as $it) {
-//                        foreach ($it->getImagemapAreas() as $area) {
-//                            MapUtility::debug("$area\n");
-//                            $html .= "\t" . $area->asHTML();
-//                            $html .= "\n";
-//                        }
-//                        $html .= "\n";
-//                    }
                 }
-
 
                 // we reverse the array for each zlayer so that the imagemap order
                 // will match up with the draw order (last drawn should be first hit)
@@ -1426,16 +1414,15 @@ class Map extends MapBase
                         foreach ($it->getImagemapAreas() as $area) {
                             MapUtility::debug("$area\n");
                             // skip the linkless areas if we are in the editor - they're redundant
-                            $html .= "\t" . $area->asHTML();
-                            $html .= "\n";
-                            $html .= "<!-- end of area $area -->";
+                            $html .= "\t" . $area->asHTML() . "\n";
+//                            $html .= "<!-- end of area $area -->";
                         }
-                        $html .= "<!-- end of item $it -->";
+//                        $html .= "<!-- end of item $it -->";
                         $html .= "\n";
                     }
                 }
 
-                $html .= "<!-- end of $z -->";
+//                $html .= "<!-- end of $z -->";
             }
         }
 

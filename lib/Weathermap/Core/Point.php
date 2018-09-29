@@ -1,4 +1,5 @@
 <?php
+
 namespace Weathermap\Core;
 
 /**
@@ -169,5 +170,23 @@ class Point
         $this->y += -$distance * cos($radiansAngle);
 
         return $this;
+    }
+
+    /**
+     * Rotate an array of Points around this Point
+     *
+     * @param Point[] $points
+     * @param int $radiansAngle
+     */
+    public function rotatePointsAround($points, $radiansAngle = 0)
+    {
+        for ($i = 0; $i < count($points); $i++) {
+            // translate so that this point is the origin
+            $deltaX = $points[$i]->x - $this->x;
+            $deltaY = $points[$i]->y - $this->y;
+            // rotate about origin, and translate back
+            $points[$i]->x = $deltaX * cos($radiansAngle) - $deltaY * sin($radiansAngle) + $this->x;
+            $points[$i]->y = $deltaY * cos($radiansAngle) + $deltaX * sin($radiansAngle) + $this->y;
+        }
     }
 }

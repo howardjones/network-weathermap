@@ -253,7 +253,7 @@ class Spine
      *
      * @param int $splitIndex
      *
-     * @returns Spine[] two new spines either side of the split
+     * @return Spine[] two new spines either side of the split
      */
     private function split($splitIndex)
     {

@@ -37,7 +37,7 @@ class MathUtility
     /**
      * rotate a list of points around cx,cy by an angle in radians, IN PLACE
      *
-     * TODO: This should be using WMPoints! (And should be a method of WMPoint)
+     * TODO: This should be using WMPoints! (And should be a method of WMPoint) - there is now a version in Point, too
      *
      * @param array $points array of ordinates (x,y,x,y,x,y...)
      * @param float $centreX centre of rotation, X coordinate

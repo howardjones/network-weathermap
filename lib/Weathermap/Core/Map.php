@@ -1281,7 +1281,7 @@ class Map extends MapBase
 
                     // This needs to only modify the areas for the correct dir
                     foreach ($mapItem->imagemapAreas as $area) {
-                        if ($area->info['direction'] == $dir) {
+                        if (array_key_exists('direction', $area->info) and $area->info['direction'] == $dir) {
                             $area->extrahtml = $overlibhtml;
                         }
                     }
@@ -1289,13 +1289,14 @@ class Map extends MapBase
             } // overlib?
 
             // now look at infourls
-            // TODO - same here overwrites one with other
             // don't use infourl in editor (we add our own click handler to edit link)
             if ($this->htmlstyle != 'editor') {
                 foreach ($dirs as $dir) {
                     if ($mapItem->infourl[$dir] != '') {
                         foreach ($mapItem->imagemapAreas as $area) {
-                            $area->href = $this->processString($mapItem->infourl[$dir], $mapItem);
+                            if (array_key_exists('direction', $area->info) and $area->info['direction'] == $dir) {
+                                $area->href = $this->processString($mapItem->infourl[$dir], $mapItem);
+                            }
                         }
                     }
                 }

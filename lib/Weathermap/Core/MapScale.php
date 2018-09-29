@@ -143,6 +143,8 @@ class MapScale extends MapItem
 
         $candidate = null;
 
+        // TODO - if entries were sorted by size, this could just return on the FIRST match
+
         foreach ($this->entries as $key => $scaleEntry) {
             if ($scaleEntry->hit($value)) {
                 MapUtility::debug("HIT for %s-%s\n", $scaleEntry->bottom, $scaleEntry->top);

@@ -109,7 +109,7 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
 
         $result = array();
         foreach ($order as $suborder) {
-            $result [] = $suborder[0];
+            $result [] = intval($suborder[0]);
         }
 
         return $result;

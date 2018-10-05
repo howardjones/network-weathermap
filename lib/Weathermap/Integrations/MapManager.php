@@ -576,7 +576,7 @@ class MapManager
      * @return null|int The database ID of the new map
      * @throws \Exception
      */
-    public function addMap($mapFilename, $groupId = 0)
+    public function addMap($mapFilename, $groupId = 1)
     {
         chdir($this->configDirectory);
 

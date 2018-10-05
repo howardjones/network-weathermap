@@ -15,18 +15,12 @@ class AddGroupReal extends Component {
     }
 
     handleSubmit(event) {
-        const {match, location, history} = this.props;
+        const {history} = this.props;
 
         console.log(`Create a new group called ${this.state.group_name}`);
         event.preventDefault();
 
-
         this.props.addGroup(this.state.group_name);
-
-        const formdata = {'name': this.state.group_name};
-
-        // axios.post('/api/test', formdata);
-
         history.push("/")
     }
 

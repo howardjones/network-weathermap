@@ -27,7 +27,6 @@ export default function (state = INITIAL_STATE, action) {
                 console.log("Got undefined settings in SET_SETTINGS");
                 return state;
             }
-            break;
         case VIEW_ALL_FULL:
             return {...state, page_style: "full"};
 

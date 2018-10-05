@@ -2,7 +2,6 @@
   "name": "cacti-user",
   "version": "1.0.0",
   "private": true,
-
   "dependencies": {
     "axios": "^0.17.0",
     "object-path-immutable": "^0.5.2",
@@ -17,11 +16,14 @@
     "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
-    "react-scripts": "1.0.14"
+    "html-loader": "^0.5.5",
+    "react-scripts": "1.0.14",
+    "watch": "^1.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "dev": "watch 'npm run build' src",
     "postbuild": "node postbuild.js",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"

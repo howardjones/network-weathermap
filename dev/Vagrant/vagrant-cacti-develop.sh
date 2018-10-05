@@ -10,7 +10,7 @@
 export DEBIAN_FRONTEND=noninteractive
 
 # Use the sample file as default values
-. /vagrant/settings.sh.sample
+. /vagrant/settings.sh-sample
 
 # Get the common settings (CACTI_VERSION etc)
 if [ -f /vagrant/settings.sh ]; then
@@ -89,7 +89,7 @@ cd /tmp
 curl -sS https://getcomposer.org/installer -o composer-setup.php
 php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
-echo "Starting installation for Cacti ${CACTI_VERSION}"
+echo "Starting installation for Cacti version '${CACTI_VERSION}'"
 
 mkdir ${CACTI_HOME}
 if [ ! -f /vagrant/cacti-${CACTI_VERSION}.tar.gz ]; then

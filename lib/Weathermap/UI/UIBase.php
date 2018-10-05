@@ -24,6 +24,7 @@ class UIBase
         "name" => "validateArgName",
         "jsname" => "validateArgJavascriptName",
         "mapfile" => "validateArgMapFilename",
+        "mapfilelist" => "validateArgMapFilenameList",
         "string" => "validateArgString",
         "non-empty-string" => "validateArgNonEmptyString",
         "bool" => "validateArgBool",
@@ -51,6 +52,7 @@ class UIBase
     public function validateRequest($action, $request)
     {
         if (!array_key_exists($action, $this->commands)) {
+            error_log("Given action does not exist!");
             return false;
         }
 
@@ -98,7 +100,7 @@ class UIBase
         }
 
         if ($type != "") {
-            throw new WeathermapInternalFail("ValidateArgs saw unknown type");
+            throw new WeathermapInternalFail("ValidateArgs saw unknown type $type");
         }
         return false;
     }
@@ -224,6 +226,17 @@ class UIBase
             return true;
         }
         return false;
+    }
+
+    private function validateArgMapFilenameList($value)
+    {
+        $confs = explode(",", $value);
+        foreach ($confs as $conf) {
+            if ($conf != self::wmeSanitizeConfigFile($conf)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private function validateArgJavascriptName($value)

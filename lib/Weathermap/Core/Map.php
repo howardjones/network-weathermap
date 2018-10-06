@@ -1283,6 +1283,10 @@ class Map extends MapBase
                         if (array_key_exists('direction', $area->info) and $area->info['direction'] == $dir) {
                             $area->extrahtml = $overlibhtml;
                         }
+
+                        if (!array_key_exists('direction', $area->info)) {
+                            MapUtility::debug("$area has no direction, for $mapItem");
+                        }
                     }
                 }
             } // overlib?
@@ -1384,6 +1388,13 @@ class Map extends MapBase
         $allLayers = array_keys($this->seenZLayers);
         rsort($allLayers);
 
+        $skipNoLinks = true;
+        // In the editor, we need everything to be clickable
+        if ($this->context == 'editor') {
+            $skipNoLinks = false;
+        }
+        MapUtility::debug("skipNoLinks is $skipNoLinks, context is $this->context\n");
+
         MapUtility::debug("Starting to dump imagemap in reverse Z-order...\n");
         foreach ($allLayers as $z) {
             MapUtility::debug("Writing HTML for layer $z\n");
@@ -1397,12 +1408,8 @@ class Map extends MapBase
 
                     // TODO: This is for timestamp and title ONLY - they could be just added like the others once they are objects
                     foreach ($this->imagemapAreas as $areaname) {
-                        // skip the linkless areas if we are in the editor - they're redundant
-                        $html .= $this->imap->exactHTML(
-                            $areaname,
-                            ($this->context != 'editor')
-                        );
-                        $html .= "\n";
+                        $html .= $this->imap->exactHTML($areaname, $skipNoLinks);
+//                        $html .= "\n";
                     }
                 }
 
@@ -1413,16 +1420,13 @@ class Map extends MapBase
                     if (!$it->isTemplate()) {
                         foreach ($it->getImagemapAreas() as $area) {
                             MapUtility::debug("$area\n");
-                            // skip the linkless areas if we are in the editor - they're redundant
-                            $html .= "\t" . $area->asHTML() . "\n";
-//                            $html .= "<!-- end of area $area -->";
+                            if (!$skipNoLinks || ($skipNoLinks && $area->hasLinks())) {
+                                $html .= "\t" . $area->asHTML() . "\n";
+                            }
                         }
-//                        $html .= "<!-- end of item $it -->";
-                        $html .= "\n";
+//                        $html .= "\n";
                     }
                 }
-
-//                $html .= "<!-- end of $z -->";
             }
         }
 

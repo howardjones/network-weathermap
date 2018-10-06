@@ -72,11 +72,8 @@ class HTMLImagemap
 // update a property on all elements in the map that match a name
 // (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
 // returns the number of elements that were matched/changed
-    public function setProp(
-        $which,
-        $what,
-        $where
-    ) {
+    public function setProp($which, $what, $where)
+    {
         $count = 0;
 
         if (true === isset($this->shapes[$where])) {
@@ -100,11 +97,8 @@ class HTMLImagemap
 // update a property on all elements in the map that match a name as a substring
 // (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
 // returns the number of elements that were matched/changed
-    public function setPropSub(
-        $which,
-        $what,
-        $where
-    ) {
+    public function setPropSub($which, $what, $where)
+    {
         $count = 0;
         foreach ($this->shapes as $shape) {
             if (($where == '') || (strstr($shape->name, $where) != false)) {
@@ -122,16 +116,13 @@ class HTMLImagemap
         return $count;
     }
 
-    public function getByName(
-        $name
-    ) {
+    public function getByName($name)
+    {
         return $this->shapes[$name];
     }
 
-    public function getBySubstring(
-        $nameFilter,
-        $reverseOrder = false
-    ) {
+    public function getBySubstring($nameFilter, $reverseOrder = false)
+    {
         $result = array();
 
         foreach ($this->shapes as $shape) {
@@ -164,18 +155,17 @@ class HTMLImagemap
         return $html;
     }
 
-    public function exactHTML(
-        $name = '',
-        $skipNoLinks = false
-    ) {
+    public function exactHTML($name = '', $skipNoLinks = false)
+    {
         $html = '';
+
+        if (array_key_exists($name, $this->shapes)) {
+            return $html;
+        }
+
         $shape = $this->shapes[$name];
 
-        if (true === isset($shape) &&
-            ((false === $skipNoLinks)
-                || ($shape->href !== '')
-                || ($shape->extrahtml !== ''))
-        ) {
+        if (((false === $skipNoLinks) || $shape->hasLinks())) {
             $html = $shape->asHTML();
         }
 

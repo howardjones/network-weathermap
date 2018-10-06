@@ -386,6 +386,8 @@ class MapNode extends MapDataItem
         foreach ($this->boundingboxes as $bbox) {
             $areaName = 'NODE:N' . $this->id . ':' . $index;
             $newArea = new HTMLImagemapAreaRectangle(array($bbox), $areaName, '');
+            // it doesn't really matter which, but it needs to have SOME direction
+            $newArea->info['direction'] = IN;
             MapUtility::debug('Adding imagemap area [' . join(',', $bbox) . "] => $newArea \n");
             $this->imagemapAreas[] = $newArea;
             $index++;

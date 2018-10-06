@@ -2,7 +2,6 @@
 
 namespace Weathermap\Integrations;
 
-
 class ManagementWebAPI
 {
     /** @var MapManager $manager */
@@ -35,13 +34,11 @@ class ManagementWebAPI
     public function mapEnable($id)
     {
         header('Content-type: application/json');
-
     }
 
     public function mapDisable($id)
     {
         header('Content-type: application/json');
-
     }
 
     public function mapDelete($id)
@@ -73,7 +70,6 @@ class ManagementWebAPI
         $data = array("result" => "OK");
 
         if ($this->manager->groupExists($id)) {
-
             $this->manager->deleteMap($id);
         } else {
             $data = array("result" => "error", "message" => "No such group");
@@ -82,5 +78,4 @@ class ManagementWebAPI
         header('Content-type: application/json');
         return json_encode($data);
     }
-
 }

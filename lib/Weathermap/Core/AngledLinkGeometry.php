@@ -50,24 +50,20 @@ class AngledLinkGeometry extends LinkGeometry
             // before the main loop, add in the jump out to the corners
             // if this is the first step, then we need to go from the middle to the outside edge first
             //(the loop may not run, but these corners are required)
-            $index = 0;
-            $tangent = $simple->getPoint($index)->vectorToPoint($simple->getPoint($index + 1));
-            $normal = $tangent->getNormal();
-
-            $there[] = $simple->getPoint($index)->copy()->addVector($normal, $width);
-            array_unshift($back, $simple->getPoint($index)->copy()->addVector($normal, -$width));
-
-            $maxStartingIndex = $simple->pointCount() - 2;
-
-            MapUtility::debug("We'll loop through %d steps.", $maxStartingIndex + 1);
 
             $point = $simple->getPoint(0);
             $nextPoint = $simple->getPoint(1);
             $tangent = $point->vectorToPoint($nextPoint);
             $normal = $tangent->getNormal();
 
-            for ($index = 0; $index < $maxStartingIndex; $index++) {
+            $there[] = $point->copy()->addVector($normal, $width);
+            array_unshift($back, $point->copy()->addVector($normal, -$width));
 
+            $maxStartingIndex = $simple->pointCount() - 2;
+
+            MapUtility::debug("We'll loop through %d steps.", $maxStartingIndex + 1);
+
+            for ($index = 0; $index < $maxStartingIndex; $index++) {
                 // At the end of the loop, we shuffle things up, and only calculate the nextNext ones here.
                 $nextNextPoint = $simple->getPoint($index + 2);
                 $nextTangent = $nextPoint->vectorToPoint($nextNextPoint);
@@ -161,7 +157,7 @@ class AngledLinkGeometry extends LinkGeometry
                 $point = $nextPoint;
                 $nextPoint = $nextNextPoint;
                 $normal = $nextNormal;
-                $tangent = $nextTangent;
+//                $tangent = $nextTangent;
             }
 
             MapUtility::debug("Arrowhead\n");

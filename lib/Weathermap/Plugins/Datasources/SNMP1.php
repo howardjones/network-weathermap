@@ -136,6 +136,10 @@ class SNMP1 extends Base
                 if (function_exists("snmp_set_quick_print")) {
                     snmp_set_quick_print($was);
                 }
+
+                if (function_exists("snmp_set_valueretrieval")) {
+                    snmp_set_valueretrieval($was2);
+                }
             } else {
                 MapUtility::warn("SNMP for $host has reached $abortCount failures. Skipping. [WMSNMP01]");
             }

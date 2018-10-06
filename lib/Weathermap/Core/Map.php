@@ -733,7 +733,7 @@ class Map extends MapBase
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", '', $input);
             $lines = explode("\n", $input);
-            $filename = '{text insert}';
+//            $filename = '{text insert}';
 
             $reader->readConfigLines($lines);
         } else {

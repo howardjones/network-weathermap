@@ -2,9 +2,8 @@
 
 namespace Weathermap\Integrations;
 
-use PDOException;
 use PDO;
-use phpDocumentor\Reflection\Types\Null_;
+use PDOException;
 
 /**
  * All the database-access functions extracted from the old Cacti plugin.
@@ -366,7 +365,7 @@ class MapManager
         }
     }
 
-    public function updateMapSetting($settingId, $name, $value)
+    public function updateMapSetting($mapId, $settingId, $name, $value)
     {
         $data = array("optname" => $name, "optvalue" => $value);
 
@@ -374,8 +373,9 @@ class MapManager
         list($set, $values) = $this->buildSet($data, $allowed);
 
         $values['id'] = $settingId;
+        $values['mapid'] = $mapId;
 
-        $stmt = $this->pdo->prepare("UPDATE weathermap_settings SET $set where id=:id");
+        $stmt = $this->pdo->prepare("UPDATE weathermap_settings SET $set where id=:id and mapid=:mapid");
         $stmt->execute($values);
     }
 
@@ -432,7 +432,6 @@ class MapManager
         $statement = $this->pdo->prepare("SELECT * FROM weathermap_settings WHERE mapid=?");
         $statement->execute(array(intval($mapId)));
         return $statement->fetchAll(PDO::FETCH_OBJ);
-
     }
 
     public function getMapSettingById($settingId)

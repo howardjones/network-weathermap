@@ -11,7 +11,7 @@ function weathermap_get_pdo()
     global $database_type, $database_default, $database_hostname, $database_username, $database_password;
     global $config;
 
-    $cacti_version = $config["cacti_version"];
+//    $cacti_version = $config["cacti_version"];
 
     // TODO: Do clever stuff in here to get us the host application's PDO session, if possible.
 

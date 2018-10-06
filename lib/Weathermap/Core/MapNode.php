@@ -200,15 +200,15 @@ class MapNode extends MapDataItem
         // if a target is specified, and you haven't forced no background, then the background will
         // come from the SCALE in USESCALE
         if (!empty($this->targets) && $this->usescale != 'none') {
-            $percentValue = 0;
+//            $percentValue = 0;
 
             if ($this->scalevar == 'in') {
-                $percentValue = $this->percentUsages[IN];
+//                $percentValue = $this->percentUsages[IN];
                 $labelColour = $this->colours[IN];
             }
 
             if ($this->scalevar == 'out') {
-                $percentValue = $this->percentUsages[OUT];
+//                $percentValue = $this->percentUsages[OUT];
                 $labelColour = $this->colours[OUT];
             }
         } elseif (!$this->labelbgcolour->isNone()) {
@@ -937,11 +937,11 @@ class MapNode extends MapDataItem
         }
 
         if ($this->iconscaletype == 'percent') {
-            list($iconColour, $junk, $junk) =
+            list($iconColour) =
                 $map->scales[$this->useiconscale]->colourFromValue($percentValue, $this->name);
         } else {
             // use the absolute value if we aren't doing percentage scales.
-            list($iconColour, $junk, $junk) =
+            list($iconColour) =
                 $map->scales[$this->useiconscale]->colourFromValue($absoluteValue, $this->name, false);
         }
         return $iconColour;

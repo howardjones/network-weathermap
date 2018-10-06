@@ -41,8 +41,6 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
 
         $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
 
-        $here = realpath(dirname(__FILE__));
-
         $this->confdir = $this->projectRoot . '/configs';
         $this->testsuite = $this->projectRoot . "/test-suite";
 
@@ -312,7 +310,7 @@ class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals("trout", $settings[0]->optvalue);
         $this->assertEquals("fish", $settings[0]->optname);
 
-        $this->manager->updateMapSetting($settings[0]->id, "fish", "carp");
+        $this->manager->updateMapSetting(1, $settings[0]->id, "fish", "carp");
 
         $settings = $this->manager->getMapSettings(1);
         # print_r($settings);

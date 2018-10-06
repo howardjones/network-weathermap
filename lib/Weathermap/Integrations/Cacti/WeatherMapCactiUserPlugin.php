@@ -90,7 +90,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         }
 
         if ($this->validateRequest($action, $request)) {
-            $result = $this->dispatchRequest($action, $request, null);
+            $this->dispatchRequest($action, $request, null);
         } else {
             print "INPUT VALIDATION FAIL";
         }
@@ -228,7 +228,6 @@ class WeatherMapCactiUserPlugin extends UIBase
         $this->cactiHeader();
 
         if ($wm_showOldUI) {
-
             print "This will all be replaced.";
 
             $pageStyle = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
@@ -411,11 +410,11 @@ class WeatherMapCactiUserPlugin extends UIBase
                                         )
                                     );
                                     print '<a href = "' . $this->makeURL(
-                                            array(
+                                        array(
                                                 "action" => "viewcycle_filtered",
                                                 "group" => $limitingToGroup
                                             )
-                                        ) . '">within this group</a>, or ';
+                                    ) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)

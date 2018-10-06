@@ -18,7 +18,8 @@
     "ext-json": "*",
     "ext-pdo": "*",
     "ext-posix": "*",
-    "ext-gd": "*"
+    "ext-gd": "*",
+    "ext-snmp": "*"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "*",

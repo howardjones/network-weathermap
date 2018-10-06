@@ -375,9 +375,9 @@ class RRDTool extends Base
         MapUtility::debug("RRD ReadData: Headings are: $headings\n");
 
         if ((in_array($dsnames[IN], $heads) || $dsnames[IN] == '-') && (in_array(
-                    $dsnames[OUT],
-                    $heads
-                ) || $dsnames[OUT] == '-')) {
+            $dsnames[OUT],
+            $heads
+        ) || $dsnames[OUT] == '-')) {
             // deal with the data, starting with the last line of output
             $rlines = array_reverse($lines);
 

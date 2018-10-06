@@ -72,7 +72,7 @@ class ImageLoader
      */
     public function imagecreatescaledfromfile($filename, $scaleWidth, $scaleHeight)
     {
-        list($width, $height, $type, $attr) = getimagesize($filename);
+        list($width, $height) = getimagesize($filename);
 
         MapUtility::debug("Getting a (maybe cached) image for $filename at $scaleWidth x $scaleHeight\n");
 
@@ -144,7 +144,7 @@ class ImageLoader
         $newImage = null;
 
         if (is_readable($filename)) {
-            list($width, $height, $type, $attr) = getimagesize($filename);
+            list($width, $height, $type) = getimagesize($filename);
             $key = $filename;
 
             if (array_key_exists($key, $this->cache)) {

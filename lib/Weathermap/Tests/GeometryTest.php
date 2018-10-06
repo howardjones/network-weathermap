@@ -125,7 +125,7 @@ class GeometryTest extends \PHPUnit_Framework_TestCase
 
 
         $vector1 = new Vector(10, 40);
-        $vector2 = $point1->vectorToPoint($point2);
+//        $vector2 = $point1->vectorToPoint($point2);
 
         $point9 = $point1->LERPWith($point3, 0.5);
         $this->assertTrue($point9->identical(new Point(20, 23)));

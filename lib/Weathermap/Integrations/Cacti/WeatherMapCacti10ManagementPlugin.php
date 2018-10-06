@@ -32,7 +32,6 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
         $this->cactiHeader();
 
         if ($wm_showOldUI) {
-
             print "This will all be replaced.";
             $this->maplistWarnings();
             $this->maplist();

@@ -36,6 +36,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         ),
         'viewthumb48' => array('handler' => 'handleLittleThumb', 'args' => array(array("id", "maphash"))),
         'viewimage' => array('handler' => 'handleImage', 'args' => array(array("id", "maphash"))),
+        'viewhtml' => array('handler' => 'handleHTML', 'args' => array(array("id", "maphash"))),
 
         'viewmap' => array(
             'handler' => 'handleViewMap',
@@ -195,6 +196,11 @@ class WeatherMapCactiUserPlugin extends UIBase
     public function handleImage($request, $appObject)
     {
         $this->outputMapImage($request['id'], ".");
+    }
+
+    public function handleHTML($request, $appObject)
+    {
+        $this->outputMapHTML($request['id']);
     }
 
     protected function isWeathermapAdmin()
@@ -410,11 +416,11 @@ class WeatherMapCactiUserPlugin extends UIBase
                                         )
                                     );
                                     print '<a href = "' . $this->makeURL(
-                                        array(
+                                            array(
                                                 "action" => "viewcycle_filtered",
                                                 "group" => $limitingToGroup
                                             )
-                                    ) . '">within this group</a>, or ';
+                                        ) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)
@@ -572,6 +578,33 @@ class WeatherMapCactiUserPlugin extends UIBase
         $pageTitle = __n("Network Weathermap", "Network Weathermaps", count($mapList));
 
         $this->outputMapViewHeader($pageTitle, $cycle, $limitToGroup);
+    }
+
+    /**
+     * @param $filehash
+     */
+    private function outputMapHTML($filehash)
+    {
+        $mapId = $this->manager->translateFileHash($filehash);
+        $userId = $this->manager->application->getCurrentUserId();
+
+        $map = $this->manager->getMapWithAccess($mapId, $userId);
+
+        header('Content-type: text/html');
+        if (null === $map) {
+            // in the management view, a disabled map will fail the query above, so generate *something*
+            print "--";
+            return;
+        }
+
+        $htmlFileName = $this->outputDirectory . '/' . $filehash . ".html";
+
+        if (file_exists($htmlFileName)) {
+            readfile($htmlFileName);
+            return;
+        }
+        print "--";
+        return;
     }
 
     /**

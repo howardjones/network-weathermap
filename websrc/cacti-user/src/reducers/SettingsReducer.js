@@ -10,6 +10,7 @@ const INITIAL_STATE = {
     map_selector: true,
     thumb_url: '/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=viewthumb&id=',
     image_url: '/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=viewimage&id=',
+    html_url: '/cacti/plugins/weathermap/weathermap-cacti10-plugin.php?action=viewhtml&id=',
     editor_url: "/cacti/plugins/weathermap/weathermap-cacti10-plugin-editor.php",
     docs_url: "/cacti/plugins/weathermap/docs/",
     management_url: "/cacti/plugins/weathermap/weathermap-cacti10-plugin-mgmt.php"

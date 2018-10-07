@@ -80,7 +80,7 @@ class SingleMap extends Component {
                                                  value={this.state.selectedMap.filehash}
                                                  defaultOption="select a map"
                                                  callbackFn={this.updateSelectedMap}/>}
-          {this.state.selectedMap && <MapFull map={this.state.selectedMap}/>}
+          {this.state.selectedMap && <MapFull map={this.state.selectedMap} />}
           <LinksFooter/>
         </div>
     );

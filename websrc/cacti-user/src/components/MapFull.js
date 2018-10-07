@@ -22,7 +22,7 @@ class MapFull extends Component {
   }
 
   getMapHtml() {
-    const path = 'output/' + this.props.map.filehash + '.html';
+    const path = this.props.settings.html_url + this.props.map.filehash;
     fetch(path).then(response => {
       return response.text();
     }).then(response => {
@@ -41,7 +41,6 @@ class MapFull extends Component {
         <div className="MapFull layoutbox">
           <h3>FULL: {this.props.map.title}</h3>
           <div id="overDiv" style={{position: 'fixed', visibility: 'hide', zIndex: 1}}></div>
-
           <div>
             {this.state.htmlContent ? <div>
               <div dangerouslySetInnerHTML={this.getMarkup()}></div>

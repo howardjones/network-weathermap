@@ -7,9 +7,8 @@ import {connect} from "react-redux";
 
 class GroupProperties extends Component {
 
-    constructor() {
-        super();
-
+    constructor(props) {
+        super(props);
         this.removeGroup = this.removeGroup.bind(this);
     }
 
@@ -24,19 +23,18 @@ class GroupProperties extends Component {
     render() {
 
         const groupId = this.props.match.params.id;
+
         return <div className='wm-group-properties-container wm-popup'>
             <h3>Group Properties for group #{groupId}</h3>
 
-            <p>Name: <input value='name here'/></p>
+            <p>Name: <input value='name of group'/></p>
 
             <p>Group-level map-SET values</p>
             <p>(Maybe group-level access?)</p>
 
             <SetEditor scope="group" id={groupId}/>
             <AccessEditor/>
-
-            <button onClick={this.removeGroup}><FormattedMessage id="remove_group" defaultMessage="Remove group"/></button>
-
+            { groupId != 1 && <button onClick={this.removeGroup}><FormattedMessage id="remove_group" defaultMessage="Remove group"/></button>}
         </div>
     }
 }

@@ -51,10 +51,10 @@ class RRDTool extends Base
             $map->addHint("cacti_url", $config['url_path']);
         }
 
-        $usePollerOutput = intval($map->getHint('rrd_use_poller_output'));
+        $this->usePollerOutput = intval($map->getHint('rrd_use_poller_output'));
 
         # Are we in Cacti?
-        if ($usePollerOutput && $map->context != 'cacti') {
+        if ($this->usePollerOutput && $map->context != 'cacti') {
             MapUtility::debug("Can't use poller_output from command-line - disabling rrd_use_poller_output [WMRRD99]\n");
             $this->rrdUsePollerOutput = false;
         }

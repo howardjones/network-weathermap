@@ -20,6 +20,8 @@ class RRDTool extends Base
 {
     private $localDataIDsSeen;
 
+    private $rrdUsePollerOutput = false;
+
     public function __construct()
     {
         parent::__construct();
@@ -53,8 +55,8 @@ class RRDTool extends Base
 
         # Are we in Cacti?
         if ($usePollerOutput && $map->context != 'cacti') {
-            MapUtility::warn("Can't use poller_output from command-line - disabling rrd_use_poller_output [WMRRD99]\n");
-            $map->addHint("rrd_use_poller_output", 0);
+            MapUtility::debug("Can't use poller_output from command-line - disabling rrd_use_poller_output [WMRRD99]\n");
+            $this->rrdUsePollerOutput = false;
         }
 
         if (file_exists($map->rrdtool)) {
@@ -504,7 +506,7 @@ class RRDTool extends Base
             $end = "start+" . $period;
         }
 
-        $usePollerOutput = intval($map->getHint('rrd_use_poller_output'));
+        $usePollerOutput = intval($this->rrdUsePollerOutput);
         $nowarnOnPollerOutputAggregate = intval($map->getHint("nowarn_rrd_poller_output_aggregation"));
         $aggregateFunction = $map->getHint('rrd_aggregate_function');
 

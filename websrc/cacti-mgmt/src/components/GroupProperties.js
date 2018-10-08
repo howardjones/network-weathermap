@@ -9,6 +9,7 @@ class GroupProperties extends Component {
 
     constructor(props) {
         super(props);
+
         this.removeGroup = this.removeGroup.bind(this);
     }
 
@@ -23,19 +24,27 @@ class GroupProperties extends Component {
     render() {
 
         const groupId = this.props.match.params.id;
+        const group = this.props.groups[groupId];
 
-        return <div className='wm-group-properties-container wm-popup'>
-            <h3>Group Properties for group #{groupId}</h3>
+        if (group) {
 
-            <p>Name: <input value='name of group'/></p>
+            return <div className='wm-group-properties-container wm-popup'>
+                <h3>Group Properties for group #{groupId} "{group.name}"</h3>
 
-            <p>Group-level map-SET values</p>
-            <p>(Maybe group-level access?)</p>
+                <p>Name: <input value={group.name}/></p>
 
-            <SetEditor scope="group" id={groupId}/>
-            <AccessEditor/>
-            { groupId != 1 && <button onClick={this.removeGroup}><FormattedMessage id="remove_group" defaultMessage="Remove group"/></button>}
-        </div>
+                <p>Group-level map-SET values</p>
+                <p>(Maybe group-level access?)</p>
+
+                <SetEditor scope="group" id={groupId}/>
+                <AccessEditor/>
+                {groupId !== 1 &&
+                <button onClick={this.removeGroup}><FormattedMessage id="remove_group" defaultMessage="Remove group"/>
+                </button>}
+            </div>
+        }
+
+        return <b>No group data...</b>;
     }
 }
 
@@ -49,4 +58,4 @@ const mapDispatchToProps = dispatch => ({
     }
 });
 
-export default connect(mapStateToProps,mapDispatchToProps)(GroupProperties);
+export default connect(mapStateToProps, mapDispatchToProps)(GroupProperties);

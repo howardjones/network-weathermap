@@ -3,10 +3,12 @@
 // copy the just-built js code into the place weathermap/cacti expect to find it
 
 const fs = require('fs');
+var path = require('path');
+
 const src = './build/';
 const dest = '../../cacti-resources/user/';
 
-const targets = ["main.js", "main.css"];
+const targets = ["main.js", "main.css", "main.css.map", "main.js.map"];
 
 
 //const target = "main.js";
@@ -24,6 +26,9 @@ for (let target of targets) {
         fs.unlinkSync(dest + target);
     }
 
+    const oldMapFile = path.basename(file) + ".map";
+    const newMapFile = path.basename(target) + ".map";
+
     // remove source maps from production and move file to dist folder
     fs.readFile(src + file, 'utf8', (err, data) => {
         if (err) {
@@ -31,12 +36,10 @@ for (let target of targets) {
             process.exit(1);
         }
 
-        // let version = `/*!\n* weathermap-user-plugin v${process.env.npm_package_version}\n* Licensed under MIT\n* \n*/\n`;
-        // let result = data.split('//# sourceMappingURL');
+        if (!target.endsWith('.map')) {
+            data = data.replace(oldMapFile, newMapFile);
+        }
 
-        // if (result[result.length - 1] !== undefined && result.length > 1) {
-        //     fs.writeFileSync(dest + target, version);
         fs.writeFileSync(dest + target, data);
-        // }
     });
 }

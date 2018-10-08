@@ -39,7 +39,7 @@ class MapFull extends Component {
   render() {
     return (
         <div className="MapFull layoutbox">
-          <h3>FULL: {this.props.map.title}</h3>
+          <h3>{this.props.map.titlecache}</h3>
           <div id="overDiv" style={{position: 'fixed', visibility: 'hide', zIndex: 1}}></div>
           <div>
             {this.state.htmlContent ? <div>

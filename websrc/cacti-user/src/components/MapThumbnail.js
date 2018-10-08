@@ -7,7 +7,7 @@ const MapThumbnail = ({map,settings}) => {
 
     return (
         <div className="wm_thumbcontainer">
-            <div className="wm_thumbtitle">TH: {map.titlecache}</div>
+            <div className="wm_thumbtitle">{map.titlecache}</div>
             <Link to={`/map/${map.filehash}`}>
                 <img className="wm_thumb" src={`${settings.thumb_url}${map.filehash}`}  width={map.thumb_width} height={map.thumb_height} alt={map.titlecache}/>
             </Link>

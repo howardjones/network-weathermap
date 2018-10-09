@@ -1037,7 +1037,7 @@ class Map extends MapBase
      */
     protected function createThumbnailFile($thumbnailFileName, $thumbnailMaxSize, $imageRef)
     {
-        MapUtility::debug("Writing thumbnail to %s\n", $thumbnailFileName);
+        MapUtility::debug("Writing thumbnail to $thumbnailFileName\n");
 
         if (!function_exists('imagecopyresampled')) {
             MapUtility::warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
@@ -1165,7 +1165,9 @@ class Map extends MapBase
                 imagepng($imageRef);
             } else {
                 $this->writeImageFile($imageFileName, $imageRef);
-                $this->createThumbnailFile($thumbnailFileName, $thumbnailMaxSize, $imageRef);
+                if ($thumbnailFileName != '') {
+                    $this->createThumbnailFile($thumbnailFileName, $thumbnailMaxSize, $imageRef);
+                }
             }
         }
 

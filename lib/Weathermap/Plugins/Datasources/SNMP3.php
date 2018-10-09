@@ -111,7 +111,7 @@ class SNMP3 extends Base
             $host = $matches[2];
             $oids = array(IN => $matches[3], OUT => $matches[4]);
 
-            if ($this->isHostAborted($host)) {
+            if (!$this->isHostAborted($host)) {
                 $this->prepareSNMPGlobals();
                 $params = $this->buildSNMPParams($map, $profileName);
 
@@ -287,6 +287,8 @@ class SNMP3 extends Base
                         $timeout,
                         $retries
                     );
+
+
                     if ($results[$id] !== false) {
                         $this->data[$id] = floatval($results[$id]);
                         $item->addHint("snmp_" . $name . "_raw", $results[$id]);

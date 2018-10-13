@@ -17,7 +17,7 @@
         <xsl:processing-instruction name="php">include 'common-page-foot.php';</xsl:processing-instruction>
     </xsl:template>
 
-    <xsl:template match="section">
+    <xsl:template match="referencesection">
         <h2 id="s_scope_{@scope}" class="configsection">
             <xsl:value-of select="@name"/>
         </h2>
@@ -43,8 +43,10 @@
     <xsl:template match="configentry">
         <section class="referenceentry">
             <h3 id="{./anchor}">
-                <xsl:value-of select="./keyword"/> <span class="scope scope-{current()/scope}">
-                <xsl:value-of select="./scope"/></span>
+                <xsl:value-of select="./keyword"/>
+                <span class="scope scope-{current()/scope}">
+                    <xsl:value-of select="./scope"/>
+                </span>
             </h3>
 
             <xsl:apply-templates select="definition"/>
@@ -81,19 +83,24 @@
     </xsl:template>
 
     <xsl:template match="changes">
-        <div class="changes">
-            <h4>Change History</h4>
+        <div class="changes card">
+            <div class="card-body">
 
-            <dl class="small">
-                <xsl:for-each select="./change">
-                    <dt>
-                        <xsl:value-of select="@version"/>
-                    </dt>
-                    <dd>
-                        <xsl:value-of select="."/>
-                    </dd>
-                </xsl:for-each>
-            </dl>
+                <h5 class="card-title">Change History</h5>
+
+                <ul class="list-group list-group-flush">
+                    <xsl:for-each select="./change">
+                        <li class="list-group-item">
+                            <strong>
+                                <xsl:value-of select="@version"/> -
+                            </strong>
+
+
+                            <xsl:value-of select="."/>
+                        </li>
+                    </xsl:for-each>
+                </ul>
+            </div>
         </div>
     </xsl:template>
 

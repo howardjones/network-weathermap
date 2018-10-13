@@ -1,47 +1,49 @@
 <!DOCTYPE html> 
-<html lang = "en" xml:lang = "en" xmlns = "http://www.w3.org/1999/xhtml"> 
- <head> 
- <link rel = "stylesheet" type = "text/css" media = "screen" href = "../../vendor/bootstrap/css/bootstrap.min.css" /> 
- <link rel = "stylesheet" type = "text/css" href = "../manual.css" /> 
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+ <meta charset="utf-8"> 
+ <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> 
+ <link rel="stylesheet" type="text/css" media="screen" href="../bootstrap.min.css"/> 
+ <link rel="stylesheet" type="text/css" href="../manual.css"/> 
  <title>PHP Weathermap v1.0.0dev - Changes for this version</title> 
- </head> 
+</head> 
 
- <body> 
- <nav class="navbar navbar-default" role="navigation"> 
-<div class="navbar navbar-inverse navbar-fixed-top"> 
- <div class="container"> 
- <div class="navbar-header" id="nav"> 
- <a class="navbar-brand" href="http://www.network-weathermap.com/">Weathermap 
- v1.0.0dev</a> 
- <ul class="nav navbar-nav"> 
- <li><a href="main.html">Contents</a></li> 
- <li><a href="main.html#installation">Installation</a></li> 
- <li><a href="main.html#basics">Basics</a></li> 
- <li><a href="faq.html">FAQ</a></li> 
- <li><a href="main.html#example">Sample Map</a></li> 
- <li><a href="cli-reference.html">CLI Reference</a></li> 
- <li><a href="config-reference.html">Config Reference</a></li> 
- <li><a href="advanced.html">Advanced</a></li> 
- <li><a href="editor.html">Editor</a></li> 
- <li><a href="cacti-plugin.html">Cacti Plugin</a></li> 
- <li><a href="http://www.network-weathermap.com/">Website</a></li> 
+<body> 
+<div class="container"> 
+ <nav class="navbar navbar-light bg-light navbar-expand" role="navigation"> 
+
+ <div class="collapse navbar-collapse"> 
+ <ul class="navbar-nav mr-auto"> 
+ <li class="nav-item"><a class="nav-link" href="main.html">Contents</a></li> 
+ <li class="nav-item"><a class="nav-link" href="main.html#installation">Installation</a></li> 
+ <li class="nav-item"><a class="nav-link" href="main.html#basics">Basics</a></li> 
+ <li class="nav-item"><a class="nav-link" href="faq.html">FAQ</a></li> 
+ <li class="nav-item"><a class="nav-link" href="main.html#example">Sample Map</a></li> 
+ <li class="nav-item"><a class="nav-link" href="cli-reference.html">CLI Reference</a></li> 
+ <li class="nav-item"><a class="nav-link" href="config-reference.html">Config Reference</a></li> 
+ <li class="nav-item"><a class="nav-link" href="advanced.html">Advanced</a></li> 
+ <li class="nav-item"><a class="nav-link" href="editor.html">Editor</a></li> 
+ <li class="nav-item"><a class="nav-link" href="cacti-plugin.html">Cacti Plugin</a></li> 
+ <li class="nav-item"><a class="nav-link" href="http://www.network-weathermap.com/">Website</a></li> 
  </ul> 
  </div> 
- </div> 
-</div> 
-</nav> <sdiv id="content"> 
- <sdiv id="content2" class="wrapper"> 
 
+ </nav> 
+</div> 
 
 <div class="container"> 
 
-<div id = "header"> 
+ <header id="header"> 
+ <div class="container"> 
  <h1>PHP Weathermap v1.0.0dev </h1> 
-
- <h4>Copyright &copy; 2005-2018 Howard Jones, 
- <tt><a href = "mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
- href = "http://www.network-weathermap.com/">Website</a>)</h4> 
-</div> 
+ <p class="lead"> 
+ Copyright &copy; 2005-2018 Howard Jones, 
+ <tt><a href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
+ href="http://www.network-weathermap.com/">Website</a>) 
+ </p> 
+ </div> 
+ </header> 
+ <main role="main"> 
 
  <h2 id="changes098a">Changes For This Version (0.98 to 0.98a)</h2> 
 
@@ -87,7 +89,7 @@
  <ul> 
  <li>MySQL error in table-creation. MySQL 5.6 is fussier. 
  <li>Editor 'delete link' broken 
- <li><a href="config-reference.html#GLOBAL_KILO">KILO</a> was ignored when processing %k in special tokens 
+ \<li\><a href="config-reference.html#GLOBAL_KILO">KILO</a> was ignored when processing %k in special tokens 
  <li>Various fixes for PHP deprecated or strict-mode warnings 
  <li>Line-ending trimming in 'external script' data source 
  <li>rounding error 'kinks' in angled <a href="config-reference.html#LINK_VIA">VIA</a> links 
@@ -108,13 +110,13 @@
  <li>new <a href="config-reference.html#GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE</a> allows collected data to be written to a file for later use (automatically enabled in 
  Cacti) 
  <li>new wmdata: datasource plugin can read data from files produced by <a href="config-reference.html#GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE</a> 
- <li><a href="config-reference.html#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a> and <a href="config-reference.html#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a> are honoured in Cacti poller as a location for a second copy of those 
+ \<li\><a href="config-reference.html#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a> and <a href="config-reference.html#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a> are honoured in Cacti poller as a location for a second copy of those 
  files. 
  <li>Editor 'tidy link' function replaces Vert & Horiz, and does much nicer job 
  <li>'retidy' option in editor to recalculate all links previously positioned with 'tidy'. 
- <li><a href="config-reference.html#GLOBAL_COLORS">KEYBGCOLOR</a> and <a href="config-reference.html#GLOBAL_COLORS">KEYOUTLINECOLOR</a> both accept 'none' 
+ \<li\><a href="config-reference.html#GLOBAL_COLORS">KEYBGCOLOR</a> and <a href="config-reference.html#GLOBAL_COLORS">KEYOUTLINECOLOR</a> both accept 'none' 
  <li>command-line weathermap has new --no-warn option to disable warnings 
- <li><a href="config-reference.html#NODE_COLORS">AICONFILLCOLOR</a> accepts 'none' for drawing giant transparent shapes. 
+ \<li\><a href="config-reference.html#NODE_COLORS">AICONFILLCOLOR</a> accepts 'none' for drawing giant transparent shapes. 
  <li>Extra warning for Boost users about poller_output 
  <li>if there are actually 0 maps in the database, the 'Weathermaps' tab gives some basic instructions. 
  <li>Cacti data picker in editor tracks most recently used hosts (thanks Zdolny) 
@@ -246,13 +248,13 @@
  <h3>New Features</h3> 
 
  <ul> 
- <li><a href="config-reference.html#LINK_LINK">LINK</a> <a href="config-reference.html#GLOBAL_WIDTH">WIDTH</a> accepts decimals</li> 
+ \<li\><a href="config-reference.html#LINK_LINK">LINK</a> <a href="config-reference.html#GLOBAL_WIDTH">WIDTH</a> accepts decimals</li> 
 
  <li>cacti-integrate.php can generate DSStats <a href="config-reference.html#LINK_TARGET">TARGETs</a> too</li> 
 
  <li>Simple <a href="config-reference.html#LINK_VIA">VIA</a> editing in editor (thanks to Zdolny)</li> 
 
- <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> can accept G,M,K,T,m,u,n suffixes (for absolute scales)</li> 
+ \<li\><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> can accept G,M,K,T,m,u,n suffixes (for absolute scales)</li> 
  </ul> 
 
  <h2 id="changes097">Changes For This Version (0.96a to 0.97)</h2> 
@@ -288,9 +290,9 @@
 
  <li>Imagemap no longer contains areas with no href defined</li> 
 
- <li><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> was ignored with <a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (thanks to uhtred)</li> 
+ \<li\><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> was ignored with <a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (thanks to uhtred)</li> 
 
- <li><a href="config-reference.html#NODE_COLORS">'AICONOUTLINECOLOR</a> none' is actually valid now (thanks to mgb & 
+ \<li\><a href="config-reference.html#NODE_COLORS">'AICONOUTLINECOLOR</a> none' is actually valid now (thanks to mgb & 
  Leathon) 
  </li> 
 
@@ -310,7 +312,7 @@
  <h3>New Features</h3> 
 
  <ul> 
- <li><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> no longer has special dependencies 
+ \<li\><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> no longer has special dependencies 
  - and the colours are nicer too. 
  </li> 
 
@@ -326,7 +328,7 @@
  have similar settings (e.g. a "24hr average" tab). 
  </li> 
 
- <li><a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE</a> keyword to include a file of common definitions (based on 
+ \<li\><a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE</a> keyword to include a file of common definitions (based on 
  work by BorisL) 
  (NOTE: this can confuse the editor sometimes 
  - see the manual page for <a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE)</a> 
@@ -340,9 +342,9 @@
  (overwrites settings otherwise) 
  </li> 
 
- <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> will accept values below 0, and also above 100</li> 
+ \<li\><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> will accept values below 0, and also above 100</li> 
 
- <li><a href="config-reference.html#LINK_USESCALE">USESCALE</a> has two new options: absolute and percent, which allows you 
+ \<li\><a href="config-reference.html#LINK_USESCALE">USESCALE</a> has two new options: absolute and percent, which allows you 
  to have a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> of absolute values 
  </li> 
 
@@ -361,7 +363,7 @@
 
  <li>SNMP datasource has option to give up on a failing host</li> 
 
- <li><a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET</a> supports percentage compass offsets and radial offsets, 
+ \<li\><a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET</a> supports percentage compass offsets and radial offsets, 
  like <a href="config-reference.html#LINK_NODES">NODES</a> does. 
  </li> 
 
@@ -467,7 +469,7 @@
  <h3>New Features</h3> 
 
  <ul> 
- <li><a href="config-reference.html#LINK_TEMPLATE">TEMPLATE</a> allows a node or link to copy it's settings from another, 
+ \<li\><a href="config-reference.html#LINK_TEMPLATE">TEMPLATE</a> allows a node or link to copy it's settings from another, 
  instead of from DEFAULT. 
  </li> 
 
@@ -545,7 +547,7 @@
  are an admin) 
  </li> 
 
- <li><a href="config-reference.html#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a> keyword allows you to specify a URL for a CSS 
+ \<li\><a href="config-reference.html#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a> keyword allows you to specify a URL for a CSS 
  stylesheet (CLI tool only) 
  </li> 
 
@@ -561,17 +563,17 @@
 
  <li>New <a href="config-reference.html#LINK_NODES">NODES</a> offset type - compass-point+percentage</li> 
 
- <li><a href="config-reference.html#GLOBAL_KEYSTYLE">"KEYSTYLE</a> inverted" - to get a thermometer-style vertical legend.</li> 
+ \<li\><a href="config-reference.html#GLOBAL_KEYSTYLE">"KEYSTYLE</a> inverted" - to get a thermometer-style vertical legend.</li> 
 
- <li><a href="config-reference.html#LINK_COMMENTSTYLE">"COMMENTSTYLE</a> center" to make comments run along the centre of a 
+ \<li\><a href="config-reference.html#LINK_COMMENTSTYLE">"COMMENTSTYLE</a> center" to make comments run along the centre of a 
  link arrow. (and 'edge' for the usual) 
  </li> 
 
- <li><a href="config-reference.html#LINK_COLORS">COMMENTFONTCOLOR</a> accepts 'contrast' as an option, for when it's over 
+ \<li\><a href="config-reference.html#LINK_COLORS">COMMENTFONTCOLOR</a> accepts 'contrast' as an option, for when it's over 
  a link 
  </li> 
 
- <li><a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (or curved) - you can turn sharp corners now</li> 
+ \<li\><a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (or curved) - you can turn sharp corners now</li> 
 
  <li>Comment (and pos) editing in editor (based on code by Zdolny)</li> 
 
@@ -579,17 +581,17 @@
  some overlays 
  </li> 
 
- <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> allows 'none' as a colour (for non-gradients). Only affects 
+ \<li\><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> allows 'none' as a colour (for non-gradients). Only affects 
  <a href="config-reference.html#LINK_LINK">LINKs</a> so far. 
  </li> 
 
  <li>fping plugin allows for changing the number of pings.</li> 
 
- <li><a href="config-reference.html#LINK_TARGET">TARGET</a> strings can be enclosed in quotes, to allow spaces in them 
+ \<li\><a href="config-reference.html#LINK_TARGET">TARGET</a> strings can be enclosed in quotes, to allow spaces in them 
  (mainly for external ! scripts) 
  </li> 
 
- <li><a href="config-reference.html#GLOBAL_KEYSTYLE">"KEYSTYLE</a> tags" 
+ \<li\><a href="config-reference.html#GLOBAL_KEYSTYLE">"KEYSTYLE</a> tags" 
  - like classic, but uses the scale tags instead of percentages. 
  </li> 
 
@@ -599,11 +601,11 @@
  mean. 
  </li> 
 
- <li><a href="config-reference.html#GLOBAL_IMAGEURI">IMAGEURI</a> keyword to match --image-uri command-line option (ignored 
+ \<li\><a href="config-reference.html#GLOBAL_IMAGEURI">IMAGEURI</a> keyword to match --image-uri command-line option (ignored 
  in Cacti plugin) 
  </li> 
 
- <li><a href="config-reference.html#GLOBAL_MINTIMEPOS">MINTIMEPOS</a> and <a href="config-reference.html#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a> to track data source times</li> 
+ \<li\><a href="config-reference.html#GLOBAL_MINTIMEPOS">MINTIMEPOS</a> and <a href="config-reference.html#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a> to track data source times</li> 
  </ul> 
 
  <h2 id="changes095">Changes For This Version (0.941 to 0.95)</h2> 
@@ -617,7 +619,7 @@
  <h3>Known Issues</h3> 
 
  <ul> 
- <li><a href="config-reference.html#LINK_ININFOURL">ININFOURL</a> / <a href="config-reference.html#LINK_OUTINFOURL">OUTINFOURL,</a> <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> 
+ \<li\><a href="config-reference.html#LINK_ININFOURL">ININFOURL</a> / <a href="config-reference.html#LINK_OUTINFOURL">OUTINFOURL,</a> <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> 
  / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a> are not handled well by the editor. If you edit a map 
  that uses these, then the 'in' side of the link will be copied to the 
  'out' side. New editor will handle this better. 
@@ -627,7 +629,7 @@
  <h3>Fixes</h3> 
 
  <ul> 
- <li><a href="config-reference.html#GLOBAL_COLORS">KEYOUTLINECOLOR</a> is actually used now (thanks to llow once more)</li> 
+ \<li\><a href="config-reference.html#GLOBAL_COLORS">KEYOUTLINECOLOR</a> is actually used now (thanks to llow once more)</li> 
 
  <li>Editor doesn't throw away <a href="config-reference.html#GLOBAL_WIDTH">WIDTH</a> and <a href="config-reference.html#GLOBAL_HEIGHT">HEIGHT</a> with no BG image</li> 
 
@@ -679,13 +681,13 @@
  later. 
  </li> 
 
- <li><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> - colorize icon images (based on patches from llow)</li> 
+ \<li\><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> - colorize icon images (based on patches from llow)</li> 
 
  <li>screenshot mode. <a href="config-reference.html#GLOBAL_SET">"SET</a> screenshot_mode 1" at the top of the map will 
  anonymise all labels, comments and bwlabels. 
  </li> 
 
- <li><a href="config-reference.html#NODE_COLORS">LABELFONTCOLOR</a> can use a special value of 'contrast' to always 
+ \<li\><a href="config-reference.html#NODE_COLORS">LABELFONTCOLOR</a> can use a special value of 'contrast' to always 
  contrast with the label colour. 
  </li> 
 
@@ -700,7 +702,7 @@
  Sometimes. It's not very useful. 
  </li> 
 
- <li><a href="config-reference.html#NODE_LABELANGLE">LABELANGLE</a> allows you to rotate node labels to 90,180,270 degrees. 
+ \<li\><a href="config-reference.html#NODE_LABELANGLE">LABELANGLE</a> allows you to rotate node labels to 90,180,270 degrees. 
  Needs truetype font. 
  </li> 
 
@@ -714,9 +716,9 @@
  <a href="config-reference.html#NODE_NODE">NODEs</a> too. 
  </li> 
 
- <li><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> keyword to control position of midpoint in links</li> 
+ \<li\><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> keyword to control position of midpoint in links</li> 
 
- <li><a href="config-reference.html#LINK_VIA">VIA</a> can be positioned relative to <a href="config-reference.html#NODE_NODE">NODEs</a> (like <a href="config-reference.html#NODE_NODE">NODEs</a> can) (thanks 
+ \<li\><a href="config-reference.html#LINK_VIA">VIA</a> can be positioned relative to <a href="config-reference.html#NODE_NODE">NODEs</a> (like <a href="config-reference.html#NODE_NODE">NODEs</a> can) (thanks 
  again to llow) 
  </li> 
 
@@ -735,13 +737,13 @@
  calculate work for half-duplex links 
  </li> 
 
- <li><a href="config-reference.html#LINK_ININFOURL">ININFOURL</a> / <a href="config-reference.html#LINK_OUTINFOURL">OUTINFOURL,</a> <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH,</a> <a href="config-reference.html#LINK_INNOTES">INNOTES</a> 
+ \<li\><a href="config-reference.html#LINK_ININFOURL">ININFOURL</a> / <a href="config-reference.html#LINK_OUTINFOURL">OUTINFOURL,</a> <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH,</a> <a href="config-reference.html#LINK_INNOTES">INNOTES</a> 
  / <a href="config-reference.html#LINK_OUTNOTES">OUTNOTES,</a> <a href="config-reference.html#LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</a> 
  / <a href="config-reference.html#LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</a> allow you to have different urls for the in and out 
  side of links (based on idea from llow) 
  </li> 
 
- <li><a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> (and IN/OUT versions) can take multiple URLs separated 
+ \<li\><a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> (and IN/OUT versions) can take multiple URLs separated 
  by spaces (again from idea by llow) 
  </li> 
 
@@ -795,7 +797,7 @@
  <h3>New Features</h3> 
 
  <ul> 
- <li><a href="config-reference.html#LINK_INBWFORMAT">INBWFORMAT</a> and <a href="config-reference.html#LINK_OUTBWFORMAT">OUTBWFORMAT</a> allow you to format the text for <a href="config-reference.html#LINK_BWLABEL">BWLABEL,</a> 
+ \<li\><a href="config-reference.html#LINK_INBWFORMAT">INBWFORMAT</a> and <a href="config-reference.html#LINK_OUTBWFORMAT">OUTBWFORMAT</a> allow you to format the text for <a href="config-reference.html#LINK_BWLABEL">BWLABEL,</a> 
  same as for COMMENTs 
  </li> 
 
@@ -936,7 +938,7 @@
 
  <li>Non-unique IDs in imagemaps, in overlib mode.</li> 
 
- <li><a href="config-reference.html#LINK_COMMENTPOS">COMMENTPOS</a> 0 doesn't kill everything anymore</li> 
+ \<li\><a href="config-reference.html#LINK_COMMENTPOS">COMMENTPOS</a> 0 doesn't kill everything anymore</li> 
 
  <li>OVERLIB would behave incorrectly with PHP4 and relatively positioned 
  nodes (Bernd Ziller) 
@@ -958,11 +960,11 @@
  <h3>New Features</h3> 
 
  <ul> 
- <li><a href="config-reference.html#LINK_BWSTYLE">BWSTYLE</a> allows you to align the <a href="config-reference.html#LINK_BWLABEL">BWLABEL</a> boxes with their links. 
+ \<li\><a href="config-reference.html#LINK_BWSTYLE">BWSTYLE</a> allows you to align the <a href="config-reference.html#LINK_BWLABEL">BWLABEL</a> boxes with their links. 
  Looks nice! 
  </li> 
 
- <li><a href="config-reference.html#LINK_COMMENTPOS">COMMENTPOS</a> allows you to move comments, much like <a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> for 
+ \<li\><a href="config-reference.html#LINK_COMMENTPOS">COMMENTPOS</a> allows you to move comments, much like <a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> for 
  <a href="config-reference.html#LINK_BWLABEL">BWLABELs</a> 
  </li> 
 
@@ -989,9 +991,9 @@
 
  You can set these at the top of the config file, for each scale (change 
  <em>scalename</em> to the scale name). 
- <tt><a href="config-reference.html#GLOBAL_SET">SET</a> key_hidezero_DEFAULT 1</tt> hides the 0-&gt;0 line if there is 
+ \<tt\><a href="config-reference.html#GLOBAL_SET">SET</a> key_hidezero_DEFAULT 1</tt> hides the 0-&gt;0 line if there is 
  one, in a 'classic' style legend for that scale. 
- <tt><a href="config-reference.html#GLOBAL_SET">SET</a> key_hidepercent_scalename 1</tt> hides the percentage signs in 
+ \<tt\><a href="config-reference.html#GLOBAL_SET">SET</a> key_hidepercent_scalename 1</tt> hides the percentage signs in 
  the 'classic' style legend for that scale. 
  </li> 
  </ul> 
@@ -999,7 +1001,7 @@
  <h3>Fixes</h3> 
 
  <ul> 
- <li><a href="config-reference.html#GLOBAL_SET">SET</a> in a DEFAULT node or link wasn't inherited properly.</li> 
+ \<li\><a href="config-reference.html#GLOBAL_SET">SET</a> in a DEFAULT node or link wasn't inherited properly.</li> 
 
  <li>weathermap.conf is a simple map again. I accidentally packaged my 
  test map for 0.9 and 0.91 
@@ -1070,13 +1072,13 @@
  html files on remote systems. It doesn't now. 
  </li> 
 
- <li><a href="config-reference.html#LINK_NOTES">NOTES</a> was not fully tested, and broke cactihost: targets, at 
+ \<li\><a href="config-reference.html#LINK_NOTES">NOTES</a> was not fully tested, and broke cactihost: targets, at 
  least. 
  </li> 
 
- <li><a href="config-reference.html#GLOBAL_KILO">KILO</a> was broken - fixed now.</li> 
+ \<li\><a href="config-reference.html#GLOBAL_KILO">KILO</a> was broken - fixed now.</li> 
 
- <li><a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> was handled badly by the editor 
+ \<li\><a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> was handled badly by the editor 
  - it would swap them over 
  </li> 
  </ul> 
@@ -1120,7 +1122,7 @@
  <p>If your GD library supports it, then Weathermap now understands JPEG and 
  GIF files for <a href="config-reference.html#GLOBAL_BACKGROUND">BACKGROUND,</a> <a href="config-reference.html#NODE_ICON">ICON</a> and <a href="config-reference.html#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE.</a> </p> 
 
- <h4><a href="config-reference.html#LINK_NOTES">NOTES</a> &amp; OVERLIBCAPTION</h4> 
+ \<h4\><a href="config-reference.html#LINK_NOTES">NOTES</a> &amp; OVERLIBCAPTION</h4> 
 
  <p>You can specify a caption string for the 'popup' overlib window now, 
  per-node/link. You can 
@@ -1178,9 +1180,9 @@
  <p>There are planned plugins for Cacti (reading directly from the Cact 
  database), Nagios Host Status, SNMP directly and others. </p> 
 
- <h4><a href="config-reference.html#NODE_NODE">NODE</a> Targets</h4> 
+ \<h4\><a href="config-reference.html#NODE_NODE">NODE</a> Targets</h4> 
 
- <p><a href="config-reference.html#NODE_NODE">NODEs</a> can have data now. This means you can have them change colour 
+ \<p\><a href="config-reference.html#NODE_NODE">NODEs</a> can have data now. This means you can have them change colour 
  according to a <a href="config-reference.html#GLOBAL_SCALE">SCALE,</a> just like a <a href="config-reference.html#LINK_LINK">LINK</a> does. Since a <a href="config-reference.html#NODE_NODE">NODE</a> only has one 
  value, you can choose which one to use (of the two that a <a href="config-reference.html#LINK_TARGET">TARGET</a> provides), 
  with USEVALUE. </p> 
@@ -1268,7 +1270,7 @@
 
  <li>Cacti plugin's Cycle mode works in IE now.</li> 
 
- <li><a href="config-reference.html#GLOBAL_KILO">KILO</a> was ignored in some places.</li> 
+ \<li\><a href="config-reference.html#GLOBAL_KILO">KILO</a> was ignored in some places.</li> 
 
  <li>Editor will let you rename nodes now!</li> 
 
@@ -1282,7 +1284,8 @@
 
  <li>Close-together nodes don't crash the curve-drawing anymore</li> 
  </ul> 
- </div> 
- </sdiv> 
+
+</div> 
+</main> 
 </body> 
 </html> 

@@ -69,7 +69,7 @@ while (<STDIN>) {
 
             if ($bareword =~ m/(.*)>(.*)/) {
                 $bareword = $2;
-                $prefix = $1 . ">";
+                $prefix = quotemeta($1 . ">");
             }
             $bareword =~ tr/A-Z//cd;
 

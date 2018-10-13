@@ -4,7 +4,7 @@
         <xi:include href = "contents.xml" />
     </textsection>
 
-    <section scope = "NODE" name = "Node-specific Configuration Directives">
+    <referencesection scope = "NODE" name = "Node-specific Configuration Directives">
         <xi:include href = "node_node.xml" />
 
         <xi:include href = "node_template.xml" />
@@ -48,9 +48,9 @@
         <xi:include href = "node_set.xml" />
 
         <xi:include href = "node_zorder.xml" />
-    </section>
+    </referencesection>
 
-    <section scope = "LINK" name = "Link-specific Configuration Directives">
+    <referencesection scope = "LINK" name = "Link-specific Configuration Directives">
         <xi:include href = "link_link.xml" />
 
         <xi:include href = "link_template.xml" />
@@ -132,9 +132,9 @@
         <xi:include href = "link_set.xml" />
 
         <xi:include href = "link_zorder.xml" />
-    </section>
+    </referencesection>
 
-    <section scope = "GLOBAL" name = "Global Configuration Directives">
+    <referencesection scope = "GLOBAL" name = "Global Configuration Directives">
         <xi:include href = "global_background.xml" />
 
         <xi:include href = "global_width.xml" />
@@ -179,5 +179,5 @@
         <xi:include href = "global_set.xml" />
 
         <xi:include href = "global_include.xml" />
-    </section>
+    </referencesection>
 </references>

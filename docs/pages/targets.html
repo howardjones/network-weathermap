@@ -1,47 +1,49 @@
 <!DOCTYPE html> 
-<html lang = "en" xml:lang = "en" xmlns = "http://www.w3.org/1999/xhtml"> 
- <head> 
- <link rel = "stylesheet" type = "text/css" media = "screen" href = "../../vendor/bootstrap/css/bootstrap.min.css" /> 
- <link rel = "stylesheet" type = "text/css" href = "../manual.css" /> 
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+ <meta charset="utf-8"> 
+ <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> 
+ <link rel="stylesheet" type="text/css" media="screen" href="../bootstrap.min.css"/> 
+ <link rel="stylesheet" type="text/css" href="../manual.css"/> 
  <title>PHP Weathermap v1.0.0dev - Specifying <a href="config-reference.html#LINK_TARGET">TARGET</a> lines</title> 
- </head> 
+</head> 
 
- <body> 
- <nav class="navbar navbar-default" role="navigation"> 
-<div class="navbar navbar-inverse navbar-fixed-top"> 
- <div class="container"> 
- <div class="navbar-header" id="nav"> 
- <a class="navbar-brand" href="http://www.network-weathermap.com/">Weathermap 
- v1.0.0dev</a> 
- <ul class="nav navbar-nav"> 
- <li><a href="main.html">Contents</a></li> 
- <li><a href="main.html#installation">Installation</a></li> 
- <li><a href="main.html#basics">Basics</a></li> 
- <li><a href="faq.html">FAQ</a></li> 
- <li><a href="main.html#example">Sample Map</a></li> 
- <li><a href="cli-reference.html">CLI Reference</a></li> 
- <li><a href="config-reference.html">Config Reference</a></li> 
- <li><a href="advanced.html">Advanced</a></li> 
- <li><a href="editor.html">Editor</a></li> 
- <li><a href="cacti-plugin.html">Cacti Plugin</a></li> 
- <li><a href="http://www.network-weathermap.com/">Website</a></li> 
+<body> 
+<div class="container"> 
+ <nav class="navbar navbar-light bg-light navbar-expand" role="navigation"> 
+
+ <div class="collapse navbar-collapse"> 
+ <ul class="navbar-nav mr-auto"> 
+ <li class="nav-item"><a class="nav-link" href="main.html">Contents</a></li> 
+ <li class="nav-item"><a class="nav-link" href="main.html#installation">Installation</a></li> 
+ <li class="nav-item"><a class="nav-link" href="main.html#basics">Basics</a></li> 
+ <li class="nav-item"><a class="nav-link" href="faq.html">FAQ</a></li> 
+ <li class="nav-item"><a class="nav-link" href="main.html#example">Sample Map</a></li> 
+ <li class="nav-item"><a class="nav-link" href="cli-reference.html">CLI Reference</a></li> 
+ <li class="nav-item"><a class="nav-link" href="config-reference.html">Config Reference</a></li> 
+ <li class="nav-item"><a class="nav-link" href="advanced.html">Advanced</a></li> 
+ <li class="nav-item"><a class="nav-link" href="editor.html">Editor</a></li> 
+ <li class="nav-item"><a class="nav-link" href="cacti-plugin.html">Cacti Plugin</a></li> 
+ <li class="nav-item"><a class="nav-link" href="http://www.network-weathermap.com/">Website</a></li> 
  </ul> 
  </div> 
- </div> 
-</div> 
-</nav> <sdiv id="content"> 
- <sdiv id="content2" class="wrapper"> 
 
+ </nav> 
+</div> 
 
 <div class="container"> 
 
-<div id = "header"> 
+ <header id="header"> 
+ <div class="container"> 
  <h1>PHP Weathermap v1.0.0dev </h1> 
-
- <h4>Copyright &copy; 2005-2018 Howard Jones, 
- <tt><a href = "mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
- href = "http://www.network-weathermap.com/">Website</a>)</h4> 
-</div> 
+ <p class="lead"> 
+ Copyright &copy; 2005-2018 Howard Jones, 
+ <tt><a href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
+ href="http://www.network-weathermap.com/">Website</a>) 
+ </p> 
+ </div> 
+ </header> 
+ <main role="main"> 
  <h2 id="targets">Specifying <a href="config-reference.html#LINK_TARGET">TARGET</a> lines</h2> 
 
  <p>The actual data-reading part of Weathermap is handled by Data Source 
@@ -92,10 +94,10 @@
 
  <h3><a id="static"></a>Static value</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> static:<em>invalue</em>:<em>outvalue</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> static:<em>invalue</em>:<em>outvalue</em> 
  </div> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> static:<em>value</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> static:<em>value</em> 
  </div> 
 
  <p>The simplest of all the plugins, static allows you to just set a value in 
@@ -110,19 +112,19 @@
 
  <h3><a id="rrd"></a>RRDtool files</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  <em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  gauge:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  rrd:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  scale:<em>factor</em>:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
@@ -136,7 +138,7 @@
  will need to edit 
  <tt>weathermap</tt> around line 29 to point to your rrdtool executable. </p> 
 
- <h4><a href="config-reference.html#LINK_TARGET">TARGET</a> formats</h4> 
+ \<h4\><a href="config-reference.html#LINK_TARGET">TARGET</a> formats</h4> 
 
  <p>If you only specify a filename, and no DS-names, the default DS names for 
  RRD files are 'traffic_in' and 'traffic_out', which works with the majority 
@@ -295,7 +297,7 @@
 
  <h3><a id="tabs"></a>Tab-separated text</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> <em>textfile</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> <em>textfile</em> 
  </div> 
 
  <p>For tab-delimited data files, the format is plain-text, with three 
@@ -319,7 +321,7 @@ link3 34.6K 113</pre>
 
  <h3><a id="mrtg"></a>MRTG .html file</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> <em>htmlfile</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> <em>htmlfile</em> 
  </div> 
 
  <p>This plugin reads data from special comments in the HTML files generated 
@@ -334,22 +336,22 @@ link3 34.6K 113</pre>
  of this datasaource: </p> 
 
  <ul> 
- <li><b><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_swap 1</b> 
+ \<li\>\<b\><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_swap 1</b> 
  - (per-link/node) will swap the in and out values over 
  </li> 
 
- <li><b><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_negate 1</b> 
+ \<li\>\<b\><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_negate 1</b> 
  - (per-link/node) will make negate the value from the MRTG file. 
  Weathermap doesn't deal well with negative values yet, so this is 
  sometimes useful. 
  </li> 
 
- <li><b><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_period d</b> 
+ \<li\>\<b\><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_period d</b> 
  - (per-link/node) allows you to choose between daily, monthly, weekly, 
  and yearly values - use 'd','m','w','y' - default is 'd' 
  </li> 
 
- <li><b><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_value av</b> 
+ \<li\>\<b\><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_value av</b> 
  - (per-link/node) allows you to choose between average, minimum, maximum 
  and current values - use 'av','min','max','cu' - default is 'cu' 
  </li> 
@@ -359,7 +361,7 @@ link3 34.6K 113</pre>
 
  <h3><a id="cactihost"></a>Cacti host status</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactihost:<em>hostid</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> cactihost:<em>hostid</em> 
  </div> 
 
  <p>This plugin reads the current status of a host from your Cacti database. 
@@ -419,7 +421,7 @@ link3 34.6K 113</pre>
  based on the state of a host would be: </p> 
 
  <div class="example"> 
-<pre><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 0 0.5 192 192 192 
+\<pre\><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 0 0.5 192 192 192 
 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 0.5 1.5 255 0 0 
 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 1.5 2.5 0 0 255 
 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 2.5 3.5 0 255 0 
@@ -430,13 +432,13 @@ link3 34.6K 113</pre>
 
  <h3><a id="cactithold"></a>Cacti threshold status</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactimonitor:<em>hostid</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> cactimonitor:<em>hostid</em> 
  </div> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:<em>tholdid</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:<em>tholdid</em> 
  </div> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:<em>rra_id</em>:<em>data_id</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:<em>rra_id</em>:<em>data_id</em> 
  </div> 
 
  <p>When used with cactimonitor: prefix, this plugin takes data from both 
@@ -467,7 +469,7 @@ link3 34.6K 113</pre>
  in the names. Then: </p> 
 
  <div class="example"> 
- <pre><a href="config-reference.html#NODE_NODE">NODE</a> myserver 
+ \<pre\><a href="config-reference.html#NODE_NODE">NODE</a> myserver 
 <a href="config-reference.html#NODE_LABEL">LABEL</a> Server 1 
 <a href="config-reference.html#NODE_POSITION">POSITION</a> 100 100 
 <a href="config-reference.html#LINK_TARGET">TARGET</a> cactimonitor:77 
@@ -489,7 +491,7 @@ link3 34.6K 113</pre>
  thresholds on each firewall as normal, and then: </p> 
 
  <div class="example"> 
- <pre><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> badness 0 100 0 255 0 255 0 0 
+ \<pre\><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> badness 0 100 0 255 0 255 0 0 
 
 <a href="config-reference.html#NODE_NODE">NODE</a> firewall_status 
  <a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:334:22 cactithold:34:255 cactithold:337:235 cactithold:33:254 
@@ -508,11 +510,11 @@ link3 34.6K 113</pre>
 
  <h3><a id="cactidsstats"></a>Cacti DSStats data collection plugin</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  dsstats:<em>dsid</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  dsstats:<em>source</em>:<em>dsid</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
@@ -556,7 +558,7 @@ link3 34.6K 113</pre>
  per second: </p> 
 
  <div class="example"> 
- <pre><a href="config-reference.html#LINK_TARGET">TARGET</a> 8*dsstats:4455:traffic_in:traffic_out</pre> 
+ \<pre\><a href="config-reference.html#LINK_TARGET">TARGET</a> 8*dsstats:4455:traffic_in:traffic_out</pre> 
  </div> 
 
  <p><strong>Performance Note:</strong>As with the rrdtool poller_output support, 
@@ -570,7 +572,7 @@ link3 34.6K 113</pre>
 
  <h3><a id="snmp"></a>SNMPv1 value</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  snmp:<em>community</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em> 
  </div> 
 
@@ -604,7 +606,7 @@ link3 34.6K 113</pre>
  <hr/> 
  <h3><a id="snmp2"></a>SNMPv2c value</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  snmp2c:<em>community</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em> 
  </div> 
 
@@ -614,7 +616,7 @@ link3 34.6K 113</pre>
  <hr/> 
  <h3><a id="snmp3"></a>SNMPv3 value</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  snmp3:<em>PROFILENAME</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em> 
  </div> 
 
@@ -635,7 +637,7 @@ link3 34.6K 113</pre>
 
  <h3><a id="script"></a>External script</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> !<em>scriptname</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> !<em>scriptname</em> 
  </div> 
 
  <p>This plugin is fairly experimental and not thoroughly tested. Due to the 
@@ -670,7 +672,7 @@ link3 34.6K 113</pre>
 
  <h3><a id="fping"></a>FPING</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> fping:<em>hostname</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> fping:<em>hostname</em> 
  </div> 
 
  <p>This plugin is fairly experimental and not thoroughly tested. It's also 
@@ -692,7 +694,7 @@ link3 34.6K 113</pre>
 
  <h3><a id="time"></a>Current Time</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> time:<em>zonename</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> time:<em>zonename</em> 
  </div> 
 
  <p>This plugin allows you to embed the current time in any timezone in your 
@@ -720,13 +722,14 @@ link3 34.6K 113</pre>
 
  <h3><a id="wmdata"></a>Weathermap Data</h3> 
 
- <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> wmdata:<em>filename</em> 
+ <div class\=\"definition\"\><a href="config-reference.html#LINK_TARGET">TARGET</a> wmdata:<em>filename</em> 
  </div> 
 
  <p>TODO </p> 
 
 
- </div> 
- </sdiv> 
+
+</div> 
+</main> 
 </body> 
 </html> 

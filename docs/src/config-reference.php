@@ -124,13 +124,15 @@
  best to define the DEFAULT node at the top of the configuration file, if you 
  intend to use it. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.7</dt>
-      <dd>Added DEFAULT node.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Added DEFAULT node.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -163,13 +165,15 @@
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added template support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added template support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -232,13 +236,15 @@ NODE sub_node
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Add relative position from other nodes.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Add relative position from other nodes.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -257,9 +263,11 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Define a relative offset within this node, that can be used by name in <a href="#NODE_POSITION">POSITION</a> and <a href="#LINK_NODES">NODES</a> commands. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">TODO - write this up! </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small"/>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush"/>
+    </div>
   </div>
 </section>
 
@@ -278,13 +286,15 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is drawn using the font specified by <a href="#NODE_LABELFONT">LABELFONT</a> in the colours specified 
  by <a href="#NODE_COLORS">LABELFONTCOLOR,</a> <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Added 'special token' support.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added 'special token' support.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -361,30 +371,32 @@ NODE sub_node
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added quotes option for targets with spaces.
-        </dd>
-      <dt>0.96</dt>
-      <dd>Added scale factors for all datasources.
-        </dd>
-      <dt>0.91</dt>
-      <dd>Added 'negative' datasources.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added plugin data sources, node targets, and added new
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added quotes option for targets with spaces.
+        </li>
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added scale factors for all datasources.
+        </li>
+        <li class="list-group-item"><strong>0.91 -
+                            </strong>Added 'negative' datasources.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added plugin data sources, node targets, and added new
         plugins.
-        </dd>
-      <dt>0.8</dt>
-      <dd>Added ability to specify multiple targets. Added
+        </li>
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added ability to specify multiple targets. Added
         tab-delimited data source. Added 'ignore' DS name.
-        </dd>
-      <dt>0.5</dt>
-      <dd>Added ability to specify DS names.
-        </dd>
-    </dl>
+        </li>
+        <li class="list-group-item"><strong>0.5 -
+                            </strong>Added ability to specify DS names.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -415,19 +427,21 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also change the colour of the <a href="#NODE_ICON">ICON</a> associated with a <a href="#NODE_NODE">NODE</a> according 
  to a different <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.97</dt>
-      <dd>Added absolute scale support.
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added USEICONSCALE.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added named scales and USESCALE.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.97 -
+                            </strong>Added absolute scale support.
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added USEICONSCALE.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added named scales and USESCALE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -450,13 +464,15 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default value is 100, which has the effect of not changing the input 
  value ( (n/100)*100 = n ). </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Added TARGET and MAXVALUE for nodes.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added TARGET and MAXVALUE for nodes.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -519,28 +535,30 @@ NODE sub_node
  <a href="#NODE_USEICONSCALE">USEICONSCALE,</a> if you are using the PHP GD library (the function required is not 
  present in the main GD library). </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added inpie, outpie and nink.
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added Artificial Icon support - round, rbox and box.
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added Icon colourising support.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added 'special token' support.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added JPEG and GIF support.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added special icon 'none', and automatic scaling.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added inpie, outpie and nink.
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added Artificial Icon support - round, rbox and box.
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added Icon colourising support.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added 'special token' support.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added JPEG and GIF support.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added special icon 'none', and automatic scaling.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -571,19 +589,21 @@ NODE sub_node
  If you know that you 
  <em>do</em> have the imagefilter function, and you prefer the 'old-style' 
  coloring, then you can add 
- <tt><a href="#NODE_SET">SET</a> use_imagefilter 1</tt> in the top section of your map config file, to use 
+ \<tt\><a href="#NODE_SET">SET</a> use_imagefilter 1</tt> in the top section of your map config file, to use 
  <tt>imagefilter</tt> instead. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.97</dt>
-      <dd>Removed dependency on imagefilter
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added USEICONSCALE.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.97 -
+                            </strong>Removed dependency on imagefilter
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added USEICONSCALE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -615,13 +635,15 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For more control, you can specify an integer offset for the x and y positions 
  of the label (e.g. <a href="#NODE_LABELOFFSET">LABELOFFSET</a> -10 -20) instead. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.7</dt>
-      <dd>Originally added LABELOFFSET
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Originally added LABELOFFSET
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -641,16 +663,18 @@ NODE sub_node
  <figure xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/labelangle+labeloffset.png"/> 
 
- <figcaption>Rotated label, using <tt><a href="#NODE_LABELANGLE">LABELANGLE</a> 90</tt> and <tt><a href="#NODE_LABELOFFSET">LABELOFFSET</a> E</tt></figcaption> 
+ <figcaption>Rotated label, using \<tt\><a href="#NODE_LABELANGLE">LABELANGLE</a> 90</tt> and \<tt\><a href="#NODE_LABELOFFSET">LABELOFFSET</a> E</tt></figcaption> 
  </figure> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added LABELANGLE.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added LABELANGLE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -668,16 +692,18 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/font-sizes.png"/>The built-in GD fonts. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.7</dt>
-      <dd>Global NODEFONT became per-node LABELFONT.
-        </dd>
-      <dt>0.6</dt>
-      <dd>Originally added NODEFONT.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Global NODEFONT became per-node LABELFONT.
+        </li>
+        <li class="list-group-item"><strong>0.6 -
+                            </strong>Originally added NODEFONT.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -734,37 +760,39 @@ NODE sub_node
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR,</a> <a href="#NODE_COLORS">AICONFILLCOLOR</a> and <a href="#NODE_COLORS">AICONOUTLINECOLOR</a> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns\:xi\=\"http\:\/\/www\.w3\.org\/2001\/XInclude\"\><a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR,</a> <a href="#NODE_COLORS">AICONFILLCOLOR</a> and <a href="#NODE_COLORS">AICONOUTLINECOLOR</a> 
  have an additional 
  option - 'none' 
  - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> 
  defaults to 'none'. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">LABELFONTCOLOR</a> has an additional option 'contrast', which will select either 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns\:xi\=\"http\:\/\/www\.w3\.org\/2001\/XInclude\"\><a href="#NODE_COLORS">LABELFONTCOLOR</a> has an additional option 'contrast', which will select either 
  black or white depending on the current <a href="#NODE_COLORS">LABELBGCOLOR.</a> This is especially useful 
  if you are using a <a href="#GLOBAL_SCALE">SCALE</a> to change the colour of your <a href="#NODE_NODE">NODE</a> <a href="#NODE_LABEL">LABELs.</a> </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">AICONOUTLINECOLOR</a> and <a href="#NODE_COLORS">AICONFILLCOLOR</a> are used to colour an 'artificial <a href="#NODE_ICON">ICON'</a> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns\:xi\=\"http\:\/\/www\.w3\.org\/2001\/XInclude\"\><a href="#NODE_COLORS">AICONOUTLINECOLOR</a> and <a href="#NODE_COLORS">AICONFILLCOLOR</a> are used to colour an 'artificial <a href="#NODE_ICON">ICON'</a> 
  if one is defined for this node. To allow the artifical icon to 
  <em>also</em> follow the colour of the <a href="#NODE_COLORS">LABELBGCOLOR</a> when you are using a <a href="#GLOBAL_SCALE">SCALE,</a> 
  you can also specify 'copy' as the colour for <a href="#NODE_COLORS">AICONFILLCOLOR.</a> See <a href="#NODE_ICON">ICON</a> for more 
  about artificial icons. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.98</dt>
-      <dd>Added 'none' for AICONFILLCOLOR.
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added 'contrast' and 'copy' options.
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added AICONFILLCOLOR and AICONOUTLINECOLOR.
-        </dd>
-      <dt>0.8</dt>
-      <dd>Added LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.98 -
+                            </strong>Added 'none' for AICONFILLCOLOR.
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added 'contrast' and 'copy' options.
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added AICONFILLCOLOR and AICONOUTLINECOLOR.
+        </li>
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR
         and LABELOUTLINECOLOR.
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -818,13 +846,15 @@ NODE sub_node
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added multiple URL support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added multiple URL support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -842,14 +872,16 @@ NODE sub_node
  the screen. Typically, you would use this once, in the DEFAULT <a href="#NODE_NODE">NODE.</a> If you use 
  this, you must also use <a href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any effect. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.7</dt>
-      <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
         code by Niels Baggesen.
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -867,14 +899,16 @@ NODE sub_node
  the screen. Typically, you would use this once, in the DEFAULT <a href="#NODE_NODE">NODE.</a> If you use 
  this, you must also use <a href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any effect. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.7</dt>
-      <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
         code by Niels Baggesen.
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -890,13 +924,15 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the caption can contain 
  <a href="advanced.html#tokens">special tokens</a> to show map data. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Originally added OVERLIBCAPTION.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added OVERLIBCAPTION.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -915,13 +951,15 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The map <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> must be set to 'overlib' to enable any of the mouse-hover 
  functionality. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Originally added NOTES.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added NOTES.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -944,13 +982,15 @@ NODE sub_node
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is more about Hint Variables in the 
  <a href="advanced.html">Advanced Topics</a> section. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Originally added SET.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added SET.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -972,13 +1012,15 @@ NODE sub_node
  can use <a href="#NODE_ZORDER">'ZORDER</a> 250' to do that. 
  </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added Z-ordering support.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added Z-ordering support.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
     
@@ -1043,13 +1085,15 @@ LINK a_real_link
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added template support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added template support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1107,22 +1151,22 @@ LINK a_real_link
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/linkoffset-eastwest.png"/> 
 
- <br/>Using compass points - <tt><a href="#LINK_NODES">NODES</a> node1:E node2:W</tt> </p> 
+ <br/>Using compass points - \<tt\><a href="#LINK_NODES">NODES</a> node1:E node2:W</tt> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/linkoffset-east50west50.png"/> 
 
  <br/>Using compass points with percentages - 
- <tt><a href="#LINK_NODES">NODES</a> node1:E50 node2:W50</tt> </p> 
+ \<tt\><a href="#LINK_NODES">NODES</a> node1:E50 node2:W50</tt> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/linkoffset-radial.png"/> 
 
- <br/>Using polar offsets - <tt><a href="#LINK_NODES">NODES</a> node1:45r20 node2:225r20</tt> </p> 
+ <br/>Using polar offsets - \<tt\><a href="#LINK_NODES">NODES</a> node1:45r20 node2:225r20</tt> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/linkoffset-parallel.png"/> 
 
  <br/>Using offsets to make parallel links- 
- <tt><a href="#LINK_NODES">NODES</a> node1:NE50 node2:NW50</tt> for one link and 
- <tt><a href="#LINK_NODES">NODES</a> node1:SE50 node2:SW50</tt> for the other. </p> 
+ \<tt\><a href="#LINK_NODES">NODES</a> node1:NE50 node2:NW50</tt> for one link and 
+ \<tt\><a href="#LINK_NODES">NODES</a> node1:SE50 node2:SW50</tt> for the other. </p> 
   </div>
   <div class="examples">
     <h4>Examples</h4>
@@ -1173,22 +1217,24 @@ LINK secondlink
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added polar offsets.
-        </dd>
-      <dt>0.96</dt>
-      <dd>Added fractional compass offsets.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added numeric pixel offsets.
-        </dd>
-      <dt>0.8</dt>
-      <dd>Added ability to specify node offset.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added polar offsets.
+        </li>
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added fractional compass offsets.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added numeric pixel offsets.
+        </li>
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added ability to specify node offset.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1262,30 +1308,32 @@ LINK secondlink
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added quotes option for targets with spaces.
-        </dd>
-      <dt>0.96</dt>
-      <dd>Added scale factors for all datasources.
-        </dd>
-      <dt>0.91</dt>
-      <dd>Added 'negative' datasources.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added plugin data sources, node targets, and added new
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added quotes option for targets with spaces.
+        </li>
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added scale factors for all datasources.
+        </li>
+        <li class="list-group-item"><strong>0.91 -
+                            </strong>Added 'negative' datasources.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added plugin data sources, node targets, and added new
         plugins.
-        </dd>
-      <dt>0.8</dt>
-      <dd>Added ability to specify multiple targets. Added
+        </li>
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added ability to specify multiple targets. Added
         tab-delimited data source. Added 'ignore' DS name.
-        </dd>
-      <dt>0.5</dt>
-      <dd>Added ability to specify DS names.
-        </dd>
-    </dl>
+        </li>
+        <li class="list-group-item"><strong>0.5 -
+                            </strong>Added ability to specify DS names.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1315,16 +1363,18 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you also specify 'absolute', then no percentage calculation is performed. 
  The raw values from the <a href="#LINK_TARGET">TARGET</a> line are just looked up in the named <a href="#GLOBAL_SCALE">SCALE.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.97</dt>
-      <dd>Added absolute scale support.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added named scales and USESCALE.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.97 -
+                            </strong>Added absolute scale support.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added named scales and USESCALE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1350,13 +1400,15 @@ LINK secondlink
  - both angled and curved links have special handling, and regular straight links 
  are treated as curved links with no <a href="#LINK_VIA">VIA</a> by default. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.97a</dt>
-      <dd>Added non-integer widths. Retconned explanation.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.97a -
+                            </strong>Added non-integer widths. Retconned explanation.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1402,21 +1454,23 @@ LINK secondlink
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Added MAXVALUE as a synonym to match NODE MAXVALUE. No
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added MAXVALUE as a synonym to match NODE MAXVALUE. No
         change in functionality.
-        </dd>
-      <dt>0.5</dt>
-      <dd>Added support for decimals in BANDWIDTH specifications.
-        </dd>
-      <dt>0.4</dt>
-      <dd>Added support for K,M,G,T suffixes on bandwidth specs.
+        </li>
+        <li class="list-group-item"><strong>0.5 -
+                            </strong>Added support for decimals in BANDWIDTH specifications.
+        </li>
+        <li class="list-group-item"><strong>0.4 -
+                            </strong>Added support for K,M,G,T suffixes on bandwidth specs.
         Changed bandwidth from bytes to bits.
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1436,13 +1490,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This means that the percentages calculated are calculated as (in+out)/max 
  instead of (in/max) and (out/max) separately. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added DUPLEX.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added DUPLEX.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1463,16 +1519,18 @@ LINK secondlink
  bandwidth label altogether. 
  </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.8</dt>
-      <dd>Added unformatted format.
-        </dd>
-      <dt>0.7</dt>
-      <dd>Changed from global BWLABELS to per-link BWLABEL.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added unformatted format.
+        </li>
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Changed from global BWLABELS to per-link BWLABEL.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1505,13 +1563,15 @@ LINK secondlink
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.94</dt>
-      <dd>Added INBWFORMAT.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.94 -
+                            </strong>Added INBWFORMAT.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1526,13 +1586,15 @@ LINK secondlink
  labels. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">See the <a href="#LINK_INBWFORMAT">INBWFORMAT</a> entry for more information. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.94</dt>
-      <dd>Added OUTBWFORMAT.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.94 -
+                            </strong>Added OUTBWFORMAT.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1557,13 +1619,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/bwstyle-angled.png"/> Angled label style </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.92</dt>
-      <dd>Added BWSTYLE.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.92 -
+                            </strong>Added BWSTYLE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1578,22 +1642,24 @@ LINK secondlink
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the 'bandwidth' labels shown on each link. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The two position values are percentages along the link arrow, from the first 
- to the second node. Therefore <tt><a href="#LINK_BWLABELPOS">BWLABELPOS</a> 75 25</tt> is the default. </p> 
+ to the second node. Therefore \<tt\><a href="#LINK_BWLABELPOS">BWLABELPOS</a> 75 25</tt> is the default. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Weathermap will produce a warning if the outpostion is greater than the 
  inposition. In most cases, you have probably made a mistake, but if you have a 
  good reason to do this, then you can disable that warning using <a href="#LINK_SET">'SET</a> 
  nowarn_bwlabelpos 1' in the top section of you map config file. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added warning for proably-wrong positions
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added BWLABELPOS
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added warning for proably-wrong positions
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added BWLABELPOS
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1629,13 +1695,15 @@ LINK secondlink
  <em>must be a TrueType font</em> as these are the only font type to support 
  rotating text. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Added link comments
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added link comments
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1655,13 +1723,15 @@ LINK secondlink
  <em>must be a TrueType font</em> as these are the only font type to support 
  rotating text. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Added link comments
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added link comments
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1681,13 +1751,15 @@ LINK secondlink
  text through any angle, as required by comments. You can change the colour used 
  to render the font with <a href="#LINK_COLORS">COMMENTFONTCOLOR</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Added link comments
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added link comments
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1704,15 +1776,17 @@ LINK secondlink
  <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The positions are specified as a percentage position along the link, like 
  <a href="#LINK_BWLABELPOS">BWLABELPOS.</a> The default positions are equivalent to 
- <strong><a href="#LINK_COMMENTPOS">COMMENTPOS</a> 95 5</strong>. </p> 
+ \<strong\><a href="#LINK_COMMENTPOS">COMMENTPOS</a> 95 5</strong>. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.92</dt>
-      <dd>Added COMMENTPOS
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.92 -
+                            </strong>Added COMMENTPOS
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1730,13 +1804,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/commentstyle-center.png"/> 'center' comment style </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added COMMENTSTYLE
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added COMMENTSTYLE
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1750,13 +1826,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position of the 'split' between the in and out arrows in a link. 
  <em>position</em> is a percentage, and defaults to 50. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added SPLITPOS
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added SPLITPOS
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1805,47 +1883,49 @@ LINK secondlink
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#LINK_COLORS">OUTLINECOLOR,</a> <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns\:xi\=\"http\:\/\/www\.w3\.org\/2001\/XInclude\"\><a href="#LINK_COLORS">OUTLINECOLOR,</a> <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' 
  - which stops that element of the link being drawn. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> also has an extra option - 'contrast' 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns\:xi\=\"http\:\/\/www\.w3\.org\/2001\/XInclude\"\><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> also has an extra option - 'contrast' 
  - which will choose black or white, depending on the colour of the link. This is 
  most useful with <a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows: </p> 
  <ul xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
- <li><a href="#LINK_COLORS">OUTLINECOLOR</a> is the colour of the line around the edge of the arrow.</li> 
+ \<li\><a href="#LINK_COLORS">OUTLINECOLOR</a> is the colour of the line around the edge of the arrow.</li> 
 
- <li><a href="#LINK_COLORS">BWOUTLINECOLOR</a> is the colour of the line surrounding the 'bandwidth 
+ \<li\><a href="#LINK_COLORS">BWOUTLINECOLOR</a> is the colour of the line surrounding the 'bandwidth 
  label' box</li> 
 
- <li><a href="#LINK_COLORS">BWBOXCOLOR</a> is the background colour for the same box</li> 
+ \<li\><a href="#LINK_COLORS">BWBOXCOLOR</a> is the background colour for the same box</li> 
 
- <li><a href="#LINK_COLORS">BWFONTCOLOR</a> is the colour used for text within that box</li> 
+ \<li\><a href="#LINK_COLORS">BWFONTCOLOR</a> is the colour used for text within that box</li> 
 
- <li><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> 
+ \<li\><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> 
  and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li> 
  </ul> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
- <img src="../images/contrast.png"/> <tt><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> contrast</tt> with 
- <tt><a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center</tt> </p> 
+ <img src="../images/contrast.png"/> \<tt\><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> contrast</tt> with 
+ \<tt\><a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center</tt> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added COMMENTFONTCOLOR contrast.
-        </dd>
-      <dt>0.93</dt>
-      <dd>Added correction
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added COMMENTFONTCOLOR contrast.
+        </li>
+        <li class="list-group-item"><strong>0.93 -
+                            </strong>Added correction
         - COMMENTCOLOR was shown instead of COMMENTFONTCOLOR.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added COMMENTCOLOR.
-        </dd>
-      <dt>0.8</dt>
-      <dd>Added OUTLINECOLOR, BWOUTLINECOLOR, BWFONTCOLOR and
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added COMMENTCOLOR.
+        </li>
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added OUTLINECOLOR, BWOUTLINECOLOR, BWFONTCOLOR and
         BWBOXCOLOR.
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1863,13 +1943,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">It is also possible to specify the <a href="#LINK_INFOURL">INFOURL</a> for the 'in' and 'out' halves of a 
  link individually, using <a href="#LINK_ININFOURL">ININFOURLand</a> <a href="#LINK_OUTINFOURL">OUTINFOURL.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1887,13 +1969,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_INFOURL">INFOURL,</a> but specifies a hyperlink for only the 'in' side of a 
  link. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1911,13 +1995,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_INFOURL">INFOURL,</a> but specifies a hyperlink for only the 'out' side of a 
  link. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1953,21 +2039,23 @@ LINK secondlink
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added multiple URL support
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-      <dt>0.0pre</dt>
-      <dd>Odd fact: This command, and the accompanying code to
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added multiple URL support
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+        <li class="list-group-item"><strong>0.0pre -
+                            </strong>Odd fact: This command, and the accompanying code to
         generate overlib imagemaps, were the first modification I ever made to the GRNET
         perl weathermap, and was what got me interested in writing my own version.
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -1987,16 +2075,18 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH,</a> but specifies a pop-up graph for only the 'in' side of 
  a link. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added multiple URL support
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added multiple URL support
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2016,16 +2106,18 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH,</a> but specifies a pop-up graph for only the 'out' side of 
  a link. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added multiple URL support
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added multiple URL support
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2043,14 +2135,16 @@ LINK secondlink
  the screen. Typically, you would use this once, in the DEFAULT link. If you use 
  this, you must also use <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any effect. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.7</dt>
-      <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
         code by Niels Baggesen.
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2068,14 +2162,16 @@ LINK secondlink
  the screen. Typically, you would use this once, in the DEFAULT link. If you use 
  this, you must also use <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any effect. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.7</dt>
-      <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
         code by Niels Baggesen.
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2091,13 +2187,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the caption can contain 
  <a href="advanced.html#tokens">special tokens</a> to show map data. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Originally added OVERLIBCAPTION.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added OVERLIBCAPTION.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2111,16 +2209,18 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION,</a> but specifies a pop-up graph caption for only the 
  'in' side of a link. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added multiple URL support
-        </dd>
-      <dt>0.9</dt>
-      <dd>Originally added OVERLIBCAPTION.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added multiple URL support
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added OVERLIBCAPTION.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2134,16 +2234,18 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION,</a> but specifies a pop-up graph caption for only the 
  'out' side of a link. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added multiple URL support
-        </dd>
-      <dt>0.9</dt>
-      <dd>Originally added OVERLIBCAPTION.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added multiple URL support
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added OVERLIBCAPTION.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2164,16 +2266,18 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">It is also possible to specify the <a href="#LINK_NOTES">NOTES</a> for the 'in' and 'out' halves of a 
  link individually, using <a href="#LINK_INNOTES">INNOTES</a> and <a href="#LINK_OUTNOTES">OUTNOTES.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-      <dt>0.9</dt>
-      <dd>Originally added NOTES.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added NOTES.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2190,13 +2294,15 @@ LINK secondlink
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_NOTES">NOTES,</a> but specifies a text box for only the 'in' side of a link. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2214,13 +2320,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_NOTES">NOTES,</a> but specifies a pop-up text box for only the 'out' side of a 
  link. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.95</dt>
-      <dd>Added IN/OUT support
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added IN/OUT support
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2252,19 +2360,21 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#LINK_VIA">VIA</a> can also be specified relative to a <a href="#NODE_NODE">NODE</a> on the map. This makes it 
  easier to have curves keep the intended shape as you re-organise a map. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added angled VIAs.
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added relative-positioned VIA.
-        </dd>
-      <dt>0.8</dt>
-      <dd>Originally added VIA.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added angled VIAs.
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added relative-positioned VIA.
+        </li>
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Originally added VIA.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2283,13 +2393,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/viastyle-angled.png"/>Angled <a href="#LINK_VIA">VIA</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added 'angled' style, and VIASTYLE.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added 'angled' style, and VIASTYLE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2310,13 +2422,15 @@ LINK secondlink
  usual (you still need to specify 
  <em>two</em> positions in the <a href="#LINK_BWLABELPOS">BWLABELPOS</a> line, however). </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.94</dt>
-      <dd>Added LINKSTYLE.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.94 -
+                            </strong>Added LINKSTYLE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2344,16 +2458,18 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/arrowstyle-compact.png"/> Compact arrow style </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.8</dt>
-      <dd>Added custom numeric form.
-        </dd>
-      <dt>0.7</dt>
-      <dd>First added.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added custom numeric form.
+        </li>
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>First added.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2376,13 +2492,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is more about Hint Variables in the 
  <a href="advanced.html">Advanced Topics</a> section. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Originally added SET.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added SET.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2404,13 +2522,15 @@ LINK secondlink
  can use <a href="#LINK_ZORDER">'ZORDER</a> 250' to do that. 
  </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added Z-ordering support.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added Z-ordering support.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
     
@@ -2424,13 +2544,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#GLOBAL_WIDTH">WIDTH</a> and <a href="#GLOBAL_HEIGHT">HEIGHT</a> specifications will be ignored 
  - the map will take the size of the background. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Added JPEG and GIF support for backgrounds.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added JPEG and GIF support for backgrounds.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2474,17 +2596,19 @@ LINK secondlink
  line, if both are used. 
  </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.98</dt>
-      <dd>This now creates a second copy of the file in the location specified, when using the
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.98 -
+                            </strong>This now creates a second copy of the file in the location specified, when using the
             Cacti plugin.
-        </dd>
-      <dt>0.7</dt>
-      <dd>Added HTMLOUTPUTFILE.
-        </dd>
-    </dl>
+        </li>
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Added HTMLOUTPUTFILE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
         <section class="referenceentry">
@@ -2500,13 +2624,15 @@ LINK secondlink
  <a href="targets.html#wmdata">wmdata datasource plugin</a>, which allows one map to refer to data in another map. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the Cacti plugin, this data is always saved in the output/ directory, in addition to anywhere you specify with this command. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.98</dt>
-      <dd>Added DATAOUTPUTFILE
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.98 -
+                            </strong>Added DATAOUTPUTFILE
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2544,20 +2670,22 @@ LINK secondlink
  line, if both are used. 
  </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.98</dt>
-      <dd>This now creates a second copy of the file in the location specified, when using the
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.98 -
+                            </strong>This now creates a second copy of the file in the location specified, when using the
             Cacti plugin.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added JPEG and GIF support.
-        </dd>
-      <dt>0.7</dt>
-      <dd>Added IMAGEOUTPUTFILE.
-        </dd>
-    </dl>
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added JPEG and GIF support.
+        </li>
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Added IMAGEOUTPUTFILE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2576,13 +2704,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are generating maps using the Cacti plugin, then this directive is 
  ignored, as the filename and uri are calculated instead. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added IMAGEURI.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added IMAGEURI.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2651,13 +2781,15 @@ LINK secondlink
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.8</dt>
-      <dd>First added FONTDEFINE
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>First added FONTDEFINE
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2683,19 +2815,21 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/font-sizes.png"/>The built-in GD fonts. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.8</dt>
-      <dd>Originally added TITLEFONT.
-        </dd>
-      <dt>0.7</dt>
-      <dd>Originally added TIMEFONT.
-        </dd>
-      <dt>0.6</dt>
-      <dd>Originally added KEYFONT.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Originally added TITLEFONT.
+        </li>
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Originally added TIMEFONT.
+        </li>
+        <li class="list-group-item"><strong>0.6 -
+                            </strong>Originally added KEYFONT.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2746,19 +2880,21 @@ LINK secondlink
  keys by specifying 'none' for those. 
  </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.98</dt>
-      <dd>Added 'none' option for KEYBGCOLOR and KEYOUTLINECOLOR</dd>
-      <dt>0.8</dt>
-      <dd>Added TIMECOLOR, TITLECOLOR, KEYTEXTCOLOR,
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.98 -
+                            </strong>Added 'none' option for KEYBGCOLOR and KEYOUTLINECOLOR</li>
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added TIMECOLOR, TITLECOLOR, KEYTEXTCOLOR,
             KEYOUTLINECOLOR and KEYBGCOLOR.
-        </dd>
-      <dt>0.7</dt>
-      <dd>Added BGCOLOR.
-        </dd>
-    </dl>
+        </li>
+        <li class="list-group-item"><strong>0.7 -
+                            </strong>Added BGCOLOR.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2792,16 +2928,18 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can control the font used to draw the timestamp with <a href="#GLOBAL_FONT">TIMEFONT,</a> and the 
  colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.6</dt>
-      <dd>Added ability to change text.
-        </dd>
-      <dt>0.5</dt>
-      <dd>Originally added TIMEPOS
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.6 -
+                            </strong>Added ability to change text.
+        </li>
+        <li class="list-group-item"><strong>0.5 -
+                            </strong>Originally added TIMEPOS
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2840,13 +2978,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can control the font used to draw the timestamp with <a href="#GLOBAL_FONT">TIMEFONT,</a> and the 
  colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Originally added MINTIMEPOS
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Originally added MINTIMEPOS
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2885,13 +3025,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can control the font used to draw the timestamp with <a href="#GLOBAL_FONT">TIMEFONT,</a> and the 
  colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Originally added MAXTIMEPOS
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Originally added MAXTIMEPOS
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2933,13 +3075,15 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can control the font used to draw the title with <a href="#GLOBAL_FONT">TITLEFONT,</a> and the 
  colour that it is drawn in, using <a href="#GLOBAL_COLORS">TITLECOLOR.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.8</dt>
-      <dd>Originally added TITLEPOS.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Originally added TITLEPOS.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -2955,13 +3099,15 @@ LINK secondlink
  millions and so on. You can define what the multiple used is. The default is 
  1000. </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.4</dt>
-      <dd>Originally added KILO.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.4 -
+                            </strong>Originally added KILO.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -3129,7 +3275,7 @@ LINK secondlink
     </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines one 'span' within the link colour-coding table. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#GLOBAL_SCALE">SCALE</a> is used to specify how <a href="#NODE_NODE">NODEs</a> and <a href="#LINK_LINK">LINKs</a> are colour-coded according to 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns\:xi\=\"http\:\/\/www\.w3\.org\/2001\/XInclude\"\><a href="#GLOBAL_SCALE">SCALE</a> is used to specify how <a href="#NODE_NODE">NODEs</a> and <a href="#LINK_LINK">LINKs</a> are colour-coded according to 
  their percent usage. If the percentage usage falls between min and max then the 
  colour specified by red, green and blue is used to colour the link. Colour 
  values are between 0 and 255. Percentages are between 0 and 100, obviously. </p> 
@@ -3196,34 +3342,36 @@ SCALE 85 100 255 0 0
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.97</dt>
-      <dd>Added absolute scale support.
-        </dd>
-      <dt>0.96</dt>
-      <dd>Added 'none' colour option.
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added USEICONSCALE.
-        </dd>
-      <dt>0.95</dt>
-      <dd>Added scale tags.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added named scales.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added considtently sorted scales.
-        </dd>
-      <dt>0.8</dt>
-      <dd>Added interpolated scale colours.
-        </dd>
-      <dt>0.5</dt>
-      <dd>Changed to allow min and max to be fractional.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.97 -
+                            </strong>Added absolute scale support.
+        </li>
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added 'none' colour option.
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added USEICONSCALE.
+        </li>
+        <li class="list-group-item"><strong>0.95 -
+                            </strong>Added scale tags.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added named scales.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added considtently sorted scales.
+        </li>
+        <li class="list-group-item"><strong>0.8 -
+                            </strong>Added interpolated scale colours.
+        </li>
+        <li class="list-group-item"><strong>0.5 -
+                            </strong>Changed to allow min and max to be fractional.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -3275,16 +3423,18 @@ SCALE 85 100 255 0 0
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can control the font used to draw the key with <a href="#GLOBAL_FONT">KEYFONT,</a> and the colours 
  that it is drawn in, using <a href="#GLOBAL_COLORS">KEYTEXTCOLOR,</a> <a href="#GLOBAL_COLORS">KEYBGCOLOR</a> and <a href="#GLOBAL_COLORS">KEYOUTLINECOLOR.</a> </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Added support for multiple SCALEs.
-        </dd>
-      <dt>0.6</dt>
-      <dd>Added ability to change text.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added support for multiple SCALEs.
+        </li>
+        <li class="list-group-item"><strong>0.6 -
+                            </strong>Added ability to change text.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -3358,20 +3508,22 @@ SET key_hidepercent_DEFAULT 1
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96</dt>
-      <dd>Added tags and inverted styles.
-        </dd>
-      <dt>0.92</dt>
-      <dd>Added hidepercent and hidezero SET variables.
-        </dd>
-      <dt>0.9</dt>
-      <dd>Added support for multiple key styles (classic,
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96 -
+                            </strong>Added tags and inverted styles.
+        </li>
+        <li class="list-group-item"><strong>0.92 -
+                            </strong>Added hidepercent and hidezero SET variables.
+        </li>
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Added support for multiple key styles (classic,
         horizontal, vertical).
-        </dd>
-    </dl>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -3420,13 +3572,15 @@ SET key_hidepercent_DEFAULT 1
             </pre>
     </blockquote>
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.9</dt>
-      <dd>Originally added SET.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.9 -
+                            </strong>Originally added SET.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -3443,7 +3597,7 @@ SET key_hidepercent_DEFAULT 1
  are several restrictions: 
 
  <ul> 
- <li><a href="#GLOBAL_INCLUDE">INCLUDE</a> can 
+ \<li\><a href="#GLOBAL_INCLUDE">INCLUDE</a> can 
  <em>only</em> be used in the 'global' section of the the map configuration 
  file - that is, before the first <a href="#NODE_NODE">NODE</a> or LINK.</li> 
 
@@ -3462,13 +3616,15 @@ SET key_hidepercent_DEFAULT 1
  why comments are 'lost' by the editor. 
  </p> 
   </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small">
-      <dt>0.96b</dt>
-      <dd>Originally added INCLUDE.
-        </dd>
-    </dl>
+  <div class="changes card">
+    <div class="card-body">
+      <h5 class="card-title">Change History</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>0.96b -
+                            </strong>Originally added INCLUDE.
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
     

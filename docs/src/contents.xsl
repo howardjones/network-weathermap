@@ -6,13 +6,13 @@
         <freetext>
             <description xmlns = "http://www.w3.org/1999/xhtml">
                 <div id = "contents">
-                    <xsl:apply-templates select = "section" />
+                    <xsl:apply-templates select = "referencesection" />
                 </div>
             </description>
         </freetext>
     </xsl:template>
 
-    <xsl:template match = "section">
+    <xsl:template match = "referencesection">
         <h4 class = "configsection"><xsl:value-of select = "@name" /></h4>
 
         <p id = "context_{@scope}">

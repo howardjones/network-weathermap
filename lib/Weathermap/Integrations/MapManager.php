@@ -345,23 +345,39 @@ class MapManager
         }
     }
 
+    public function addMapSetting($mapId, $name, $value)
+    {
+        $data = array("id" => $mapId, "name" => $name, "value" => $value);
+        $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, optname, optvalue) VALUES (:id, :name, :value)");
+        $statement->execute($data);
+    }
+
+    public function addGroupSetting($groupId, $name, $value)
+    {
+        $data = array("groupid" => $groupId, "name" => $name, "value" => $value);
+        $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, groupid, optname, optvalue) VALUES (0, :groupid,  :name, :value)");
+        $statement->execute($data);
+    }
+
+    public function addGlobalSetting($name, $value)
+    {
+        $data = array("name" => $name, "value" => $value);
+        $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, groupid, optname, optvalue) VALUES (0, 0,  :name, :value)");
+        $statement->execute($data);
+    }
+
+    // This is the old function that Cacti would call
     public function saveMapSetting($mapId, $name, $value)
     {
         if ($mapId > 0) {
             // map setting
-            $data = array("id" => $mapId, "name" => $name, "value" => $value);
-            $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, optname, optvalue) VALUES (:id, :name, :value)");
-            $statement->execute($data);
+            $this->addMapSetting($mapId, $name, $value);
         } elseif ($mapId < 0) {
             // group setting
-            $data = array("groupid" => -$mapId, "name" => $name, "value" => $value);
-            $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, groupid, optname, optvalue) VALUES (0, :groupid,  :name, :value)");
-            $statement->execute($data);
+            $this->addGroupSetting(-$mapId, $name, $value);
         } else {
             // Global setting
-            $data = array("name" => $name, "value" => $value);
-            $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, groupid, optname, optvalue) VALUES (0, 0,  :name, :value)");
-            $statement->execute($data);
+            $this->addGlobalSetting($name, $value);
         }
     }
 
@@ -500,6 +516,8 @@ class MapManager
 
         # then delete the group
         $this->pdo->prepare("DELETE FROM weathermap_groups WHERE id=?")->execute(array($groupId));
+
+        $this->pdo->prepare("DELETE FROM weathermap_settings WHERE groupid=?")->execute(array($groupId));
 
         # Finally, resort, just in case
         $this->resortGroups();

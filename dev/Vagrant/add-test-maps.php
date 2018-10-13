@@ -17,7 +17,7 @@ require_once __DIR__ . '/../../lib/all.php';
 require_once __DIR__ . '/../../lib/Weathermap/Integrations/Cacti/database.php';
 
 
-$configDirectory = realpath('./configs');
+$configDirectory = realpath('../../configs');
 print("dir is $configDirectory\n");
 
 $app = new CactiApplicationInterface(weathermap_get_pdo());
@@ -37,3 +37,7 @@ $groupid = $manager->createGroup("Empty Group");
 
 print_r($manager->getMaps());
 
+$manager->addMapSetting($mapid, "n1","val1");
+$manager->addMapSetting($mapid, "n2","val2");
+$manager->addGroupSetting($groupid, "n1","val9");
+$manager->addGlobalSetting("n1","val0");

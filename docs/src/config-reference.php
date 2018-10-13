@@ -1,6 +1,9 @@
-<?php include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.php'; ?><h2 id="configref">Configuration Reference</h2><p>This page is automatically compiled, and documents all the
-                    configuration directives that are available in PHP Weathermap
-                    <?php echo $WEATHERMAP_VERSION; ?>.  </p>
+<?php include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include
+            'common-page-head.php';
+        ?><h2 id="configref">Configuration Reference</h2><p>This page is automatically compiled, and documents all the
+            configuration directives that are available in PHP Weathermap
+            <?php echo $WEATHERMAP_VERSION;?>.
+         </p>
     <h2 class="configsection">Introduction</h2>
         <div class="preamble">
   <div xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" id="contents">
@@ -104,8 +107,8 @@
     
 
     <h2 id="s_scope_NODE" class="configsection">Node-specific Configuration Directives</h2>
-        <div class="referenceentry">
-  <h3 id="NODE_NODE">NODE</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_NODE">NODE<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">NODE
 
         <em class="meta">nodename</em>
@@ -114,7 +117,7 @@
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The initial definition of a <a href="#NODE_NODE">NODE.</a> This must come before any other 
  configuration related to this node. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The 'nodename' is used in link definitions to specify which nodes the link 
- joins. The nodename is must be a single word, with no spaces. </p> 
+ joins. The nodename must be a single word, with no spaces. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is one special node name, 'DEFAULT', which allows for the setting of 
  defaults. All nodes that are defined after this one in the configuration file 
  will use the parameters of this node as a starting point. For this reason, it is 
@@ -129,10 +132,10 @@
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_TEMPLATE">TEMPLATE</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_TEMPLATE">TEMPLATE<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">TEMPLATE
 
         <em class="meta">nodename</em>
@@ -168,10 +171,10 @@
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_POSITION">POSITION</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_POSITION">POSITION<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">POSITION
 
         <em class="meta">x-coord</em>
@@ -237,10 +240,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_DEFINEOFFSET">DEFINEOFFSET</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_DEFINEOFFSET">DEFINEOFFSET<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">DEFINEOFFSET
 
         <em class="meta">offsetname</em>
@@ -258,10 +261,10 @@ NODE sub_node
     <h4>Change History</h4>
     <dl class="small"/>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_LABEL">LABEL</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_LABEL">LABEL<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">LABEL
 
         <em class="meta">labeltext</em>
@@ -283,10 +286,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_TARGET">TARGET</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_TARGET">TARGET<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">TARGET
 
         <em class="meta">targetspec</em>
@@ -383,10 +386,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_USESCALE">USESCALE</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_USESCALE">USESCALE<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">USESCALE
 
         <em class="meta">scalename</em>
@@ -426,10 +429,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_MAXVALUE">MAXVALUE</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_MAXVALUE">MAXVALUE<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">MAXVALUE
 
         <em class="meta">max-value</em>
@@ -455,10 +458,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_ICON">ICON</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_ICON">ICON<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">ICON
 
         <em class="meta">iconimagefile</em>
@@ -539,10 +542,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_USEICONSCALE">USEICONSCALE</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_USEICONSCALE">USEICONSCALE<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">USEICONSCALE
 
         <em class="meta">scalename</em>
@@ -582,10 +585,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_LABELOFFSET">LABELOFFSET</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_LABELOFFSET">LABELOFFSET<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">LABELOFFSET
 
         <em class="meta">compass-point</em>
@@ -620,10 +623,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_LABELANGLE">LABELANGLE</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_LABELANGLE">LABELANGLE<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">LABELANGLE
 
         <em class="meta">angle</em>
@@ -649,10 +652,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_LABELFONT">LABELFONT</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_LABELFONT">LABELFONT<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">LABELFONT
 
         <em class="meta">fontnumber</em>
@@ -676,10 +679,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_COLORS">*COLOR</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_COLORS">*COLOR<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">LABELFONTCOLOR
 
         <em class="meta">red</em>
@@ -763,10 +766,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_INFOURL">INFOURL</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_INFOURL">INFOURL<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">INFOURL
 
         <em class="meta">url</em>
@@ -777,10 +780,10 @@ NODE sub_node
  &lt;map&gt; section of the HTML so that when you click on the node, you are 
  taken to the url specified here. </p> 
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_OVERLIBGRAPH">OVERLIBGRAPH</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_OVERLIBGRAPH">OVERLIBGRAPH<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">OVERLIBGRAPH
 
         <em class="meta">url</em>
@@ -823,10 +826,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_OVERLIBWIDTH">OVERLIBWIDTH</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_OVERLIBWIDTH">OVERLIBWIDTH<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">OVERLIBWIDTH
 
         <em class="meta">imagewidth</em>
@@ -848,10 +851,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_OVERLIBHEIGHT">OVERLIBHEIGHT<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">OVERLIBHEIGHT
 
         <em class="meta">imagewidth</em>
@@ -873,10 +876,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_OVERLIBCAPTION">OVERLIBCAPTION</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_OVERLIBCAPTION">OVERLIBCAPTION<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">OVERLIBCAPTION
 
         <em class="meta">caption text</em>
@@ -895,10 +898,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_NOTES">NOTES</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_NOTES">NOTES<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">NOTES
 
         <em class="meta">notes text</em>
@@ -920,10 +923,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_SET">SET</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_SET">SET<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">SET
 
         <em class="meta">hintname</em>
@@ -949,10 +952,10 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="NODE_ZORDER">ZORDER</h3>
+        <section class="referenceentry">
+  <h3 id="NODE_ZORDER">ZORDER<span class="scope scope-NODE">NODE</span></h3>
   <div class="definition">ZORDER
 
         <em class="meta">z-coord</em>
@@ -977,12 +980,12 @@ NODE sub_node
         </dd>
     </dl>
   </div>
-</div>
+</section>
     
 
     <h2 id="s_scope_LINK" class="configsection">Link-specific Configuration Directives</h2>
-        <div class="referenceentry">
-  <h3 id="LINK_LINK">LINK</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_LINK">LINK<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">LINK
 
         <em class="meta">linkname</em>
@@ -998,10 +1001,10 @@ NODE sub_node
  best to define the DEFAULT link at the top of the configuration file, if you 
  intend to use it. </p> 
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_TEMPLATE">TEMPLATE</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_TEMPLATE">TEMPLATE<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">TEMPLATE
 
         <em class="meta">linkname</em>
@@ -1048,10 +1051,10 @@ LINK a_real_link
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_NODES">NODES</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_NODES">NODES<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">NODES
 
         <em class="meta">nodename{:compassoffset}</em>
@@ -1187,10 +1190,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_TARGET">TARGET</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_TARGET">TARGET<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">TARGET
 
         <em class="meta">targetspec</em>
@@ -1284,10 +1287,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_USESCALE">USESCALE</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_USESCALE">USESCALE<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">USESCALE
 
         <em class="meta">scalename</em>
@@ -1323,10 +1326,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_WIDTH">WIDTH</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_WIDTH">WIDTH<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">WIDTH
 
         <em class="meta">width</em>
@@ -1355,15 +1358,25 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_BANDWIDTH">BANDWIDTH</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_BANDWIDTH">BANDWIDTH<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">BANDWIDTH
 
         <em class="meta">max-bandwidth</em>
     </div>
   <div class="definition">BANDWIDTH
+
+        <em class="meta">max-in-bandwidth</em>
+
+        <em class="meta">max-out-bandwidth</em>
+    </div>
+  <div class="definition">MAXVALUE
+
+        <em class="meta">max-bandwidth</em>
+    </div>
+  <div class="definition">MAXVALUE
 
         <em class="meta">max-in-bandwidth</em>
 
@@ -1405,10 +1418,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_DUPLEX">DUPLEX</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_DUPLEX">DUPLEX<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">DUPLEX
 
         <em class="meta">full</em>
@@ -1431,10 +1444,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_BWLABEL">BWLABEL</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_BWLABEL">BWLABEL<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">BWLABEL
 
         <em class="meta">formatname</em>
@@ -1461,10 +1474,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_INBWFORMAT">INBWFORMAT</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_INBWFORMAT">INBWFORMAT<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">INBWFORMAT
 
         <em class="meta">string</em>
@@ -1500,10 +1513,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OUTBWFORMAT">OUTBWFORMAT</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OUTBWFORMAT">OUTBWFORMAT<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OUTBWFORMAT
 
         <em class="meta">string</em>
@@ -1521,10 +1534,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_BWSTYLE">BWSTYLE</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_BWSTYLE">BWSTYLE<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">BWSTYLE
 
         <em class="meta">formatname</em>
@@ -1552,10 +1565,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_BWLABELPOS">BWLABELPOS</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_BWLABELPOS">BWLABELPOS<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">BWLABELPOS
 
         <em class="meta">inposition</em>
@@ -1582,10 +1595,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_BWFONT">BWFONT</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_BWFONT">BWFONT<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">BWFONT
 
         <em class="meta">fontnumber</em>
@@ -1598,10 +1611,10 @@ LINK secondlink
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/font-sizes.png"/>The built-in GD fonts. </p> 
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_INCOMMENT">INCOMMENT</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_INCOMMENT">INCOMMENT<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">INCOMMENT
 
         <em class="meta">string</em>
@@ -1624,10 +1637,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OUTCOMMENT">OUTCOMMENT</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OUTCOMMENT">OUTCOMMENT<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OUTCOMMENT
 
         <em class="meta">string</em>
@@ -1650,10 +1663,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_COMMENTFONT">COMMENTFONT</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_COMMENTFONT">COMMENTFONT<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">COMMENTFONT
 
         <em class="meta">fontnumber</em>
@@ -1676,10 +1689,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_COMMENTPOS">COMMENTPOS</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_COMMENTPOS">COMMENTPOS<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">COMMENTPOS
 
         <em class="meta">inposition</em>
@@ -1701,10 +1714,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_COMMENTSTYLE">COMMENTSTYLE</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_COMMENTSTYLE">COMMENTSTYLE<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">COMMENTSTYLE edge
     </div>
   <div class="definition">COMMENTSTYLE center
@@ -1725,10 +1738,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_SPLITPOS">SPLITPOS</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_SPLITPOS">SPLITPOS<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">SPLITPOS
 
         <em class="meta">position</em>
@@ -1745,10 +1758,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_COLORS">*COLOR</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_COLORS">*COLOR<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OUTLINECOLOR
 
         <em class="meta">red</em>
@@ -1834,10 +1847,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_INFOURL">INFOURL</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_INFOURL">INFOURL<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">INFOURL
 
         <em class="meta">url</em>
@@ -1858,10 +1871,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_ININFOURL">ININFOURL</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_ININFOURL">ININFOURL<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">ININFOURL
 
         <em class="meta">url</em>
@@ -1882,10 +1895,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OUTINFOURL">OUTINFOURL</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OUTINFOURL">OUTINFOURL<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OUTINFOURL
 
         <em class="meta">url</em>
@@ -1906,10 +1919,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OVERLIBGRAPH">OVERLIBGRAPH</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OVERLIBGRAPH">OVERLIBGRAPH<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OVERLIBGRAPH
 
         <em class="meta">url</em>
@@ -1956,10 +1969,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_INOVERLIBGRAPH">INOVERLIBGRAPH<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">INOVERLIBGRAPH
 
         <em class="meta">url</em>
@@ -1985,10 +1998,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OUTOVERLIBGRAPH
 
         <em class="meta">url</em>
@@ -2014,10 +2027,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OVERLIBWIDTH">OVERLIBWIDTH</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OVERLIBWIDTH">OVERLIBWIDTH<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OVERLIBWIDTH
 
         <em class="meta">imagewidth</em>
@@ -2039,10 +2052,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OVERLIBHEIGHT">OVERLIBHEIGHT<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OVERLIBHEIGHT
 
         <em class="meta">imagewidth</em>
@@ -2064,10 +2077,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OVERLIBCAPTION">OVERLIBCAPTION</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OVERLIBCAPTION">OVERLIBCAPTION<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OVERLIBCAPTION
 
         <em class="meta">caption text</em>
@@ -2086,10 +2099,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_INOVERLIBCAPTION">INOVERLIBCAPTION<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">INOVERLIBCAPTION
 
         <em class="meta">caption text</em>
@@ -2109,10 +2122,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OUTOVERLIBCAPTION
 
         <em class="meta">caption text</em>
@@ -2132,10 +2145,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_NOTES">NOTES</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_NOTES">NOTES<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">NOTES
 
         <em class="meta">notes text</em>
@@ -2162,10 +2175,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_INNOTES">INNOTES</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_INNOTES">INNOTES<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">INNOTES
 
         <em class="meta">url</em>
@@ -2185,10 +2198,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_OUTNOTES">OUTNOTES</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_OUTNOTES">OUTNOTES<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">OUTNOTES
 
         <em class="meta">url</em>
@@ -2209,10 +2222,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_VIA">VIA</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_VIA">VIA<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">VIA
 
         <em class="meta">x-coord</em>
@@ -2253,10 +2266,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_VIASTYLE">VIASTYLE</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_VIASTYLE">VIASTYLE<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">VIASTYLE curved
     </div>
   <div class="definition">VIASTYLE angled
@@ -2278,10 +2291,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_LINKSTYLE">LINKSTYLE</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_LINKSTYLE">LINKSTYLE<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">LINKSTYLE oneway
     </div>
   <div class="definition">LINKSTYLE twoway
@@ -2305,10 +2318,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_ARROWSTYLE">ARROWSTYLE</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_ARROWSTYLE">ARROWSTYLE<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">ARROWSTYLE
 
         <em class="meta">stylename</em>
@@ -2342,10 +2355,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_SET">SET</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_SET">SET<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">SET
 
         <em class="meta">hintname</em>
@@ -2371,10 +2384,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="LINK_ZORDER">ZORDER</h3>
+        <section class="referenceentry">
+  <h3 id="LINK_ZORDER">ZORDER<span class="scope scope-LINK">LINK</span></h3>
   <div class="definition">ZORDER
 
         <em class="meta">z-coord</em>
@@ -2399,12 +2412,12 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
     
 
     <h2 id="s_scope_GLOBAL" class="configsection">Global Configuration Directives</h2>
-        <div class="referenceentry">
-  <h3 id="GLOBAL_BACKGROUND">BACKGROUND</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_BACKGROUND">BACKGROUND<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">BACKGROUND <em class="meta">imagefile</em></div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an PNG, JPEG or GIF image file to be used as a background image. </p> 
@@ -2419,10 +2432,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_WIDTH">WIDTH</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_WIDTH">WIDTH<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">WIDTH
 
         <em class="meta">map-width</em>
@@ -2433,10 +2446,10 @@ LINK secondlink
  any <a href="#GLOBAL_WIDTH">WIDTH</a> specified is ignored. If neither a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> or <a href="#GLOBAL_WIDTH">WIDTH</a> is specified, 
  then the default <a href="#GLOBAL_WIDTH">WIDTH</a> is 800 pixels. </p> 
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_HEIGHT">HEIGHT</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_HEIGHT">HEIGHT<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">HEIGHT
 
         <em class="meta">map-height</em>
@@ -2447,10 +2460,10 @@ LINK secondlink
  any <a href="#GLOBAL_HEIGHT">HEIGHT</a> specified is ignored. If neither a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> or <a href="#GLOBAL_HEIGHT">HEIGHT</a> is specified, 
  then the default <a href="#GLOBAL_HEIGHT">HEIGHT</a> is 600 pixels. </p> 
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">HTMLOUTPUTFILE
 
         <em class="meta">htmlfile</em>
@@ -2473,9 +2486,9 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
-        <div class="referenceentry">
-  <h3 id="GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE</h3>
+</section>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">DATAOUTPUTFILE
 
         <em class="meta">datafile</em>
@@ -2495,10 +2508,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">HTMLSTYLESHEET
 
         <em class="meta">URL</em>
@@ -2515,25 +2528,29 @@ LINK secondlink
  </change> 
  </changes> 
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">IMAGEOUTPUTFILE
 
         <em class="meta">imagefile</em>
     </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This specifies the name of the PNG, JPEG or GIF file that will be generated. 
- The format chosen is based on the file-extension. </p> 
+ The format chosen is based on the file-extension. 
+ </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The equivalent command-line option takes precedence over this configuration 
- line, if both are used. </p> 
+ line, if both are used. 
+ </p> 
   </div>
   <div class="changes">
     <h4>Change History</h4>
     <dl class="small">
       <dt>0.98</dt>
-      <dd>This now creates a second copy of the file in the location specified, when using the Cacti plugin.</dd>
+      <dd>This now creates a second copy of the file in the location specified, when using the
+            Cacti plugin.
+        </dd>
       <dt>0.9</dt>
       <dd>Added JPEG and GIF support.
         </dd>
@@ -2542,10 +2559,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_IMAGEURI">IMAGEURI</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_IMAGEURI">IMAGEURI<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">IMAGEURI 
         <em class="meta">image-uri</em>
     </div>
@@ -2567,10 +2584,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_FONTDEFINE">FONTDEFINE</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_FONTDEFINE">FONTDEFINE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">FONTDEFINE
         <em class="meta">fontnumber</em>
         <em class="meta">gdfontfile</em>
@@ -2642,10 +2659,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_FONT">*FONT</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_FONT">*FONT<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">TITLEFONT
 
         <em class="meta">fontnumber</em>
@@ -2680,10 +2697,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_COLORS">*COLOR</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_COLORS">*COLOR<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">BGCOLOR        <em class="meta">red</em>         <em class="meta">green</em>        <em class="meta">blue</em>     </div>
   <div class="definition">TIMECOLOR
 
@@ -2743,10 +2760,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_TIMEPOS">TIMEPOS</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_TIMEPOS">TIMEPOS<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">TIMEPOS
 
         <em class="meta">x-pos</em>
@@ -2786,10 +2803,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_MINTIMEPOS">MINTIMEPOS</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_MINTIMEPOS">MINTIMEPOS<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">MINTIMEPOS
 
         <em class="meta">x-pos</em>
@@ -2831,10 +2848,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_MAXTIMEPOS">MAXTIMEPOS</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_MAXTIMEPOS">MAXTIMEPOS<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">MAXTIMEPOS
 
         <em class="meta">x-pos</em>
@@ -2876,10 +2893,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_TITLE">TITLE</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_TITLE">TITLE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">TITLE
 
         <em class="meta">titlestring</em>
@@ -2890,10 +2907,10 @@ LINK secondlink
  plugin. If you'd like the title to be shown on the map too, then add <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> 
  line also. </p> 
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_TITLEPOS">TITLEPOS</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_TITLEPOS">TITLEPOS<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">TITLEPOS
 
         <em class="meta">x-pos</em>
@@ -2924,10 +2941,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_KILO">KILO</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_KILO">KILO<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">KILO
 
         <em class="meta">number</em>
@@ -2946,10 +2963,10 @@ LINK secondlink
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_HTMLSTYLE">HTMLSTYLE</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_HTMLSTYLE">HTMLSTYLE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">HTMLSTYLE
 
         <em class="meta">formatname</em>
@@ -2962,10 +2979,10 @@ LINK secondlink
  pop up graphs can work, too. This requires Javascript, which is why 'static' is 
  the default. </p> 
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_SCALE">SCALE</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_SCALE">SCALE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">SCALE
 
         <em class="meta">min</em>
@@ -3208,10 +3225,10 @@ SCALE 85 100 255 0 0
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_KEYPOS">KEYPOS</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_KEYPOS">KEYPOS<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">KEYPOS
 
         <em class="meta">x-pos</em>
@@ -3269,10 +3286,10 @@ SCALE 85 100 255 0 0
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_KEYSTYLE">KEYSTYLE</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_KEYSTYLE">KEYSTYLE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">KEYSTYLE
 
         <em class="meta">stylename</em>
@@ -3356,10 +3373,10 @@ SET key_hidepercent_DEFAULT 1
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_SET">SET</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_SET">SET<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">SET
 
         <em class="meta">hintname</em>
@@ -3411,10 +3428,10 @@ SET key_hidepercent_DEFAULT 1
         </dd>
     </dl>
   </div>
-</div>
+</section>
 
-        <div class="referenceentry">
-  <h3 id="GLOBAL_INCLUDE">INCLUDE</h3>
+        <section class="referenceentry">
+  <h3 id="GLOBAL_INCLUDE">INCLUDE<span class="scope scope-GLOBAL">GLOBAL</span></h3>
   <div class="definition">INCLUDE
 
         <em class="meta">filename</em>
@@ -3453,6 +3470,6 @@ SET key_hidepercent_DEFAULT 1
         </dd>
     </dl>
   </div>
-</div>
+</section>
     
-<?php include 'common-page-foot.php'; ?>
+<?php include 'common-page-foot.php';?>

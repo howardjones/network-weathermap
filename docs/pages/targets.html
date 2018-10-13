@@ -3,7 +3,7 @@
  <head> 
  <link rel = "stylesheet" type = "text/css" media = "screen" href = "../../vendor/bootstrap/css/bootstrap.min.css" /> 
  <link rel = "stylesheet" type = "text/css" href = "../manual.css" /> 
- <title>PHP Weathermap v0.98a - Specifying <a href="config-reference.html#LINK_TARGET">TARGET</a> lines</title> 
+ <title>PHP Weathermap v1.0.0dev - Specifying <a href="config-reference.html#LINK_TARGET">TARGET</a> lines</title> 
  </head> 
 
  <body> 
@@ -12,7 +12,7 @@
  <div class="container"> 
  <div class="navbar-header" id="nav"> 
  <a class="navbar-brand" href="http://www.network-weathermap.com/">Weathermap 
- v0.98a</a> 
+ v1.0.0dev</a> 
  <ul class="nav navbar-nav"> 
  <li><a href="main.html">Contents</a></li> 
  <li><a href="main.html#installation">Installation</a></li> 
@@ -36,9 +36,9 @@
 <div class="container"> 
 
 <div id = "header"> 
- <h1>PHP Weathermap v0.98a </h1> 
+ <h1>PHP Weathermap v1.0.0dev </h1> 
 
- <h4>Copyright &copy; 2005-2016 Howard Jones, 
+ <h4>Copyright &copy; 2005-2018 Howard Jones, 
  <tt><a href = "mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
  href = "http://www.network-weathermap.com/">Website</a>)</h4> 
 </div> 
@@ -53,48 +53,49 @@
  contains the parameters the plugin needs to find your data. 
  <em>All</em> plugins return an 'in' and 'out' value, and some may set other 
  variables that can be accessed by 
- <a href = "advanced.html#tokens">Special Tokens</a> in strings. For 
+ <a href="advanced.html#tokens">Special Tokens</a> in strings. For 
  situations where there is only really one output, the 'out' value may just 
  be the same as the 'in'. </p> 
 
  <p>Here are the details of the standard data source plugins: </p> 
 
  <ul> 
- <li><a href = "#static">Static value</a></li> 
+ <li><a href="#static">Static value</a></li> 
 
- <li><a href = "#rrd">RRDtool files</a> (Cacti, Cricket, "new-style" 
- MRTG, etc)</li> 
+ <li><a href="#rrd">RRDtool files</a> (Cacti, Cricket, "new-style" 
+ MRTG, etc) 
+ </li> 
 
- <li><a href = "#tabs">Tab-separated text files</a></li> 
+ <li><a href="#tabs">Tab-separated text files</a></li> 
 
- <li><a href = "#mrtg">MRTG-generated HTML files</a></li> 
+ <li><a href="#mrtg">MRTG-generated HTML files</a></li> 
 
- <li><a href = "#cactihost">Cacti host status</a></li> 
+ <li><a href="#cactihost">Cacti host status</a></li> 
 
- <li><a href = "#cactithold">Cacti threshold/monitor status</a></li> 
+ <li><a href="#cactithold">Cacti threshold/monitor status</a></li> 
 
- <li><a href = "#cactidsstats">Cacti DSStats data collection 
+ <li><a href="#cactidsstats">Cacti DSStats data collection 
  plugin</a></li> 
 
- <li><a href = "#script">MRTG-style external script</a></li> 
+ <li><a href="#script">MRTG-style external script</a></li> 
 
- <li><a href = "#snmp">SNMP OID</a></li> 
+ <li><a href="#snmp">SNMP OID</a></li> 
 
- <li><a href = "#fping">fping</a></li> 
+ <li><a href="#fping">fping</a></li> 
 
- <li><a href = "#time">Time</a></li> 
- <li><a href = "#wmdata">Weathermap Data</a></li> 
+ <li><a href="#time">Time</a></li> 
+ <li><a href="#wmdata">Weathermap Data</a></li> 
  </ul> 
 
- <hr /> 
+ <hr/> 
 
 
- <h3><a id = "static"></a>Static value</h3> 
+ <h3><a id="static"></a>Static value</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> static:<em>invalue</em>:<em>outvalue</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> static:<em>invalue</em>:<em>outvalue</em> 
  </div> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> static:<em>value</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> static:<em>value</em> 
  </div> 
 
  <p>The simplest of all the plugins, static allows you to just set a value in 
@@ -105,28 +106,28 @@
  <p>The values in the target string can use the same K,M,G,T suffixes as 
  <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH.</a> </p> 
 
- <hr /> 
+ <hr/> 
 
- <h3><a id = "rrd"></a>RRDtool files</h3> 
+ <h3><a id="rrd"></a>RRDtool files</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  <em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  gauge:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  rrd:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  scale:<em>factor</em>:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
  <p>This is the 'core' plugin for Weathermap. It reads data from rrd files, 
- created using <a href = "http://www.rrdtool.org/">Tobi Oetiker's RRDtool</a>, 
+ created using <a href="http://www.rrdtool.org/">Tobi Oetiker's RRDtool</a>, 
  by tools like Cacti, MRTG, Cricket, NRG and so on. </p> 
 
  <p>First of all, Weathermap needs to be able to find your rrdtool 
@@ -173,7 +174,7 @@
  the present to the past, by using <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_start -1d' in the top section of 
  the config file. The full range of time-specification strings is at the 
  bottom of the 
- <a href = "http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch 
+ <a href="http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch 
  manual page</a>. </p> 
 
  <p>If you are using a tool other than Cacti, then the default DS names of 
@@ -204,7 +205,7 @@
  These can be used in the <a href="config-reference.html#LINK_TARGET">TARGET,</a> <a href="config-reference.html#LINK_INFOURL">INFOURL</a> and <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> commands in 
  particular, to reduce a lot of duplication. </p> 
 
- <h4><a id = "rrdpollerextras">Cacti poller_output support</a> (aka Boost 
+ <h4><a id="rrdpollerextras">Cacti poller_output support</a> (aka Boost 
  support)</h4> 
 
  <p>If you are using Cacti as your data collector, and running Weathermap 
@@ -242,7 +243,7 @@
  <a href="config-reference.html#LINK_INFOURL">INFOURL</a> lines: 
  </p> 
 
- <div class = "example"> 
+ <div class="example"> 
  <pre> 
  <a href="config-reference.html#GLOBAL_SET">SET</a> rrd_use_poller_output 1 
 
@@ -290,11 +291,11 @@
 
  <p>XXX THIS NEEDS TO BE WRITTEN! </p> 
 
- <hr /> 
+ <hr/> 
 
- <h3><a id = "tabs"></a>Tab-separated text</h3> 
+ <h3><a id="tabs"></a>Tab-separated text</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> <em>textfile</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> <em>textfile</em> 
  </div> 
 
  <p>For tab-delimited data files, the format is plain-text, with three 
@@ -306,19 +307,19 @@
  The file should have an extension of .txt or .tsv to be recognised as a 
  tab-delimited file by Weathermap. </p> 
 
- <div class = "example"> 
+ <div class="example"> 
  <h5>A suitable tab-delimited data file</h5> 
 
-<pre>link1 3M 4M 
+ <pre>link1 3M 4M 
 link2 66K 1.8M 
 link3 34.6K 113</pre> 
  </div> 
 
- <hr /> 
+ <hr/> 
 
- <h3><a id = "mrtg"></a>MRTG .html file</h3> 
+ <h3><a id="mrtg"></a>MRTG .html file</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> <em>htmlfile</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> <em>htmlfile</em> 
  </div> 
 
  <p>This plugin reads data from special comments in the HTML files generated 
@@ -334,27 +335,31 @@ link3 34.6K 113</pre>
 
  <ul> 
  <li><b><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_swap 1</b> 
- - (per-link/node) will swap the in and out values over</li> 
+ - (per-link/node) will swap the in and out values over 
+ </li> 
 
  <li><b><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_negate 1</b> 
  - (per-link/node) will make negate the value from the MRTG file. 
  Weathermap doesn't deal well with negative values yet, so this is 
- sometimes useful.</li> 
+ sometimes useful. 
+ </li> 
 
  <li><b><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_period d</b> 
  - (per-link/node) allows you to choose between daily, monthly, weekly, 
- and yearly values - use 'd','m','w','y' - default is 'd'</li> 
+ and yearly values - use 'd','m','w','y' - default is 'd' 
+ </li> 
 
  <li><b><a href="config-reference.html#GLOBAL_SET">SET</a> mrtg_value av</b> 
  - (per-link/node) allows you to choose between average, minimum, maximum 
- and current values - use 'av','min','max','cu' - default is 'cu'</li> 
+ and current values - use 'av','min','max','cu' - default is 'cu' 
+ </li> 
  </ul> 
 
- <hr /> 
+ <hr/> 
 
- <h3><a id = "cactihost"></a>Cacti host status</h3> 
+ <h3><a id="cactihost"></a>Cacti host status</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactihost:<em>hostid</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactihost:<em>hostid</em> 
  </div> 
 
  <p>This plugin reads the current status of a host from your Cacti database. 
@@ -367,24 +372,36 @@ link3 34.6K 113</pre>
 
  <table class="bordered striped small"> 
  <thead> 
- <tr><th>Code</th><th><tt>state</tt> value</th> 
+ <tr> 
+ <th>Code</th> 
+ <th><tt>state</tt> value</th> 
  </tr> 
  </thead> 
 
  <tbody> 
- <tr><td>0</td><td>disabled</td> 
+ <tr> 
+ <td>0</td> 
+ <td>disabled</td> 
  </tr> 
 
- <tr><td>1</td><td>down</td> 
+ <tr> 
+ <td>1</td> 
+ <td>down</td> 
  </tr> 
 
- <tr><td>2</td><td>recovering</td> 
+ <tr> 
+ <td>2</td> 
+ <td>recovering</td> 
  </tr> 
 
- <tr><td>3</td><td>up</td> 
+ <tr> 
+ <td>3</td> 
+ <td>up</td> 
  </tr> 
 
- <tr><td>5</td><td>unknown</td> 
+ <tr> 
+ <td>5</td> 
+ <td>unknown</td> 
  </tr> 
 
 
@@ -401,7 +418,7 @@ link3 34.6K 113</pre>
  <p>An appropriate <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> definition to get red, green, yellow and grey labels 
  based on the state of a host would be: </p> 
 
- <div class = "example"> 
+ <div class="example"> 
 <pre><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 0 0.5 192 192 192 
 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 0.5 1.5 255 0 0 
 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 1.5 2.5 0 0 255 
@@ -409,17 +426,17 @@ link3 34.6K 113</pre>
 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 4.5 5.5 128 128 128 </pre> 
  </div> 
 
- <hr /> 
+ <hr/> 
 
- <h3><a id = "cactithold"></a>Cacti threshold status</h3> 
+ <h3><a id="cactithold"></a>Cacti threshold status</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactimonitor:<em>hostid</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactimonitor:<em>hostid</em> 
  </div> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:<em>tholdid</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:<em>tholdid</em> 
  </div> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:<em>rra_id</em>:<em>data_id</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> cactithold:<em>rra_id</em>:<em>data_id</em> 
  </div> 
 
  <p>When used with cactimonitor: prefix, this plugin takes data from both 
@@ -449,7 +466,7 @@ link3 34.6K 113</pre>
  - they should have 'up','down','disabled','recovering' and 'tholdbreached' 
  in the names. Then: </p> 
 
- <div class = "example"> 
+ <div class="example"> 
  <pre><a href="config-reference.html#NODE_NODE">NODE</a> myserver 
 <a href="config-reference.html#NODE_LABEL">LABEL</a> Server 1 
 <a href="config-reference.html#NODE_POSITION">POSITION</a> 100 100 
@@ -471,7 +488,7 @@ link3 34.6K 113</pre>
  many of the set have exceeded their session count. You would set up 
  thresholds on each firewall as normal, and then: </p> 
 
- <div class = "example"> 
+ <div class="example"> 
  <pre><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> badness 0 100 0 255 0 255 0 0 
 
 <a href="config-reference.html#NODE_NODE">NODE</a> firewall_status 
@@ -487,20 +504,20 @@ link3 34.6K 113</pre>
  weathermap. 
  </p> 
 
- <hr /> 
+ <hr/> 
 
- <h3><a id = "cactidsstats"></a>Cacti DSStats data collection plugin</h3> 
+ <h3><a id="cactidsstats"></a>Cacti DSStats data collection plugin</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  dsstats:<em>dsid</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  dsstats:<em>source</em>:<em>dsid</em>:<em>in_ds</em>:<em>out_ds</em> 
  </div> 
 
  <p>The 
- <a href = "http://forums.cacti.net/about33875.html">DSStats Cacti plugin</a> 
+ <a href="http://forums.cacti.net/about33875.html">DSStats Cacti plugin</a> 
  stores data as the poller collects it, and also collates periodic average 
  and maximums. Which are all stored in tables in the Cacti database. This 
  makes collecting data (especially the periodic data) much more efficient. 
@@ -529,7 +546,7 @@ link3 34.6K 113</pre>
  global <a href="config-reference.html#GLOBAL_SET">SET</a> variable "dsstats_default_type" to the required default. </p> 
 
  <p>The DSStats datasource also sets the same additional variables described 
- in for <a href = "#rrdpollerextras">poller_output support</a> in the rrdtool 
+ in for <a href="#rrdpollerextras">poller_output support</a> in the rrdtool 
  plugin. </p> 
 
  <p><strong>NOTE:</strong> One important difference between this and 
@@ -538,7 +555,7 @@ link3 34.6K 113</pre>
  interface traffic) then you will need to multiply that data by 8 to get bits 
  per second: </p> 
 
- <div class = "example"> 
+ <div class="example"> 
  <pre><a href="config-reference.html#LINK_TARGET">TARGET</a> 8*dsstats:4455:traffic_in:traffic_out</pre> 
  </div> 
 
@@ -549,11 +566,11 @@ link3 34.6K 113</pre>
  can disable those queries, while still using DSStats support. To do this, 
  add <a href="config-reference.html#GLOBAL_SET">'SET</a> dsstats_no_cacti_extras 1' to the top of the map config file. </p> 
 
- <hr /> 
+ <hr/> 
 
- <h3><a id = "snmp"></a>SNMP value</h3> 
+ <h3><a id="snmp"></a>SNMPv1 value</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
  snmp:<em>community</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em> 
  </div> 
 
@@ -584,11 +601,41 @@ link3 34.6K 113</pre>
  you are polling a lot of switch ports on a device that has gone down, for 
  example. </p> 
 
- <hr /> 
+ <hr/> 
+ <h3><a id="snmp2"></a>SNMPv2c value</h3> 
 
- <h3><a id = "script"></a>External script</h3> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ snmp2c:<em>community</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em> 
+ </div> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> !<em>scriptname</em> 
+ <p>This is the same as the SNMPv1 target above, but for SNMPv2c agents. These are much more common 
+ nowadays. </p> 
+
+ <hr/> 
+ <h3><a id="snmp3"></a>SNMPv3 value</h3> 
+
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> 
+ snmp3:<em>PROFILENAME</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em> 
+ </div> 
+
+ <pre> 
+ # snmp3_PROFILE1_import 33 
+ # 
+ # OR 
+ # 
+ # snmp3_PROFILE1_username 
+ # snmp3_PROFILE1_seclevel 
+ # snmp3_PROFILE1_authproto 
+ # snmp3_PROFILE1_authpass 
+ # snmp3_PROFILE1_privproto 
+ # snmp3_PROFILE1_privpass 
+ </pre> 
+
+ <hr/> 
+
+ <h3><a id="script"></a>External script</h3> 
+
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> !<em>scriptname</em> 
  </div> 
 
  <p>This plugin is fairly experimental and not thoroughly tested. Due to the 
@@ -619,11 +666,11 @@ link3 34.6K 113</pre>
  intended for MRTG, as the 3rd line would be the device uptime and the 4th 
  line would be it's name. </p> 
 
- <hr /> 
+ <hr/> 
 
- <h3><a id = "fping"></a>FPING</h3> 
+ <h3><a id="fping"></a>FPING</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> fping:<em>hostname</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> fping:<em>hostname</em> 
  </div> 
 
  <p>This plugin is fairly experimental and not thoroughly tested. It's also 
@@ -632,7 +679,7 @@ link3 34.6K 113</pre>
  future version. </p> 
 
  <p>This plugin uses the 'fping' command-line tool 
- [<a href = "http://fping.sourceforge.net/">http://fping.sourceforge.net/</a>] 
+ [<a href="http://fping.sourceforge.net/">http://fping.sourceforge.net/</a>] 
  to ping a host, and returns various statistics about it's state. </p> 
 
  <p>You can adjust the number of pings (the default is 5), by setting the 
@@ -643,9 +690,9 @@ link3 34.6K 113</pre>
  whatever you have set), the 'fping_min' Hint Variable is the minimum ping 
  time in milliseconds, and 'fping_max' is the maximum. </p> 
 
- <h3><a id = "time"></a>Current Time</h3> 
+ <h3><a id="time"></a>Current Time</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> time:<em>zonename</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> time:<em>zonename</em> 
  </div> 
 
  <p>This plugin allows you to embed the current time in any timezone in your 
@@ -671,12 +718,12 @@ link3 34.6K 113</pre>
  <p><strong>NOTE:</strong>The timezone handling code requires at least PHP 
  version 5. </p> 
 
- <h3><a id = "wmdata"></a>Weathermap Data</h3> 
+ <h3><a id="wmdata"></a>Weathermap Data</h3> 
 
- <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> wmdata:<em>filename</em> 
+ <div class="definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> wmdata:<em>filename</em> 
  </div> 
 
-<p>TODO </p> 
+ <p>TODO </p> 
 
 
  </div> 

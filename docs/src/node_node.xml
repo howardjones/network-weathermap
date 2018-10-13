@@ -16,7 +16,7 @@
         configuration related to this node.</p>
 
         <p>The 'nodename' is used in link definitions to specify which nodes the link
-        joins. The nodename is must be a single word, with no spaces.</p>
+        joins. The nodename must be a single word, with no spaces.</p>
 
         <p>There is one special node name, 'DEFAULT', which allows for the setting of
         defaults. All nodes that are defined after this one in the configuration file

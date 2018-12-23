@@ -76,8 +76,8 @@ sed -i -e "s|export APACHE_RUN_USER=www-data|export APACHE_RUN_USER=vagrant|" \
 
 service apache2 restart
 
-echo "Installing bower"
-npm install -g bower
+#echo "Installing bower"
+#npm install -g bower
 
 echo "Installing swap"
 dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
@@ -173,7 +173,7 @@ if [ "${WEATHERMAP_VERSION}" == "git" ]; then
 
   chown -R vagrant ${CACTI_PLUGINS}/weathermap
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
-  su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
+  su -c "cd ${CACTI_PLUGINS}/weathermap && npm install" - vagrant
   su -c "${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 
@@ -184,7 +184,7 @@ if [ "${WEATHERMAP_VERSION}" == "rsync" ]; then
 
   chown -R vagrant ${CACTI_PLUGINS}/weathermap
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
-  su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
+  su -c "cd ${CACTI_PLUGINS}/weathermap && npm install" - vagrant
   su -c "${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 
@@ -193,7 +193,7 @@ if [ "${WEATHERMAP_VERSION}" == "mount" ]; then
 
   chown -R vagrant ${CACTI_PLUGINS}/weathermap
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer update" - vagrant
-  su -c "cd ${CACTI_PLUGINS}/weathermap && bower install" - vagrant
+  su -c "cd ${CACTI_PLUGINS}/weathermap && npm install" - vagrant
   su -c "cd ${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 

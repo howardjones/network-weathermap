@@ -95,10 +95,10 @@ class CactiDSStats extends Base
     /**
      * @param string $targetString
      * @param Map $map
-     * @param MapDataItem $item
+     * @param MapDataItem $mapItem
      * @return array
      */
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -217,7 +217,7 @@ class CactiDSStats extends Base
         // fill all that other information (ifSpeed, etc)
         // (but only if it's not switched off!)
         if (($map->getHint("dsstats_no_cacti_extras") === null) && $localDataId > 0) {
-            updateCactiData($item, $localDataId);
+            updateCactiData($mapItem, $localDataId);
         }
 
         return $this->returnData();

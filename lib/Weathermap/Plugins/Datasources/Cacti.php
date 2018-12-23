@@ -43,7 +43,7 @@ class Cacti extends Base
         return false;
     }
 
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;

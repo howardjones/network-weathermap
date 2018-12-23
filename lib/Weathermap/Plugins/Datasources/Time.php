@@ -37,10 +37,10 @@ class Time extends Base
     /**
      * @param string $targetString
      * @param Map $map
-     * @param MapDataItem $item
+     * @param MapDataItem $mapItem
      * @return array
      */
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -58,10 +58,10 @@ class Time extends Base
                     MapUtility::debug("Time ReadData: Timezone exists: $tz\n");
                     $dateTime = new \DateTime("now", new DateTimeZone($tz));
 
-                    $item->addNote("time_time12", $dateTime->format("h:i"));
-                    $item->addNote("time_time12ap", $dateTime->format("h:i A"));
-                    $item->addNote("time_time24", $dateTime->format("H:i"));
-                    $item->addNote("time_timezone", $tz);
+                    $mapItem->addNote("time_time12", $dateTime->format("h:i"));
+                    $mapItem->addNote("time_time12ap", $dateTime->format("h:i A"));
+                    $mapItem->addNote("time_time24", $dateTime->format("H:i"));
+                    $mapItem->addNote("time_timezone", $tz);
                     $this->data[IN] = $dateTime->format("H");
                     $this->dataTime = time();
                     $this->data[OUT] = $dateTime->format("i");

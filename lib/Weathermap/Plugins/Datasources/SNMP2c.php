@@ -61,7 +61,7 @@ class SNMP2C extends Base
         }
     }
 
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -112,7 +112,7 @@ class SNMP2C extends Base
                     $inResult = snmp2_get($host, $community, $inOID, $timeout, $retries);
                     if ($inResult !== false) {
                         $this->data[IN] = floatval($inResult);
-                        $item->addHint("snmp_in_raw", $inResult);
+                        $mapItem->addHint("snmp_in_raw", $inResult);
                     } else {
                         $this->downCache{$host}++;
                     }
@@ -123,7 +123,7 @@ class SNMP2C extends Base
                         // use floatval() here to force the output to be *some* kind of number
                         // just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
                         $this->data[OUT] = floatval($outResult);
-                        $item->addHint("snmp_out_raw", $outResult);
+                        $mapItem->addHint("snmp_out_raw", $outResult);
                     } else {
                         $this->downCache{$host}++;
                     }

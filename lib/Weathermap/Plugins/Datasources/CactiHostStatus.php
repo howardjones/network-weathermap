@@ -45,10 +45,10 @@ class CactiHostStatus extends Base
     /**
      * @param string $targetString
      * @param Map $map
-     * @param MapDataItem $item
+     * @param MapDataItem $mapItem
      * @return array
      */
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -90,18 +90,18 @@ class CactiHostStatus extends Base
 
                 $this->data[IN] = $state;
                 $this->data[OUT] = $state;
-                $item->addNote("state", $statename);
-                $item->addNote("cacti_description", $result['description']);
+                $mapItem->addNote("state", $statename);
+                $mapItem->addNote("cacti_description", $result['description']);
 
-                $item->addNote("cacti_hostname", $result['hostname']);
-                $item->addNote("cacti_curtime", $result['cur_time']);
-                $item->addNote("cacti_avgtime", $result['avg_time']);
-                $item->addNote("cacti_mintime", $result['min_time']);
-                $item->addNote("cacti_maxtime", $result['max_time']);
-                $item->addNote("cacti_availability", $result['availability']);
+                $mapItem->addNote("cacti_hostname", $result['hostname']);
+                $mapItem->addNote("cacti_curtime", $result['cur_time']);
+                $mapItem->addNote("cacti_avgtime", $result['avg_time']);
+                $mapItem->addNote("cacti_mintime", $result['min_time']);
+                $mapItem->addNote("cacti_maxtime", $result['max_time']);
+                $mapItem->addNote("cacti_availability", $result['availability']);
 
-                $item->addNote("cacti_faildate", $result['status_fail_date']);
-                $item->addNote("cacti_recdate", $result['status_rec_date']);
+                $mapItem->addNote("cacti_faildate", $result['status_fail_date']);
+                $mapItem->addNote("cacti_recdate", $result['status_rec_date']);
             }
         }
         return $this->returnData();

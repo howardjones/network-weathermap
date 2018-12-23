@@ -101,7 +101,7 @@ class SNMP3 extends Base
         return true;
     }
 
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -117,7 +117,7 @@ class SNMP3 extends Base
 
                 MapUtility::debug("SNMPv3 ReadData: SNMP settings are %s\n", json_encode($params));
 
-                $this->getSNMPData($host, $params, $oids, $item, $this->timeout, $this->retryCount);
+                $this->getSNMPData($host, $params, $oids, $mapItem, $this->timeout, $this->retryCount);
 
                 $this->restoreSNMPGlobals();
             } else {

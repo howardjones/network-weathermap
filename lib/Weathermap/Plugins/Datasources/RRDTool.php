@@ -436,7 +436,7 @@ class RRDTool extends Base
     // returns a 3-part array (invalue, outvalue and datavalid time_t)
     // invalue and outvalue should be -1,-1 if there is no valid data
     // data_time is intended to allow more informed graphing in the future
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -519,7 +519,7 @@ class RRDTool extends Base
 
         if ($usePollerOutput == 1) {
             MapUtility::debug("Going to try poller_output, as requested.\n");
-            RRDTool::readFromPollerOutput($rrdfile, "AVERAGE", $start, $end, $dsnames, $map, $item);
+            RRDTool::readFromPollerOutput($rrdfile, "AVERAGE", $start, $end, $dsnames, $map, $mapItem);
         }
 
         // if poller_output didn't get anything, or if it couldn't/didn't run, do it the old-fashioned way
@@ -541,11 +541,11 @@ class RRDTool extends Base
                         $end,
                         $dsnames,
                         $map,
-                        $item
+                        $mapItem
                     );
                 } else {
                     // do this the tried and trusted old-fashioned way
-                    RRDTool::readFromRealRRDtool($rrdfile, $cfname, $start, $end, $dsnames, $map, $item);
+                    RRDTool::readFromRealRRDtool($rrdfile, $cfname, $start, $end, $dsnames, $map, $mapItem);
                 }
             } else {
                 MapUtility::warn("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");

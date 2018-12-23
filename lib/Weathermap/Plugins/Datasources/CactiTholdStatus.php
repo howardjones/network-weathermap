@@ -115,10 +115,10 @@ class CactiTholdStatus extends Base
     /**
      * @param string $targetString The string from the config file
      * @param Map $map A reference to the map object (redundant)
-     * @param MapDataItem $item A reference to the object this target is attached to
+     * @param MapDataItem $mapItem A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -210,18 +210,18 @@ class CactiTholdStatus extends Base
 
                     $this->data[IN] = $state;
                     $this->data[OUT] = 0;
-                    $item->addNote("state", $statename);
-                    $item->addNote("cacti_description", $result['description']);
+                    $mapItem->addNote("state", $statename);
+                    $mapItem->addNote("cacti_description", $result['description']);
 
-                    $item->addNote("cacti_hostname", $result['hostname']);
-                    $item->addNote("cacti_curtime", $result['cur_time']);
-                    $item->addNote("cacti_avgtime", $result['avg_time']);
-                    $item->addNote("cacti_mintime", $result['min_time']);
-                    $item->addNote("cacti_maxtime", $result['max_time']);
-                    $item->addNote("cacti_availability", $result['availability']);
+                    $mapItem->addNote("cacti_hostname", $result['hostname']);
+                    $mapItem->addNote("cacti_curtime", $result['cur_time']);
+                    $mapItem->addNote("cacti_avgtime", $result['avg_time']);
+                    $mapItem->addNote("cacti_mintime", $result['min_time']);
+                    $mapItem->addNote("cacti_maxtime", $result['max_time']);
+                    $mapItem->addNote("cacti_availability", $result['availability']);
 
-                    $item->addNote("cacti_faildate", $result['status_fail_date']);
-                    $item->addNote("cacti_recdate", $result['status_rec_date']);
+                    $mapItem->addNote("cacti_faildate", $result['status_fail_date']);
+                    $mapItem->addNote("cacti_recdate", $result['status_rec_date']);
                 }
                 MapUtility::debug("CactiTHold ReadData: Basic state for host $id is $state/$statename\n");
 
@@ -262,15 +262,15 @@ class CactiTholdStatus extends Base
                 if (($numFailing > 0) && ($numThresholds > 0) && ($state == 3)) {
                     $state = 4;
                     $statename = "tholdbreached";
-                    $item->addNote("state", $statename);
-                    $item->addNote("thold_failcount", $numFailing);
-                    $item->addNote("thold_failpercent", ($numFailing / $numThresholds) * 100);
+                    $mapItem->addNote("state", $statename);
+                    $mapItem->addNote("thold_failcount", $numFailing);
+                    $mapItem->addNote("thold_failpercent", ($numFailing / $numThresholds) * 100);
                     $this->data[IN] = $state;
                     $this->data[OUT] = $numFailing;
                     MapUtility::debug("CactiTHold ReadData: State is $state/$statename\n");
                 } elseif ($numThresholds > 0) {
-                    $item->addNote("thold_failcount", 0);
-                    $item->addNote("thold_failpercent", 0);
+                    $mapItem->addNote("thold_failcount", 0);
+                    $mapItem->addNote("thold_failpercent", 0);
                     MapUtility::debug("CactiTHold ReadData: Leaving state as $state\n");
                 }
             }

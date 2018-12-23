@@ -63,10 +63,10 @@ class FPing extends Base
     /**
      * @param string $targetString
      * @param Map $map
-     * @param MapDataItem $item
+     * @param MapDataItem $mapItem
      * @return array
      */
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -74,7 +74,7 @@ class FPing extends Base
         $pingCount = intval($map->getHint("fping_ping_count", 5));
 
         if (preg_match($this->regexpsHandled[0], $targetString, $matches)) {
-            $this->ping($item, $matches[1], $pingCount);
+            $this->ping($mapItem, $matches[1], $pingCount);
         }
 
         return $this->returnData();

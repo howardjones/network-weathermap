@@ -26,15 +26,15 @@ class TabFile extends Base
     /**
      * @param string $targetString The string from the config file
      * @param Map $map A reference to the map object (redundant)
-     * @param MapDataItem $mapItem A reference to the object this target is attached to
+     * @param MapDataItem $mapMapItem A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    public function readData($targetString, &$map, &$mapItem)
+    public function readData($targetString, &$map, &$mapMapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
-        $itemName = $mapItem->name;
+        $itemName = $mapMapItem->name;
 
         $fullpath = realpath($targetString);
         $fileHandle = $this->validateAndOpenFile($fullpath);

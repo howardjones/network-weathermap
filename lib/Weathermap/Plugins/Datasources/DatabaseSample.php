@@ -42,10 +42,10 @@ class DatabaseSample extends Base
     /**
      * @param string $targetString
      * @param Map $map
-     * @param MapDataItem $item
+     * @param MapDataItem $mapItem
      * @return array
      */
-    public function readData($targetString, &$map, &$item)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $pdo = null;
         $this->data[IN] = null;

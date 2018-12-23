@@ -1,4 +1,9 @@
 <?php
+
+namespace Weathermap\Plugins\Datasources;
+
+use Weathermap\Core\MapUtility;
+
 // Run an external 'MRTG-compatible' script, and return it's values
 // TARGET !/usr/local/bin/qmailmrtg7 t /var/log/qmail
 
@@ -18,11 +23,10 @@
 //       your own datasource plugin which only runs that one command.
 
 /**
-  * Get data from an external script. Disabled by default.
-  */
-class WeatherMapDataSource_external extends WeatherMapDataSource
+ * Get data from an external script. Disabled by default.
+ */
+class ExternalScript extends Base
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -34,16 +38,23 @@ class WeatherMapDataSource_external extends WeatherMapDataSource
         $this->name = "ExternalScript";
     }
 
-    public function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetString, &$map, &$mapItem)
     {
-        if (preg_match("/^!(.*)$/", $targetstring, $matches)) {
+        // By default, fail.
+        // Remove this line ONLY if you understand the risks, and have taken appropriate measures
+        // so that users (or the public) can't access your map editor! Otherwise they can run
+        // arbitrary scripts on your Weathermap server.
+
+        return $this->returnData();
+
+        if (preg_match("/^!(.*)$/", $targetString, $matches)) {
             $command = $matches[1];
             $lines = array();
 
-            wm_debug("ExternalScript ReadData: Running $command\n");
+            MapUtility::debug("ExternalScript ReadData: Running $command\n");
             // run the command here
             if (($pipe = popen($command, "r")) === false) {
-                wm_warn("ExternalScript ReadData: Failed to run external script. [WMEXT01]\n");
+                MapUtility::warn("ExternalScript ReadData: Failed to run external script. [WMEXT01]\n");
             } else {
                 $i = 0;
                 while (($i < 5) && !feof($pipe)) {
@@ -55,18 +66,18 @@ class WeatherMapDataSource_external extends WeatherMapDataSource
                     $this->data[IN] = floatval($lines[0]);
                     $this->data[OUT] = floatval($lines[1]);
 
-                    $item->addHint("external_line1", $lines[0]);
-                    $item->addHint("external_line2", $lines[1]);
-                    $item->addHint("external_line3", $lines[2]);
-                    $item->addHint("external_line4", $lines[3]);
+                    $mapItem->addHint("external_line1", $lines[0]);
+                    $mapItem->addHint("external_line2", $lines[1]);
+                    $mapItem->addHint("external_line3", $lines[2]);
+                    $mapItem->addHint("external_line4", $lines[3]);
                     $this->dataTime = time();
                 } else {
-                    wm_warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");
+                    MapUtility::warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");
                 }
             }
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

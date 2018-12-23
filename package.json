@@ -1,0 +1,27 @@
+{
+  "name": "network-weathermap",
+  "version": "1.0.0",
+  "description": "Dummy package for weathermap to fetch jquery dependencies",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/howardjones/network-weathermap.git"
+  },
+  "author": "Howard Jones <howie@thingy.com>",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/howardjones/network-weathermap/issues"
+  },
+  "homepage": "https://github.com/howardjones/network-weathermap#readme",
+  "dependencies": {
+    "jquery": "^3.3.1"
+  }
+}

@@ -3,7 +3,6 @@
 *.iml
 
 tmp/
-dev/Vagrant/post-install.sh
 
 # Build process artifacts:
 build
@@ -34,9 +33,12 @@ websrc/cacti-user/*.log
 # Test artifacts
 test-suite/results*
 test-suite/diffs/*
+test-suite/diffs-*/*
 test-suite/summary.html
 test-suite/summary-failing.html
 test-suite/failing-images.txt
+test-suite/references/*.conf
+test-suite/tmp-*
 
 reports/
 
@@ -56,10 +58,15 @@ dev/docs/
 dev/phpcs/
 
 # Vagrant generated files:
-dev/Vagrant/settings.sh
 dev/Vagrant/.vagrant
 dev/Vagrant/*.log
 dev/vagrant-testers/*.zip
 dev/vagrant-testers/.vagrant/
 
+# Vagrant local-only config
+dev/Vagrant/settings.sh
+dev/Vagrant/post-install.sh
+dev/Vagrant/*-post-install.sql
 
+# React generated files
+cacti-resources/*/*.map

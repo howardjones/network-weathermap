@@ -33,7 +33,7 @@ if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
     exit();
 }
 
-$jquery = '<script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>';
+$jquery = '<script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>';
 if (isset($config['cacti_version'])) {
     if (substr($config['cacti_version'], 0, 2) == "1.") {
         $jquery = "";

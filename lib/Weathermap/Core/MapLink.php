@@ -323,6 +323,7 @@ class MapLink extends MapDataItem
                 $this->absoluteUsages[$direction] = $this->maxValues[$direction];
             }
 
+//            MapUtility::debug("Format for direction=" . $this->bwlabelformats[$direction] . "\n");
             $bwlabelText = $this->owner->processString($this->bwlabelformats[$direction], $this);
 
             if ($bwlabelText != '') {
@@ -393,11 +394,16 @@ class MapLink extends MapDataItem
 
         // a box. the last point is the start point for the text.
         $points = array(
-            $minX, $minY,
-            $minX, $maxY,
-            $maxX, $maxY,
-            $maxX, $minY,
-            $centre->x - $strWidth / 2, $centre->y + $strHeight / 2 + 1
+            $minX,
+            $minY,
+            $minX,
+            $maxY,
+            $maxX,
+            $maxY,
+            $maxX,
+            $minY,
+            $centre->x - $strWidth / 2,
+            $centre->y + $strHeight / 2 + 1
         );
 
         if ($radianAngle != 0) {
@@ -438,12 +444,11 @@ class MapLink extends MapDataItem
             $rectanglePoints[] = max($points[1], $points[3]);
             $newArea = new HTMLImagemapAreaRectangle(array($rectanglePoints), $areaName, '');
             MapUtility::debug("Adding Rectangle imagemap for $areaName\n");
-            $newArea->info['direction'] = $direction;
         } else {
             $newArea = new HTMLImagemapAreaPolygon(array($points), $areaName, '');
-            $newArea->info['direction'] = $direction;
             MapUtility::debug("Adding Poly imagemap for $areaName\n");
         }
+        $newArea->info['direction'] = $direction;
         // Make a note that we added this area
         $this->imagemapAreas[] = $newArea;
         $this->owner->imap->addArea($newArea);

@@ -161,6 +161,7 @@ class Editor
 
         $affectedNodes = array();
         $affectedLinks = array();
+        $affectedNodes [] = $movingNode->name;
 
         // This is a complicated bit. Find out if this node is involved in any
         // links that have VIAs. If it is, we want to rotate those VIA points
@@ -252,13 +253,26 @@ class Editor
         $movingNode->x = $newX;
         $movingNode->y = $newY;
 
-        $nLinks = count($affectedLinks);
-        $nNodes = count($affectedNodes);
 
         // TODO: need to redraw image here, to get correct imagemap?
         // TODO: Also, recalculate any relative positioned nodes? (doesn't matter with current editor, but isn't intuitive)
 
-        return array($nNodes, $nLinks, $affectedNodes, $affectedLinks);
+        // Find affected Nodes. This is recursive - we could be moving a node that positions another, that in turn
+        // positions another!
+        $changes = 0;
+        $iterations = 0;
+        do {
+            foreach ($this->map->nodes as $node) {
+                if (in_array($node->positionRelativeTo, $affectedNodes) && !in_array($node->name, $affectedNodes)) {
+                    $node->relativePositionResolved = false;
+                    $affectedNodes [] = $node->name;
+                    $changes++;
+                }
+            }
+            $iterations++;
+        } while ($changes > 0 && $iterations < 1000);
+
+        return array(count($affectedNodes), count($affectedLinks), $affectedNodes, $affectedLinks);
     }
 
     public function updateNode($nodeName, $params)
@@ -267,27 +281,46 @@ class Editor
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        if ($this->map->nodeExists($nodeName)) {
-            // first check if there's a rename...
+        if (!$this->map->nodeExists($nodeName)) {
+            return;
+        }
+
+        $node = $this->map->getNode($nodeName);
+
+        // first check if there's a rename...
+        if (array_key_exists('new_name', $params)) {
             if ($nodeName != $params['new_name']) {
                 $nodeName = $this->renameNode($nodeName, $params['new_name']);
             }
 
             $node = $this->map->getNode($nodeName);
+        }
 
+        if (array_key_exists('x', $params) && array_key_exists('y', $params)) {
             $node->setPosition(new Point($params['x'], $params['y']));
+
+        }
+
+        if (array_key_exists('label', $params)) {
             $node->label = $params['label'];
+        }
 
-            // AICONs mess this up, because they're not fully supported by the editor, but it can still break them
-            if ($params['iconfilename'] != '--AICON--') {
-                $node->iconfile = stripslashes($params['iconfilename']);
-            }
+        // AICONs mess this up, because they're not fully supported by the editor, but it can still break them
+        if (array_key_exists('iconfilename', $params) && $params['iconfilename'] != '--AICON--') {
+            $node->iconfile = stripslashes($params['iconfilename']);
+        }
 
+        if (array_key_exists('infourl', $params)) {
             $node->infourl[IN] = $params['infourl'];
+        }
+
+        if (array_key_exists('hover', $params)) {
             $urls = preg_split('/\s+/', $params['hover'], -1, PREG_SPLIT_NO_EMPTY);
             $node->overliburl[IN] = $urls;
             $node->overliburl[OUT] = $urls;
+        }
 
+        if (array_key_exists('lock_to', $params)) {
             if ($params['lock_to'] == "") {
                 $node->positionRelativeTo = "";
             } else {

@@ -634,6 +634,7 @@ class EditorUI extends UIBase
     /**
      * @param string[] $params
      * @param Editor $editor
+     * @throws WeathermapInternalFail
      */
     public function cmdMoveNode($params, $editor)
     {

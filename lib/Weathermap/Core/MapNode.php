@@ -15,10 +15,14 @@ namespace Weathermap\Core;
 class MapNode extends MapDataItem
 {
     public $drawable;
+
+    // Coordinates we're actually going to draw at
     public $x;
     public $y;
+    // Coordinates specified in config file, maybe in combination with another node to be relative to
     public $originalX;
     public $originalY;
+
     public $relativePositionResolved;
     public $width;
     public $height;

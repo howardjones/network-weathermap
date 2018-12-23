@@ -396,6 +396,54 @@ class EditorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(320, $n->y);
     }
 
+    public function testNodeMoveRelative()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "named_node");
+        $editor->addNode(100, 200, "other_named_node");
+        $editor->addNode(200, 200, "third_named_node", "named_node");
+        $editor->addNode(300, 200, "4th_named_node");
+        $editor->addNode(200, 300, "5th_named_node", "named_node");
+
+        $editor->updateNode('other_named_node', array(
+            'lock_to' => 'named_node'
+        ));
+
+        $editor->updateNode('third_named_node', array(
+            'lock_to' => 'other_named_node'
+        ));
+
+        $editor->updateNode('4th_named_node', array(
+            'lock_to' => 'other_named_node'
+        ));
+
+        $results = $editor->moveNode('named_node', 150, 180);
+        $this->assertEquals(4, $results[0], "4 nodes were affected");
+        $this->assertEquals(0, $results[1], "0 links were affected");
+
+        $n1 = $editor->map->getNode('named_node');
+        $n2 = $editor->map->getNode('third_named_node');
+
+        $this->assertInstanceOf("Weathermap\\Core\\MapNode", $n1);
+        $this->assertInstanceOf("Weathermap\\Core\\MapNode", $n2);
+
+        $nDeps = $n1->getDependencies();
+        $nDepsString = join(" ", array_map(array("Weathermap\\Tests\\EditorTest", "makeString"), $nDeps));
+        $this->assertEquals("[NODE other_named_node] [NODE third_named_node] [NODE 4th_named_node]", $nDepsString,
+            "Dependency created for relative positioning");
+
+        // the original move
+        $this->assertEquals(150, $n1->x);
+        $this->assertEquals(180, $n1->y);
+
+        // this one should have moved along with it
+        $this->assertEquals(250, $n2->x);
+        $this->assertEquals(280, $n2->y);
+    }
+
+
     public function testLinkRename()
     {
         $editor = new Editor();

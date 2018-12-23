@@ -440,7 +440,9 @@ class ConfigReader
                     '/^POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
                     array(
                         'x' => 1,
-                        'y' => 2
+                        'y' => 2,
+                        'originalX' => 1,
+                        'originalY' => 2
                     )
                 ),
                 array(

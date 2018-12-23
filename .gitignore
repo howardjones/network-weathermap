@@ -17,6 +17,7 @@ composer.lock
 !build/phpcs.xml
 !build/network-weathermap.doxy
 vendor/*
+!vendor/jquery-fastlivefilter/jquery.fastLiveFilter.js
 node_modules/
 
 docs/src/contents.xml

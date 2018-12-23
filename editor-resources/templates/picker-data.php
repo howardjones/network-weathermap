@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="vendor/jquery-fastlivefilter/jquery.fastLiveFilter.js"></script>
 
 

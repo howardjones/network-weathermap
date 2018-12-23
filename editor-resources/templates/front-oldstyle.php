@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
     <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css"/>
-    <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="editor-resources/editor-front.js" type="text/javascript"></script>
     <title>PHP Weathermap Editor <?php echo WEATHERMAP_VERSION; ?></title></head>
 <body>

@@ -3,7 +3,7 @@
 <head>
 
     <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css"/>
-    <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="editor-resources/editor.js" type="text/javascript"></script>
     <script src="editor-resources/editor16.js" type="text/javascript"></script>
     <script type="text/javascript">

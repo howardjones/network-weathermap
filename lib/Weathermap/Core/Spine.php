@@ -147,11 +147,14 @@ class Spine
 
         $foundIndex = $this->findIndexNearDistance($targetDistance);
 
+
         // Figure out how far the target distance is between the found point and the next one
-        $ratio = ($targetDistance - $this->elements[$foundIndex]->distance) / ($this->elements[$foundIndex + 1]->distance - $this->elements[$foundIndex]->distance);
+        $left = $this->elements[$foundIndex];
+        $right = $this->elements[$foundIndex + 1];
+        $ratio = ($targetDistance - $left->distance) / ($right->distance - $left->distance);
 
         // linearly interpolate x and y to get to the actual required distance
-        $newPoint = $this->elements[$foundIndex]->point->LERPWith($this->elements[$foundIndex + 1]->point, $ratio);
+        $newPoint = $left->point->LERPWith($right->point, $ratio);
 
         return array($newPoint, $foundIndex);
     }
@@ -262,6 +265,11 @@ class Spine
 
         $endCursor = $this->pointCount() - 1;
         $totalDistance = $this->totalDistance();
+
+        // Even if splitIndex is 0, we still want element 0 in the result
+        if ($splitIndex == 0) {
+            $spine1->addRawElement(clone $this->elements[0]);
+        }
 
         for ($i = 0; $i < $splitIndex; $i++) {
             $spine1->addRawElement(clone $this->elements[$i]);

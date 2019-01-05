@@ -147,4 +147,33 @@ class SpineTest extends \PHPUnit_Framework_TestCase
         $index = $testSpine->findIndexNearDistance(-100);
         $this->assertEquals(0, $index);
     }
+
+    public function testSplit()
+    {
+        $testSpine = new Spine();
+
+        $testSpine->addPoint(new Point(0, 0));
+        $testSpine->addPoint(new Point(1000, 0));
+
+        list($a, $b) = $testSpine->splitAtDistance(500);
+        $this->assertGreaterThanOrEqual(2, $a->pointCount(),
+            "Result from split should always have at least two points (centre)");
+        $this->assertGreaterThanOrEqual(2, $b->pointCount(),
+            "Result from split should always have at least two points (centre)");
+
+
+        list($a, $b) = $testSpine->splitAtDistance(20);
+        $this->assertGreaterThanOrEqual(2, $a->pointCount(),
+            "Result from split should always have at least two points (near start)");
+        $this->assertGreaterThanOrEqual(2, $b->pointCount(),
+            "Result from split should always have at least two points (near start)");
+
+
+        list($a, $b) = $testSpine->splitAtDistance(980);
+        $this->assertGreaterThanOrEqual(2, $a->pointCount(),
+            "Result from split should always have at least two points (near end)");
+        $this->assertGreaterThanOrEqual(2, $b->pointCount(),
+            "Result from split should always have at least two points (near end)");
+
+    }
 }

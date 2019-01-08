@@ -41,11 +41,13 @@ class ExternalScript extends Base
     public function ReadData($targetString, &$map, &$mapItem)
     {
         // By default, fail.
-        // Remove this line ONLY if you understand the risks, and have taken appropriate measures
+        // Remove these 3 lines ONLY if you understand the risks, and have taken appropriate measures
         // so that users (or the public) can't access your map editor! Otherwise they can run
         // arbitrary scripts on your Weathermap server.
 
-        return $this->returnData();
+        if (!array_key_exists("WM_TESTS_RUNNING", $_ENV)) {
+            return $this->returnData();
+        }
 
         if (preg_match("/^!(.*)$/", $targetString, $matches)) {
             $command = $matches[1];
@@ -76,6 +78,7 @@ class ExternalScript extends Base
                 }
             }
         }
+
 
         return $this->returnData();
     }

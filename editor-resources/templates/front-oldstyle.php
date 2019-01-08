@@ -27,7 +27,8 @@
             <p>Create A New Map:<br>
                 <form method="GET">Named: <input type="text" name="mapname" size="20"><input name="action" type="hidden"
                                                                                              value="newmap"><input
-                            name="plug" type="hidden" value="<?php echo $fromplug ?>"><input type="submit" value="Create">
+                            name="plug" type="hidden" value="<?php echo $fromplug ?>"><input type="submit"
+                                                                                             value="Create">
             <p>
                 <small>Note: filenames must contain no spaces and end in .conf</small>
             </p>
@@ -46,8 +47,8 @@
                     <li>
                         <?php echo $notes[$file] ?>
                         <a href="?mapname=<?php echo $file ?>&action=nothing&plug=<?php
-                            echo $fromplug ?>"><?php echo $file ?></a>
-                         - <span class="comment"><?php echo $title ?></span>
+                        echo $fromplug ?>"><?php echo $file ?></a>
+                        - <span class="comment"><?php echo $title ?></span>
                     </li>
                 <?php endforeach ?>
             </ul>
@@ -56,8 +57,10 @@
             2005-2017
             Howard Jones -
             howie@thingy.com<br/>The current version should always be <a href="http://www.network-weathermap.com/">available
-                here</a>, along with other related software. PHP Weathermap is licensed under the GNU Public License,
-            version 2. See COPYING for details. This distribution also includes the Overlib library by Erik Bosrup.
+                here</a>, along with other related software. PHP Weathermap is licensed under the MIT License, see
+            LICENSE file for more information.
+            This distribution also includes other open source software listed in
+            the README file.
         </div>
     </div>
 </div>

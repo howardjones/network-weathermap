@@ -2,7 +2,7 @@
 /*   PHP Weathermap 1.0.0
      Copyright Howard Jones, 2005-2018 howie@thingy.com
      http://www.network-weathermap.com/
-     Released under the GNU Public License
+     PHP Weathermap is licensed under the MIT License, see LICENSE file for more information.
 
     one file to include all the others...
 */

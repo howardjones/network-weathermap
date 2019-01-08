@@ -35,7 +35,7 @@
                                     <span class="input-group"><input type="text" class="form-control"
                                                                      placeholder="filename" name="mapname"
                                                                      size="20"><span
-                                            class="input-group-addon"> .conf</span>
+                                                class="input-group-addon"> .conf</span>
                                     </span>
                                 </div>
 
@@ -44,8 +44,9 @@
                                 <input name="plug" type="hidden" value="<?php echo $fromplug ?>">
 
                                 <div class="col-xs-4">
-                                    <input type="checkbox" name="template" value="copy"> <label>copied from</label> <select
-                                        name="sourcemap">
+                                    <input type="checkbox" name="template" value="copy"> <label>copied from</label>
+                                    <select
+                                            name="sourcemap">
                                         <?php foreach ($titles as $file => $title): ?>
                                             <option value="<?php echo $file ?>"><?php echo $file ?></option>
                                         <?php endforeach ?>
@@ -65,7 +66,7 @@
                                     <tr>
                                         <td><?php echo $notes[$file] ?></td>
                                         <td><a href="?mapname=<?php echo $file ?>&action=nothing&plug=<?php
-                                        echo $fromplug ?>"><?php echo $file ?></a></td>
+                                            echo $fromplug ?>"><?php echo $file ?></a></td>
                                         <td><span class="comment"><?php echo $title ?></span></td>
                                     </tr>
                                 <?php endforeach ?>
@@ -78,9 +79,9 @@
                             Copyright &copy; 2005-2016 Howard Jones - howie@thingy.com
                             <br/>The current version should always be
                             <a href="http://www.network-weathermap.com/">available here</a>,
-                            along with other related software. PHP Weathermap is licensed under the GNU Public License,
-                            version 2. See
-                            COPYING for details. This distribution also includes other open source software listed in
+                            along with other related software. PHP Weathermap is licensed under the MIT License, see
+                            LICENSE file for more information.
+                            This distribution also includes other open source software listed in
                             the README file.
                         </small>
                     </div>

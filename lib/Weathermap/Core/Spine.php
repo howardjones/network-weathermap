@@ -75,7 +75,26 @@ class Spine
         return $lastElement->distance;
     }
 
-    public function simplify($epsilon = 1e-10)
+    public function linearExpand()
+    {
+        if ($this->pointCount() == 2) {
+            $e0 = $this->elements[0];
+            $e2 = $this->elements[1];
+
+            $d = $e2->distance / 2;
+            $p = $e0->point->copy()->LERPWith($e2->point, 0.5);
+
+            $e1 = new SpineElement($p, $d);
+
+            $this->elements = array($e0, $e1, $e2);
+
+        } else {
+            throw new WeathermapInternalFail("Trying to linearExpand a large spine");
+        }
+
+    }
+
+    public function simplify($epsilon = 1e-9)
     {
         $output = new Spine();
 
@@ -289,21 +308,31 @@ class Spine
 
     public function splitAtDistance($splitDistance)
     {
+        $spines[IN] = null;
+        $spines[OUT] = null;
+
         list($halfwayPoint, $halfwayIndex) = $this->findPointAtDistance($splitDistance);
 
         MapUtility::debug($this . "\n");
         MapUtility::debug("Halfway split (%d) is at index %d %s\n", $splitDistance, $halfwayIndex, $halfwayPoint);
 
-        list($spine1, $spine2) = $this->split($halfwayIndex);
+        list($spines[IN], $spines[OUT]) = $this->split($halfwayIndex);
 
         // Add the actual midpoint back to the end of both spines (on the reverse one, reverse the distance)
-        $spine1->addRawElement(new SpineElement($halfwayPoint, $splitDistance));
-        $spine2->addRawElement(new SpineElement($halfwayPoint, $this->totalDistance() - $splitDistance));
+        $spines[IN]->addRawElement(new SpineElement($halfwayPoint, $splitDistance));
+        $spines[OUT]->addRawElement(new SpineElement($halfwayPoint, $this->totalDistance() - $splitDistance));
 
-        MapUtility::debug($spine1 . "\n");
-        MapUtility::debug($spine2 . "\n");
+        foreach (array(OUT, IN) as $dir) {
+            if ($spines[$dir]->pointCount() < 3) {
+                MapUtility::debug("Fixing 2-point spine");
+                $spines[$dir]->linearExpand();
+            }
+        }
 
-        return array($spine1, $spine2);
+        MapUtility::debug($spines[OUT] . "\n");
+        MapUtility::debug($spines[IN] . "\n");
+
+        return $spines;
     }
 
     public function __toString()

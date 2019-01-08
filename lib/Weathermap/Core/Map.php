@@ -5,7 +5,7 @@ namespace Weathermap\Core;
 // PHP Weathermap 0.98
 // Copyright Howard Jones, 2005-2016 howie@thingy.com
 // http://www.network-weathermap.com/
-// Released under the GNU Public License
+// PHP Weathermap is licensed under the MIT License, see LICENSE file for more information.
 
 /**
  * The top-level Weathermap object. Does way more than it should.

@@ -222,6 +222,8 @@ class LinkGeometry
             list($this->splitCurves[OUT], $this->splitCurves[IN]) = $this->curvePoints->splitAtDistance($halfwayDistance);
         }
 
+
+
         $this->midPoint = $this->splitCurves[OUT]->lastPoint();
     }
 

@@ -53,8 +53,8 @@ class AngledLinkGeometry extends LinkGeometry
 
             $point = $simple->getPoint(0);
             $nextPoint = $simple->getPoint(1);
-            $tangent = $point->vectorToPoint($nextPoint);
-            $normal = $tangent->getNormal();
+
+            $normal = $point->vectorToPoint($nextPoint)->getNormal();
 
             $there[] = $point->copy()->addVector($normal, $width);
             array_unshift($back, $point->copy()->addVector($normal, -$width));
@@ -66,8 +66,7 @@ class AngledLinkGeometry extends LinkGeometry
             for ($index = 0; $index < $maxStartingIndex; $index++) {
                 // At the end of the loop, we shuffle things up, and only calculate the nextNext ones here.
                 $nextNextPoint = $simple->getPoint($index + 2);
-                $nextTangent = $nextPoint->vectorToPoint($nextNextPoint);
-                $nextNormal = $nextTangent->getNormal();
+                $nextNormal = $nextPoint->vectorToPoint($nextNextPoint)->getNormal();
 
                 // Get the next two line segments, and figure out the angle between them
                 // (different angles are dealt with differently)
@@ -107,15 +106,15 @@ class AngledLinkGeometry extends LinkGeometry
 
                 // Now do all that again, with the points on the other side
 
-                $point1 = $point->copy()->addVector($normal, -$width);
-                $point2 = $nextPoint->copy()->addVector($normal, -$width);
-                $point3 = $nextPoint->copy()->addVector($nextNormal, -$width);
-                $point4 = $nextNextPoint->copy()->addVector($nextNormal, -$width);
+                $point1a = $point->copy()->addVector($normal, -$width);
+                $point2a = $nextPoint->copy()->addVector($normal, -$width);
+                $point3a = $nextPoint->copy()->addVector($nextNormal, -$width);
+                $point4a = $nextNextPoint->copy()->addVector($nextNormal, -$width);
 
-                MapUtility::debug("%s->%s crossing %s->%s\n", $point1, $point2, $point3, $point4);
+                MapUtility::debug("%s->%s crossing %s->%s\n", $point1a, $point2a, $point3a, $point4a);
 
-                $line3 = $point1->lineToPoint($point2);
-                $line4 = $point3->lineToPoint($point4);
+                $line3 = $point1a->lineToPoint($point2a);
+                $line4 = $point3a->lineToPoint($point4a);
 
                 $crossingPoint2 = $line3->findCrossingPoint($line4);
 

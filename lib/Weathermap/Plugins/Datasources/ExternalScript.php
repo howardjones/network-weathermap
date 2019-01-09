@@ -41,11 +41,12 @@ class ExternalScript extends Base
     public function ReadData($targetString, &$map, &$mapItem)
     {
         // By default, fail.
-        // Remove these 3 lines ONLY if you understand the risks, and have taken appropriate measures
+        // Remove these 4 lines ONLY if you understand the risks, and have taken appropriate measures
         // so that users (or the public) can't access your map editor! Otherwise they can run
         // arbitrary scripts on your Weathermap server.
 
-        if (!array_key_exists("WM_TESTS_RUNNING", $_ENV)) {
+        if (!array_key_exists("WM_TESTS_RUNNING", $_SERVER)) {
+            MapUtility::warn("ExternalScript targets are currently disabled");
             return $this->returnData();
         }
 

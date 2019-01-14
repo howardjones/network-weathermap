@@ -207,7 +207,7 @@ touch ${CACTI_HOME}/last-cacti-poll.txt
 chown vagrant ${CACTI_HOME}/last-cacti-poll.txt
 
 # create the database content for the phpunit database tests, if there is now a weathermap installation with tests
-if [ -d ${CACTI_HOME}plugins/weathermap/test-suite ]; then
+if [ -d ${CACTI_HOME}/plugins/weathermap/test-suite ]; then
   echo "Adding php unit database content."
   mysql -uroot weathermaptest < ${CACTI_PLUGINS}/weathermap/test-suite/data/weathermap-empty.sql
 fi

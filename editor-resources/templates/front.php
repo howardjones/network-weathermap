@@ -3,17 +3,11 @@
 <div class="container">
 
     <div id="nojs" class="alert"><b>WARNING</b> -
-        Sorry, it's partly laziness on my part, but you really need JavaScript enabled and DOM support in your browser
-        to
-        use this editor. It's a visual tool, so accessibility is already an issue, if it is, and from a security
-        viewpoint,
-        you\'re already running my code on your <i>server</i> so either you trust it all having read it, or you're
-        already
-        screwed.<P>
-            If it's a major issue for you, please feel free to complain.
-            It's mainly laziness as I said, and there could be a fallback (not so smooth) mode
-            for non-javascript browsers if it was seen to be worthwhile (I would take a bit of convincing,
-            because I don't see a benefit, personally).
+        Sorry, if you have installed this from a full release, you really need JavaScript enabled and
+        DOM support in your browser to use this editor.<br/><br/>
+        If you have downloaded this from GitHub's sources, you will need to make sure that you have followed
+        the <a href="https://github.com/howardjones/network-weathermap#using-the-dev-version">Using The Dev Version</a>
+        instructions as well.  Until you do, vital JavaScript files will be missing that also cause this message.
     </div>
 
     <div id="withjs">

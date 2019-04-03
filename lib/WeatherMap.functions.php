@@ -530,8 +530,10 @@ function line_crossing($x1,$y1,$x2,$y2, $x3,$y3,$x4,$y4)
     $b2 = -1;   
     $c1 = ($y1 - $slope1 * $x1 );
     $c2 = ($y3 - $slope2 * $x3 );
-    
-    $det_inv = 1/($a1*$b2 - $a2*$b1);
+
+
+    $f = $a1 * $b2 - $a2 * $b1;
+    $det_inv = 1/ $f;
     
     $xi = (($b1*$c2 - $b2*$c1)*$det_inv);
     $yi = (($a2*$c1 - $a1*$c2)*$det_inv);
@@ -1326,7 +1328,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 }
 
 // Take a spine, and strip out all the points that are co-linear with the points either side of them
-function simplify_spine(&$input, $epsilon=1e-10)
+function simplify_spine(&$input, $epsilon=1e-8)
 {   
     $output = array();
     

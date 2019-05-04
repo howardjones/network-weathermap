@@ -22,9 +22,10 @@ require_once dirname(__FILE__) . "/lib/all.php";
 
 // These four are not classes which can be autoloaded. They're the global functions that Cacti is looking
 // for to use as plugin hook functions
-require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
-require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti88-plugin-hooks.php";
-require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php";
+require_once dirname(__FILE__) . "/ilib/Cacti/database.php";
+require_once dirname(__FILE__) . "/ilib/Cacti/cacti88-plugin-hooks.php";
+require_once dirname(__FILE__) . "/ilib/Cacti/cacti-plugin-poller.php";
+
 // and the old (to be replaced) Giant Function Of Everything for drawing maps
 require_once dirname(__FILE__) . "/lib/Weathermap/Poller/poller-common.php";
 

@@ -1,3 +1,10 @@
+# Don't install this branch!
+
+This is where we're splitting up weathermap into core and Cacti 0.8.8h plugin. It will
+**definitely** not work on Cacti 1.x and probably not work at all!
+
+
+
 # PHP Network Weathermap 1.0.0 (dev)
 
 ## Current Status (2018-03-02)

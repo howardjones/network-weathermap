@@ -40,7 +40,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Weathermap\\": "lib/Weathermap"
+      "Weathermap\\": "lib/Weathermap",
+      "Weathermap\\Integrations\\Cacti\\": "ilib/Cacti"
     }
   }
 }

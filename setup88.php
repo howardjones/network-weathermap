@@ -30,13 +30,6 @@ require_once dirname(__FILE__) . "/ilib/Cacti/cacti-plugin-poller.php";
 require_once dirname(__FILE__) . "/lib/Weathermap/Poller/poller-common.php";
 
 
-//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
-//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti88-plugin-hooks.php";
-//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/cacti-plugin-poller.php";
-//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/CactiApplicationInterface.php";
-//require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/MapManager.php";
-//require_once dirname(__FILE__) . "/lib/Weathermap/Core/constants.php";
-
 function plugin_weathermap_version()
 {
     return array(

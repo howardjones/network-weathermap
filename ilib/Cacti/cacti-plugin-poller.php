@@ -1,5 +1,8 @@
 <?php
 
+use Weathermap\Integrations\Cacti\CactiApplicationInterface;
+use function Weathermap\Poller\runMaps;
+
 function weathermap_poller_output($rrdUpdateArray)
 {
     global $config;
@@ -148,7 +151,7 @@ function weathermap_poller_bottom()
     include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
 
     $pdo = weathermap_get_pdo();
-    $app = new \Weathermap\Integrations\Cacti\CactiApplicationInterface($pdo);
+    $app = new CactiApplicationInterface($pdo);
 
     weathermap_setup_table();
 
@@ -173,7 +176,7 @@ function weathermap_poller_bottom()
             $poller->preFlight();
 //            $poller->run();
 
-            \Weathermap\Poller\runMaps($baseDir);
+            runMaps($baseDir);
         } else {
             if ($quietlogging == 0) {
                 \cacti_log(

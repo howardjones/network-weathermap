@@ -17,8 +17,16 @@ if [ -f /vagrant/settings.sh ]; then
 . /vagrant/settings.sh
 fi
 
-CACTI_HOME=${WEBROOT}/cacti
-CACTI_PLUGINS=${CACTI_HOME}/plugins
+CACTI_HOME="${WEBROOT}/cacti"
+CACTI_PLUGINS="${CACTI_HOME}/plugins"
+
+sudo cat > /etc/profile.d/cacti-weathermap.sh <<EOF
+export CACTI_VERSION="$CACTI_VERSION"
+export PHP_VERSION="$PHP_VERSION"
+export WEATHERMAP_VERSION="$WEATHERMAP_VERSION"
+export WEBROOT="$WEBROOT"
+export CACTI_HOME="$CACTI_HOME"
+EOF
 
 echo "Installing 'dos2unix'."
 apt-get -y update
@@ -163,7 +171,7 @@ fi
 # if WEATHERMAP_VERSION is a version number, this will look for locally-made release files (for pre-release tests)
 if [ -f /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip ]; then
   echo "Unzipping weathermap from local release zip"
-  unzip /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip -d ${CACTI_HOME}plugins/
+  unzip /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip -d ${CACTI_PLUGINS}
   chown -R vagrant ${CACTI_PLUGINS}/weathermap
 fi
 

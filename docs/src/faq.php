@@ -269,7 +269,7 @@
                     title = "jwz's law of software envelopment">mail-reading
                 capability</a> anytime soon), then it stands a better chance. Things
                 that take dozens of parameters to adjust something very subtle are
-                less likely. Ultimately, it is a GPLed program though, so <i>you</i> can
+                less likely. Ultimately, it is an open source program though, so <i>you</i> can
                 <i>always</i> add your own features! I try to keep a todo list on the
                 website for current work-in-progress. Obviously, things that
                 <i>I</i> want are <i>always</i> sensible and useful<tt>:-)</tt> .</p>

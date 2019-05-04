@@ -144,7 +144,7 @@ if (sizeof($gopts) > 0) {
             case '--help':
                 print "cacti-integrate.php\n";
                 print
-                    "Copyright Howard Jones, 2008-2018 howie@thingy.com\nReleased under the GNU Public License\nhttp://www.network-weathermap.com/\n\n";
+                    "Copyright Howard Jones, 2008-2019 howie@thingy.com\nReleased under the MIT License\nhttp://www.network-weathermap.com/\n\n";
 
                 print "Usage: php cacti-integrate.php [options]\n\n";
 

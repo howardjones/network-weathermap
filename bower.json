@@ -2,7 +2,7 @@
   "name": "weathermap",
   "version": "1.0.0",
   "description": "Network Weathermap",
-  "license": "GPLv2",
+  "license": "MIT",
   "private": true,
   "ignore": [
     "**/.*",

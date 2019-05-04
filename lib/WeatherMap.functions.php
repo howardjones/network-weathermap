@@ -1,8 +1,8 @@
 <?php
 // PHP Weathermap 0.98a
-// Copyright Howard Jones, 2005-2018 howie@thingy.com
+// Copyright Howard Jones, 2005-2019 howie@thingy.com
 // http://www.network-weathermap.com/
-// Released under the GNU Public License
+// Released under the MIT License
 
 // Utility functions
 // Check for GD & PNG support This is just in here so that both the editor and CLI can use it without the need for another file

@@ -1,7 +1,7 @@
 <?php
-// Copyright Howard Jones, 2005-2018 howie@thingy.com
+// Copyright Howard Jones, 2005-2019 howie@thingy.com
 // http://wotsit.thingy.com/haj/cacti/
-// Released under the GNU Public License
+// Released under the MIT License
 
 // A simple port of the guts of Apache's mod_imap
 // - if you have an image control in a form, it's not really defined what happens to USEMAP

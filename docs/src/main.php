@@ -4,20 +4,8 @@
         $PATH_EXTRA="../";
         include "common-page-head.php";
 ?>
-            <div class = "license"><p>PHP Weathermap is free software; you can
-            redistribute it and/or modify it under the terms of the GNU General Public
-            License as published by the Free Software Foundation; either version 2 of
-            the License, or (at your option) any later version.</p>
-
-                <p>PHP Weathermap is distributed in the hope that it will be useful, but
-                WITHOUT ANY WARRANTY; without even the implied warranty of
-                MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-                Public License for more details.</p>
-
-                <p>You should have received a copy of the GNU General Public License
-                along with PHP Weathermap; if not, write to the Free Software
-                Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
-                USA</p>
+            <div class = "license">
+                <p>PHP Weathermap is licensed under the MIT license. See LICENSE file for complete license.</p>
 
                 <p>Parts of this software distribution are by other authors. Please see
                 the README file for attribution and license details.</p>

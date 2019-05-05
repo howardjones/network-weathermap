@@ -20,3 +20,10 @@
 * Should Weathermap core be a library, so that the NMS plugin can just use composer install/update to get it?
 
   * in that world, the CLI tool would be another consumer of the same library
+  
+----
+
+# Current issues
+
+* Cacti picker doesn't work
+* fullscreen cycle can't find jquery (needs several components in vendor/ actually)

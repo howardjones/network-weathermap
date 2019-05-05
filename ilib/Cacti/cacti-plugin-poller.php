@@ -169,13 +169,14 @@ function weathermap_poller_bottom()
         // if we're due, run the render updates
         if (($renderperiod == 0) || (($rendercounter % $renderperiod) == 0)) {
             // TODO: This is horrible!
-            $baseDir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+            $baseDir = dirname(dirname(dirname(__FILE__)));
 
             // TODO: this will replace poller-common/runMaps
             $poller = new \Weathermap\Poller\Poller($baseDir, $app, $weathermapPollerStartTime);
+            \cacti_log("New preflight: \n", true, "WEATHERMAP");
             $poller->preFlight();
 //            $poller->run();
-
+            \cacti_log("Old runmaps: \n", true, "WEATHERMAP");
             runMaps($baseDir);
         } else {
             if ($quietlogging == 0) {

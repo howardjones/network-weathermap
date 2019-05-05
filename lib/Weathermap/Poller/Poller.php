@@ -39,8 +39,8 @@ class Poller
         $this->config = new PollerConfig();
         // TODO: fill in the pollerConfig
 
-        $this->configDirectory = realpath($baseDirectory . DIRECTORY_SEPARATOR . 'configs');
-        $this->outputDirectory = realpath($baseDirectory . DIRECTORY_SEPARATOR . 'output');
+        $this->configDirectory = $baseDirectory . DIRECTORY_SEPARATOR . 'configs';
+        $this->outputDirectory = $baseDirectory . DIRECTORY_SEPARATOR . 'output';
 
         $this->manager = new MapManager(weathermap_get_pdo(), $this->configDirectory, $applicationInterface);
 
@@ -77,9 +77,9 @@ class Poller
         }
 
         if (!is_dir($this->outputDirectory)) {
-            MapUtility::warn("Output directory ($this->outputDirectory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process user$userNote (like you did with the RRA directory) [WMPOLL07]\n");
+            MapUtility::warn("Output directory ($this->outputDirectory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process user$userNote (like you did with the RRA directory) [WMPOLL07new]\n");
             $this->totalWarnings++;
-            $this->warningNotes .= " (Output directory problem prevents any maps running WMPOLL07)";
+            $this->warningNotes .= " (Output directory problem prevents any maps running WMPOLL07new)";
 
             return;
         }

@@ -100,14 +100,14 @@ function runMaps($mydir)
                 $NOTE = " ($username)";
             }
 
-            MapUtility::warn("Output directory ($outputDirectory) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process user$NOTE (like you did with the RRA directory) [WMPOLL06]\n");
+            MapUtility::warn("Output directory ($outputDirectory) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process user$NOTE (like you did with the RRA directory) [WMPOLL06old]\n");
             $totalWarnings++;
-            $warningNotes .= " (Permissions problem prevents any maps running - check cacti.log for WMPOLL06)";
+            $warningNotes .= " (Permissions problem prevents any maps running - check cacti.log for WMPOLL06old)";
         }
     } else {
-        MapUtility::warn("Output directory ($outputDirectory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
+        MapUtility::warn("Output directory ($outputDirectory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07old]\n");
         $totalWarnings++;
-        $warningNotes .= " (Output directory problem prevents any maps running [WMPOLL07])";
+        $warningNotes .= " (Output directory problem prevents any maps running [WMPOLL07old])";
     }
     Utility::memoryCheck("MEM Final");
     chdir($originalWorkingDir);

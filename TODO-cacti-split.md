@@ -1,6 +1,6 @@
 # TODO
 
-* Re-introduce 0.98a Cacti plugin code
+* ~~Re-introduce 0.98a Cacti plugin code~~
 * Rewrite to use MapManager (and UIBase?)
 * Update poller code to __really__ use the new Poller classes
 * Fix remaining editor issues

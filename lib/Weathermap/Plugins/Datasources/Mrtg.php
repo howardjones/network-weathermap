@@ -55,13 +55,15 @@ class Mrtg extends Base
 
     public function readData($targetString, &$map, &$mapItem)
     {
+        MapUtility::debug("MRTG ReadData: Reading from $targetString for $mapItem\n");
+
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
-        $matchvalue = $mapItem->get_hint('mrtg_value', 'cu');
-        $matchperiod = $mapItem->get_hint('mrtg_period', 'd');
-        $swap = intval($mapItem->get_hint('mrtg_swap'), 0);
-        $negate = intval($mapItem->get_hint('mrtg_negate'), 0);
+        $matchvalue = $mapItem->getHint('mrtg_value', 'cu');
+        $matchperiod = $mapItem->getHint('mrtg_period', 'd');
+        $swap = intval($mapItem->getHint('mrtg_swap'), 0);
+        $negate = intval($mapItem->getHint('mrtg_negate'), 0);
 
         $this->readDataFromFile($targetString, $matchvalue, $matchperiod);
 

@@ -45,7 +45,7 @@ class ExternalScript extends Base
         // so that users (or the public) can't access your map editor! Otherwise they can run
         // arbitrary scripts on your Weathermap server.
 
-        if (!array_key_exists("WM_TESTS_RUNNING", $_SERVER)) {
+        if (!array_key_exists("WM_TESTS_RUNNING", $_ENV)) {
             MapUtility::warn("ExternalScript targets are currently disabled");
             return $this->returnData();
         }

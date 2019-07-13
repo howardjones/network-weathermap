@@ -48,8 +48,7 @@ class Mrtg extends Base
                 $this->dataTime = filemtime($targetstring);
             }
         } else {
-            // some error code to go in here
-            MapUtility::debug("MRTG ReadData: Couldn't open ($targetstring). \n");
+            MapUtility::warn("MRTG ReadData: Couldn't open file: $targetstring [WMMRTG01]\n");
         }
     }
 

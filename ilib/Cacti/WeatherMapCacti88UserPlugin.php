@@ -21,18 +21,26 @@ class WeatherMapCacti88UserPlugin extends WeatherMapCactiUserPlugin
         $this->colours = $colours;
         $this->myURL = "weathermap-cacti88-plugin.php";
         $this->editorURL = "weathermap-cacti88-plugin-editor.php";
+        $this->managementURL = "weathermap-cacti88-plugin-mgmt.php";
         $this->managementRealm = "weathermap-cacti88-plugin-mgmt.php";
         $this->editorRealm = "weathermap-cacti88-plugin-editor.php";
     }
 
+    public function cactiGraphHeader()
+    {
+        global $config;
+        include_once $this->cactiConfig["base_path"] . "/include/top_graph_header.php";
+    }
 
     public function cactiHeader()
     {
+        global $config;
         include_once $this->cactiConfig["base_path"] . "/include/top_header.php";
     }
 
     public function cactiFooter()
     {
+        global $config;
         include_once $this->cactiConfig["base_path"] . "/include/bottom_footer.php";
     }
 

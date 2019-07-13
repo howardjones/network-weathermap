@@ -111,7 +111,8 @@ class Target
 
     public function readData(&$map, &$mapItem)
     {
-        MapUtility::debug("ReadData for $mapItem ($this->pluginName $this->pluginRunnable)\n");
+        $runnable = ($this->pluginRunnable == 1 ? "Runnable" : "Not Runnable");
+        MapUtility::debug("ReadData for $mapItem ($this->pluginName plugin - $runnable)\n");
         if (!$this->pluginRunnable) {
             MapUtility::debug("Plugin %s isn't runnable\n", $this->pluginName);
             return;

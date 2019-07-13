@@ -175,7 +175,7 @@ if [ -f /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip ];
   chown -R vagrant ${CACTI_PLUGINS}/weathermap
 fi
 
-if [ "${WEATHERMAP_VERSION}" == "git" ]; then
+if [ "${WEATHERMAP_VERSION}" = "git" ]; then
   echo "Cloning weathermap from local git"
   git clone -b database-refactor /network-weathermap ${CACTI_PLUGINS}/weathermap
 
@@ -185,7 +185,7 @@ if [ "${WEATHERMAP_VERSION}" == "git" ]; then
   su -c "${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 
-if [ "${WEATHERMAP_VERSION}" == "rsync" ]; then
+if [ "${WEATHERMAP_VERSION}" = "rsync" ]; then
   echo "rsyncing weathermap from local dir"
   mkdir ${CACTI_PLUGINS}/weathermap
   rsync -a --exclude=composer.lock --exclude=vendor/ /network-weathermap/ ${CACTI_PLUGINS}/weathermap/
@@ -196,7 +196,7 @@ if [ "${WEATHERMAP_VERSION}" == "rsync" ]; then
   su -c "${CACTI_PLUGINS}/weathermap && composer install" - vagrant
 fi
 
-if [ "${WEATHERMAP_VERSION}" == "mount" ]; then
+if [ "${WEATHERMAP_VERSION}" = "mount" ]; then
   echo "Mounting weathermap from vagrant host"
 
   chown -R vagrant ${CACTI_PLUGINS}/weathermap
@@ -220,7 +220,7 @@ if [ -d ${CACTI_HOME}/plugins/weathermap/test-suite ]; then
   mysql -uroot weathermaptest < ${CACTI_PLUGINS}/weathermap/test-suite/data/weathermap-empty.sql
 fi
 
-if [ "${WITH_SPINE}" == "yes" ]; then
+if [ "${WITH_SPINE}" = "yes" ]; then
   apt-get install -y build-essential dos2unix dh-autoreconf help2man libssl-dev libmysql++-dev librrds-perl libsnmp-dev libmysqlclient-dev libmysqld-dev
 
   cd /vagrant
@@ -240,6 +240,8 @@ if [ "${WITH_SPINE}" == "yes" ]; then
 
   rm -rf /vagrant/cacti-spine-${CACTI_VERSION}/
 fi
+
+rm "${WEBROOT}/index.html"
 
 # any local tweaks can be added to post-install.sh
 if [ -x /vagrant/post-install.sh ]; then

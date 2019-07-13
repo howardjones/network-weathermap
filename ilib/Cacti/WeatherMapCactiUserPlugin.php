@@ -27,6 +27,7 @@ class WeatherMapCactiUserPlugin extends UIBase
     public $editorRealm;
 
     public $commands = array(
+        // These were used by the React UI, but might as well stay
         'maplist' => array('handler' => 'handleMapListAPI', 'args' => array()),
         'settings' => array('handler' => 'handleSettingsAPI', 'args' => array()),
 
@@ -38,9 +39,11 @@ class WeatherMapCactiUserPlugin extends UIBase
         'viewimage' => array('handler' => 'handleImage', 'args' => array(array("id", "maphash"))),
         'viewhtml' => array('handler' => 'handleHTML', 'args' => array(array("id", "maphash"))),
 
+
+        // BELOW HERE NEED PORTING FROM OLDER PLUGIN
         'viewmap' => array(
             'handler' => 'handleViewMap',
-            'args' => array(array("id", "maphash"), array("group_id", "int", true))
+            'args' => array(array("id", "maphash"))
         ),
 
         'viewcycle_fullscreen' => array(
@@ -89,6 +92,10 @@ class WeatherMapCactiUserPlugin extends UIBase
         if (isset($request['action'])) {
             $action = strtolower(trim($request['action']));
         }
+        if ($action == "") {
+            $action = ":: DEFAULT ::";
+        }
+
 
         if ($this->validateRequest($action, $request)) {
             $this->dispatchRequest($action, $request, null);
@@ -224,57 +231,50 @@ class WeatherMapCactiUserPlugin extends UIBase
         return false;
     }
 
-
+    /***
+     * The main view. Draw maps or thumbs for the selected group ('all' is a special group)
+     *
+     * @param $request
+     * @param $appObject
+     */
     public function handleDefaultView($request, $appObject)
     {
-        global $wm_showOldUI, $config;
+        global $config;
 
         $weathermapPath = $config['url_path'] . 'plugins/weathermap/';
         $cactiResourcePath = $weathermapPath . 'cacti-resources/';
 
-        $this->cactiHeader();
+        $this->cactiGraphHeader();
 
-        if ($wm_showOldUI) {
-            print "This will all be replaced.";
-
-            $pageStyle = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
-            $userId = $this->manager->application->getCurrentUserId();
-            $limitToGroup = $this->getGroupFilter($request);
-
-            $mapList = $this->manager->getMapsForUser($userId, $limitToGroup);
-
-            // "First-only" style
-            if ($pageStyle == 2) {
-                $mapList = array($mapList[0]);
-            }
-            $mapCount = count($mapList);
-
-            $this->outputMapHeader($mapList, false, $limitToGroup);
-
-            if ($pageStyle == 0 && $mapCount > 1) {
-                $this->drawThumbnailView($mapList);
-            } else {
-                $this->drawFullMapView($mapList);
-            }
-
-            if ($mapCount == 0) {
-                print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
-            }
+        $pageStyle = $this->manager->application->getAppSetting("weathermap_pagestyle", 0);
+        $userId = $this->manager->application->getCurrentUserId();
+        $limitToGroup = $this->getGroupFilter($request);
+        if ($limitToGroup == -2) {
+            $limitToGroup = null;
         }
 
-        // get the locale from host app
-        $locale = $this->manager->application->getLocale();
+        $mapList = $this->manager->getMapsForUser($userId, $limitToGroup);
 
-        print "<small>NOTHING HERE</small>";
-        print "<h1>INCOMPLETE</h1>";
-        print '<script type="text/javascript" src="' . $weathermapPath . 'overlib.js"></script>';
-
-
-        print "<hr />";
-
-        if ($wm_showOldUI) {
-            $this->outputVersionBox();
+        // "First-only" style
+        if ($pageStyle == 2) {
+            $mapList = array($mapList[0]);
         }
+        $mapCount = count($mapList);
+
+        $this->outputMapHeader($mapList, false, $limitToGroup);
+
+        // "thumbnail" style
+        if ($pageStyle == 0 && $mapCount > 1) {
+            $this->drawThumbnailView($mapList);
+        } else {
+            $this->drawFullMapView($mapList);
+        }
+
+        if ($mapCount == 0) {
+            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
+        }
+        $this->outputVersionBox();
+        $this->outputOverlib();
 
         $this->cactiFooter();
     }
@@ -284,9 +284,34 @@ class WeatherMapCactiUserPlugin extends UIBase
     // Below here are the old server-side functions that are replaced by client components
 
 
+    /***
+     * View a map or group of maps in normal mode.
+     *
+     * @param $request
+     * @param $appObject
+     */
     public function handleViewMap($request, $appObject)
     {
-        print "Unimplemented map view";
+        global $config;
+
+        $weathermapPath = $config['url_path'] . 'plugins/weathermap/';
+        $cactiResourcePath = $weathermapPath . 'cacti-resources/';
+        $userId = $this->manager->application->getCurrentUserId();
+        $mapId = $this->manager->translateFileHash($request['id']);
+
+        $this->cactiGraphHeader();
+
+        $map = $this->manager->getMapWithAccess($userId, $mapId);
+        if (sizeof($map) == 1) {
+            $map = $map[0];
+            $this->outputMapSelector($mapId);
+            $this->drawOneFullMap($map);
+        }
+
+        $this->outputVersionBox();
+        $this->outputOverlib();
+
+        $this->cactiFooter();
     }
 
     public function handleViewCycleFullscreen($request, $appObject)
@@ -376,7 +401,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         }
 
 
-        \html_start_box('Weathermap Info', '100%', '', '3', 'center', '');
+        \html_graph_start_box(1, true);
         ?>
         <tr class='even'>
             <td>
@@ -388,12 +413,26 @@ class WeatherMapCactiUserPlugin extends UIBase
             </td>
         </tr>
         <?php
-        \html_end_box();
+        \html_graph_end_box();
+    }
+
+    protected function outputOverlib()
+    {
+        print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
+        print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
     }
 
     protected function outputMapViewHeader($pageTitle, $isCycling, $limitingToGroup)
     {
-        \html_start_box($pageTitle, '100%', '', '3', 'center', '');
+        $groupCycleURL = $this->makeURL(
+            array(
+                "action" => "viewcycle_filtered",
+                "group" => $limitingToGroup
+            )
+        );
+        $allCycleURL = $this->makeURL(array("action" => "viewcycle"));
+
+        \html_graph_start_box($pageTitle, '100%', '', '3', 'center', '');
         ?>
         <tr class="even">
             <td>
@@ -407,20 +446,10 @@ class WeatherMapCactiUserPlugin extends UIBase
                                 (automatically cycle between full-size maps (<?php
 
                                 if ($limitingToGroup > 0) {
-                                    $this->makeURL(
-                                        array(
-                                            "action" => "viewcycle_filtered",
-                                            "group" => $limitingToGroup
-                                        )
-                                    );
-                                    print '<a href = "' . $this->makeURL(
-                                            array(
-                                                "action" => "viewcycle_filtered",
-                                                "group" => $limitingToGroup
-                                            )
-                                        ) . '">within this group</a>, or ';
+
+                                    print '<a href = "' . $groupCycleURL . '">within this group</a>, or ';
                                 }
-                                print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
+                                print ' <a href = "' . $allCycleURL . '">all maps</a>';
                                 ?>)
                                 <?php
                             }
@@ -430,8 +459,12 @@ class WeatherMapCactiUserPlugin extends UIBase
                 </table>
             </td>
         </tr>
+        <tr>
+            <td><i>Click on thumbnails for a full view (or you can <a href="<?php echo $groupCycleURL ?>">automatically
+                        cycle</a> between full-size maps)</i></td>
+        </tr>
         <?php
-        \html_end_box();
+        \html_graph_end_box();
 
         $this->outputGroupTabs($limitingToGroup);
     }
@@ -461,6 +494,55 @@ class WeatherMapCactiUserPlugin extends UIBase
         }
 
         return false;
+    }
+
+    protected function outputMapSelector($current_id = 0)
+    {
+        $showMapSelector = $this->manager->application->getAppSetting("weathermap_map_selector", 0);
+
+        if ($showMapSelector == 0) {
+            return;
+        }
+
+        $userId = $this->manager->application->getCurrentUserId();
+        $maps = $this->manager->getMapsWithAccessAndGroups($userId);
+
+        if (sizeof($maps) > 1) {
+            print("Map Combo Box Here");
+        }
+
+        $nullhash = "xxxx";
+        $all_groups = array_map( function($x) {return $x->name; }, $maps );
+        $known_groups = array_unique($all_groups);
+        $ngroups = sizeof($known_groups);
+
+        $current_map = array_filter($maps, function($x) use ($current_id) { return ($x->id == $current_id); });
+
+        if (sizeof($current_map) == 1) {
+            $nullhash = array_shift($current_map)->filehash;
+        }
+
+        $select_box = "";
+
+        $lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
+        foreach ($maps as $map) {
+            if ($ngroups > 1 && $map->name != $lastgroup) {
+                $select_box .= "<option style='font-weight: bold; font-style: italic' value='$nullhash'>" . htmlspecialchars($map->name) . "</option>";
+                $lastgroup = $map->name;
+            }
+            $select_box .= '<option ';
+            if ($current_id == $map->id) {
+                $select_box .= " SELECTED ";
+            }
+            $select_box .= 'value="' . $map->filehash . '">';
+            // if we're showing group headings, then indent the map names
+            if ($ngroups > 1) {
+                $select_box .= " - ";
+            }
+            $select_box .= htmlspecialchars($map->titlecache) . '</option>';
+        }
+        print "<select>". $select_box . "</select>";
+
     }
 
     private function drawThumbnailView($mapList)
@@ -648,6 +730,11 @@ class WeatherMapCactiUserPlugin extends UIBase
     public function cactiEnableGraphRefresh()
     {
         $_SESSION['custom'] = false;
+    }
+
+    public function cactiGraphHeader()
+    {
+        print "OVERRIDE ME";
     }
 
     public function cactiFooter()

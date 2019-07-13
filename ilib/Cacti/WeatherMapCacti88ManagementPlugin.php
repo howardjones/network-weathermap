@@ -28,25 +28,12 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
      */
     public function handleManagementMainScreen($request, $appObject)
     {
-        global $wm_showOldUI;
-
         $this->cactiHeader();
-        if ($wm_showOldUI) {
-            print "This will all be replaced.";
-            $this->maplistWarnings();
-            $this->maplist();
-            $this->footerLinks();
-        }
-
-        // get the locale from host app
-        $locale = $this->manager->application->getLocale();
-
-        print "<h3>NOTHING HERE</h3>";
-        print "<h1>INCOMPLETE</h1>";
-
+        $this->maplistWarnings();
+        $this->maplist();
+        $this->footerLinks();
         $this->cactiFooter();
     }
-
 
     public function cactiHeader()
     {

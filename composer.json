@@ -1,6 +1,6 @@
 {
   "name": "howardjones/network-weathermap",
-  "license": "GPL",
+  "license": "MIT",
   "minimum-stability": "dev",
   "prefer-stable": true,
   "authors": [

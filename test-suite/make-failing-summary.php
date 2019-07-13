@@ -51,6 +51,10 @@ if (is_dir($dir)) {
 
 $f = fopen($summaryFile, "r");
 
+if ($f === false) {
+    die("Couldn't open summary file for reading");
+}
+
 $percents = array();
 
 while (!feof($f)) {

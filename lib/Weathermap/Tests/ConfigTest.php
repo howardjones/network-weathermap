@@ -245,6 +245,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         self::$previousWorkingDirectory = getcwd();
         chdir($this->projectRoot);
+
+        $_ENV['WM_TESTS_RUNNING'] = 1;
     }
 
     private function generateSlug($str)

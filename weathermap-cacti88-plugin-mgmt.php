@@ -12,7 +12,7 @@ require_once dirname(__FILE__) . "/lib/all.php";
 
 use Weathermap\Integrations\Cacti\WeatherMapCacti88ManagementPlugin;
 
-$plugin = new WeatherMapCacti88ManagementPlugin($config, $colors, "png", realpath(dirname(__FILE__)));
+$plugin = new WeatherMapCacti88ManagementPlugin($config, $colors, realpath(dirname(__FILE__)));
 
 $plugin->main($_REQUEST);
 

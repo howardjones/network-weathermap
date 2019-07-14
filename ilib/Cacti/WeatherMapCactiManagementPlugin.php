@@ -257,6 +257,206 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array()));
     }
 
+
+    public function handleGroupSelect(
+        $request,
+        $appObject
+    ) {
+        $this->cactiHeader();
+
+        $add_url = $this->makeURL(array("action" => "group_form", "id" => 0));
+
+        \html_start_box(
+            __('Edit Map Groups'),
+            '100%',
+            '',
+            '2',
+            'center',
+            $add_url
+        );
+        \html_header(array(__('Actions'), __('Group Name'), __('Settings'), __('Sort Order')), 2);
+
+        $groups = $this->manager->getGroups();
+
+        if (is_array($groups)) {
+            if (count($groups) > 0) {
+                foreach ($groups as $group) {
+                    \form_alternate_row();
+
+
+                    print '<td style="width:4%"><a class="hyperLink" href="';
+                    print $this->makeURL(array("action" => "group_form", "id" => $group->id));
+                    print '"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="" title="' . __('Rename This Group') . '"></a></td>';
+                    print '<td>' . htmlspecialchars($group->name) . '</td>';
+
+                    print '<td>';
+                    $settings_url = $this->makeURL(array("action" => "map_settings", "id" => -$group->id));
+                    print "<a class='hyperLink' href='" . $settings_url . "'>";
+                    $settingCount = $this->manager->getMapSettingCount(0, $group->id);
+                    if ($settingCount > 0) {
+                        print sprintf(__n('%s special', '%s specials', $settingCount), $settingCount);
+                    } else {
+                        print __('standard');
+                    }
+                    print '</a>';
+                    print '</td>';
+
+                    print '<td>';
+
+                    $up_url = $this->makeURL(array(
+                        "action" => "move_group_up",
+                        "id" => $group->id,
+                        'order' => $group->sortorder
+                    ));
+                    $down_url = $this->makeURL(array(
+                        "action" => "move_group_down",
+                        "id" => $group->id,
+                        'order' => $group->sortorder
+                    ));
+
+                    print '<a href="' . $up_url . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
+                    print '<a href="' . $down_url . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
+
+                    print '</td>';
+
+                    print '<td class="right">';
+
+                    if ($group->id > 1) {
+                        $delete_url = $this->makeURL(array("action" => "groupadmin_delete", "id" => $group->id));
+                        print '<a href="' . $delete_url . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Remove this definition from this map"></a>';
+                    }
+
+                    print '</td>';
+
+                    print '</tr>';
+                }
+            } else {
+                print '<tr>';
+                print '<td colspan=2>' . __('No groups are defined.') . '</td>';
+                print '</tr>';
+            }
+        }
+
+        \html_end_box();
+
+        $this->cactiFooter();
+    }
+
+    public function handleGroupForm(
+        $request,
+        $appObject
+    ) {
+        $id = $request['id'];
+
+        $this->cactiHeader();
+
+        $action_url = $this->makeURL(array());
+
+        print '<form action="' . $action_url . '"><input type="hidden" name="action" value="group_update" />';
+
+        $groupName = '';
+        // if id==0, it's an Add, otherwise it's an editor.
+        if ($id == 0) {
+            \html_start_box(__('Adding a Group...'), '100%', '', '2', 'center', '');
+        } else {
+            \html_start_box(__('Editing Group %s', $id), '100%', '', '2', 'center', '');
+            $group = $this->manager->getGroup($id);
+            $groupName = $group->name;
+        }
+
+        print '<td>' . __('Group Name:') . "<input type='text' name='gname' value='" . htmlspecialchars($groupName) . "'/>\n";
+
+        if ($id > 0) {
+            print " <input type='submit' value='" . __('Update') . "' /></td>\n";
+        } else {
+            print " <input type='submit' value='" . __('Add') . "' /></td>\n";
+        }
+
+        if ($id > 0) {
+            print "<td><input type='hidden' name='id' value='$id' /></td>\n";
+        }
+
+        \html_end_box();
+
+        print "</form>";
+        $this->cactiFooter();
+    }
+
+    public function handleMapGroupChangeForm(
+        $request,
+        $appObject
+    ) {
+        $this->cactiHeader();
+
+        $mapId = $request['id'];
+        $map = $this->manager->getMap($mapId);
+        $title = $map->titlecache;
+        $curgroup = $map->group_id;
+
+        $edit_url = $this->makeURL(array());
+        print '<form action="' . $edit_url . '">';
+
+        \html_start_box(
+            __('Edit map group for Weathermap %s: %s', $mapId, $title),
+            '100%',
+            '',
+            '2',
+            'center',
+            ''
+        );
+
+        print "<td>" . __('Choose an existing Group:') . "&nbsp;<select name='new_group'>";
+
+        $groups = $this->manager->getGroups();
+
+        foreach ($groups as $grp) {
+            print '<option ';
+            if ($grp->id == $curgroup) {
+                print ' SELECTED ';
+            }
+            print 'value=' . $grp->id . '>' . htmlspecialchars($grp->name) . '</option>';
+        }
+
+        print '</select>';
+        print '<input type="image" src="../../images/button_save.gif"  border="0" alt="Change Group" title="Change Group" />';
+        print '</td>';
+        print "</tr>\n";
+        print '<tr><td></td></tr>';
+
+        print "<tr><td><p>" . __(
+                'or create a new group in the <b><a href=\'%s\'>group management screen</a>',
+                $this->makeURL(array('action' => 'groupadmin'))
+            );
+        print "</b></p></td></tr>";
+
+        print "<tr><td><input type=hidden name='map_id' value='" . $mapId . "'></td></td>";
+        print "<tr><td><input type=hidden name='action' value='chgroup_update'></td></td>";
+
+        \html_end_box();
+        print "</form>";
+
+        ?>
+        <script type='text/javascript'>
+            $(function () {
+                $('#save').click(function () {
+                    var strURL = 'weathermap-cacti10-plugin-mgmt.php';
+                    strURL += (strURL.indexOf('?') >= 0 ? '&' : '?') + 'header=false';
+                    var json = $('#editme').serializeObject();
+                    $.post(strURL, json).done(function (data) {
+                        $('#main').html(data);
+                        applySkin();
+                        window.scrollTo(0, 0);
+                    });
+                });
+            });
+        </script>
+        <?php
+
+
+        $this->cactiFooter();
+    }
+
+
     public function handleMapSettingsDelete(
         $request,
         $appObject
@@ -448,192 +648,6 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    public function handleGroupSelect(
-        $request,
-        $appObject
-    ) {
-        $this->cactiHeader();
-
-        \html_start_box(
-            __('Edit Map Groups'),
-            '100%',
-            '',
-            '2',
-            'center',
-            'weathermap-cacti10-plugin-mgmt.php?action=group_form&id=0'
-        );
-        \html_header(array(__('Actions'), __('Group Name'), __('Settings'), __('Sort Order')), 2);
-
-        $groups = $this->manager->getGroups();
-
-        if (is_array($groups)) {
-            if (count($groups) > 0) {
-                foreach ($groups as $group) {
-                    \form_alternate_row();
-
-
-                    print '<td style="width:4%"><a class="hyperLink" href="';
-                    print $this->makeURL(array("action" => "group_form", "id" => $group->id));
-                    print '"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="" title="' . __('Rename This Group') . '"></a></td>';
-                    print '<td>' . htmlspecialchars($group->name) . '</td>';
-
-                    print '<td>';
-                    print "<a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=-" . $group->id . "'>";
-                    $settingCount = $this->manager->getMapSettingCount(0, $group->id);
-                    if ($settingCount > 0) {
-                        print sprintf(__n('%s special', '%s specials', $settingCount), $settingCount);
-                    } else {
-                        print __('standard');
-                    }
-                    print '</a>';
-                    print '</td>';
-
-                    print '<td>';
-
-                    print '<span class="remover fa fa-caret-up moveArrow" href="';
-                    print $this->makeURL(array("action" => "move_group_up", "id" => $group->id));
-                    print '" title="' . __('Move Group Up') . '"></span>';
-                    print '<span class="remover fa fa-caret-down moveArrow" href="';
-                    print $this->makeURL(array("action" => "move_group_down", "id" => $group->id));
-                    print '" title="' . __('Move Group Down') . '"></span>';
-                    print '</td>';
-
-                    print '<td class="right">';
-                    if ($group->id > 1) {
-                        print '<span class="remover fa fa-remove deleteMarker" href="';
-                        print $this->makeURL(array("action" => "groupadmin_delete", "id" => $group->id));
-                        print '" title="' . __('Remove this definition from this map') . '"></span>';
-                    }
-                    print '</td>';
-
-                    print '</tr>';
-                }
-            } else {
-                print '<tr>';
-                print '<td colspan=2>' . __('No groups are defined.') . '</td>';
-                print '</tr>';
-            }
-        }
-
-        \html_end_box();
-
-        $this->cactiFooter();
-    }
-
-    public function handleGroupForm(
-        $request,
-        $appObject
-    ) {
-        $id = $request['id'];
-
-        $this->cactiHeader();
-
-        \form_start('weathermap-cacti10-plugin-mgmt.php');
-
-        $groupName = '';
-        // if id==0, it's an Add, otherwise it's an editor.
-        if ($id == 0) {
-            \html_start_box(__('Adding a Group...'), '100%', '', '2', 'center', '');
-        } else {
-            \html_start_box(__('Editing Group %s', $id), '100%', '', '2', 'center', '');
-            $group = $this->manager->getGroup($id);
-            $groupName = $group->name;
-        }
-
-        print '<td>' . __('Group Name:') . "<input type='text' name='gname' value='" . htmlspecialchars($groupName) . "'/>\n";
-
-        if ($id > 0) {
-            print " <input type='submit' value='" . __('Update') . "' /></td>\n";
-        } else {
-            print " <input type='submit' value='" . __('Add') . "' /></td>\n";
-        }
-
-        print "<td><input type='hidden' name='action' value='group_update'/></td>";
-        if ($id > 0) {
-            print "<td><input type='hidden' name='id' value='$id' /></td>\n";
-        }
-
-        \html_end_box();
-
-        \form_end();
-
-        $this->cactiFooter();
-    }
-
-    public function handleMapGroupChangeForm(
-        $request,
-        $appObject
-    ) {
-        $this->cactiHeader();
-
-        $mapId = $request['id'];
-        $map = $this->manager->getMap($mapId);
-        $title = $map->titlecache;
-        $curgroup = $map->group_id;
-
-        \form_start('weathermap-cacti10-plugin-mgmt.php', 'editme');
-
-        \html_start_box(
-            __('Edit map group for Weathermap %s: %s', $mapId, $title),
-            '100%',
-            '',
-            '2',
-            'center',
-            ''
-        );
-
-        print "<td>" . __('Choose an existing Group:') . "&nbsp;<select name='new_group'>";
-
-        $groups = $this->manager->getGroups();
-
-        foreach ($groups as $grp) {
-            print '<option ';
-            if ($grp->id == $curgroup) {
-                print ' SELECTED ';
-            }
-            print 'value=' . $grp->id . '>' . htmlspecialchars($grp->name) . '</option>';
-        }
-
-        print '</select>';
-        print "&nbsp;<input type='button' id='save' name='save' value='" . __('Save') . "' title='" . __('Change Group') . "'>";
-        print '</td>';
-        print "</tr>\n";
-        print '<tr><td></td></tr>';
-
-
-        print "<tr><td><p>" . __(
-                'or create a new group in the <b><a href=\'%s\'>group management screen</a>',
-                $this->makeURL(array('action' => 'groupadmin'))
-            );
-        print "</b></p></td></tr>";
-
-        print "<tr><td><input type=hidden name='map_id' value='" . $mapId . "'></td></td>";
-        print "<tr><td><input type=hidden name='action' value='chgroup_update'></td></td>";
-
-        \html_end_box();
-
-        \form_end();
-
-        ?>
-        <script type='text/javascript'>
-            $(function () {
-                $('#save').click(function () {
-                    var strURL = 'weathermap-cacti10-plugin-mgmt.php';
-                    strURL += (strURL.indexOf('?') >= 0 ? '&' : '?') + 'header=false';
-                    var json = $('#editme').serializeObject();
-                    $.post(strURL, json).done(function (data) {
-                        $('#main').html(data);
-                        applySkin();
-                        window.scrollTo(0, 0);
-                    });
-                });
-            });
-        </script>
-        <?php
-
-
-        $this->cactiFooter();
-    }
 
     protected function handleMapSettingsPage(
         $request,
@@ -926,12 +940,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
                 print '</td>';
                 print '<td class="right">';
 
-                print '<span class="remover fa fa-remove deleteMarker" href="' . $this->makeURL(
-                        array(
-                            "action" => "delete_map",
-                            "id" => $map->id
-                        )
-                    ) . '" title="' . __('Delete Map') . '"></span>';
+                $delete_url = $this->makeURL(
+                    array(
+                        "action" => "delete_map",
+                        "id" => $map->id
+                    )
+                );
+                print '<a href="' . $delete_url . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
+
                 print '</td>';
                 print '</tr>';
                 $i++;
@@ -1248,13 +1264,15 @@ class WeatherMapCactiManagementPlugin extends UIBase
             );
         }
 
+        $settings_url = $this->makeURL(array("action" => "map_settings_form", "mapid" => intval($id)));
+
         \html_start_box(
             $title,
             '100%',
             '',
             '2',
             'center',
-            'weathermap-cacti10-plugin-mgmt.php?action=map_settings_form&mapid=' . intval($id)
+            $settings_url
         );
         \html_header(array(__('Actions'), __('Name'), __('Value')), 2);
 
@@ -1296,11 +1314,13 @@ class WeatherMapCactiManagementPlugin extends UIBase
         print '<div align=center>';
 
         if ($type == 'group') {
-            print '<a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=groupadmin">' . __('Back to Group Admin') . '</a>';
+            $back_url = $this->makeURL(array("action" => "groupadmin"));
+            print '<a class="hyperLink" href="' . $back_url . '">' . __('Back to Group Admin') . '</a>';
         }
 
         if ($type == 'global') {
-            print '<a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=">' . __('Back to Map Admin') . '</a>';
+            $back_url = $this->makeURL(array());
+            print '<a class="hyperLink" href="' . $back_url . '">' . __('Back to Map Admin') . '</a>';
         }
 
         print '</div>';

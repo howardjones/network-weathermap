@@ -77,4 +77,15 @@ class HTMLImagemapAreaRectangle extends HTMLImagemapArea
     {
         return sprintf('Rectangle[%d,%d-%d,%d]', $this->x1, $this->y1, $this->x2, $this->y2);
     }
+
+    /***
+     * Draw this shape, mainly for debugging
+     *
+     * @param $gdImage
+     * @param $color
+     */
+    public function draw($gdImage, $color)
+    {
+        imagerectangle($gdImage, $this->x1, $this->y1, $this->x2, $this->y2, $color);
+    }
 }

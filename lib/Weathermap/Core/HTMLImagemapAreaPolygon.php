@@ -107,6 +107,31 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
         $this->maxy = max($ylist);
     }
 
+
+    /***
+     * Draw this shape, mainly for debugging
+     *
+     * @param $gdImage
+     * @param $color
+     */
+    public function draw($gdImage, $color)
+    {
+        $polyline = array();
+
+        foreach ($this->points as $point) {
+            $polyline [] = $point[0];
+            $polyline [] = $point[1];
+        }
+
+        imagepolygon(
+            $gdImage,
+            $polyline,
+            count($polyline) / 2,
+            $color
+        );
+
+    }
+
     public function __toString()
     {
         return 'Polygon';

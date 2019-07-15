@@ -404,7 +404,7 @@ class EditorUI extends UIBase
             }
         }
 
-        $editor->map->drawMap('', '', 250, true, $this->useOverlayVIA, $this->useOverlayRelative);
+        $editor->map->drawMap('', '', 250, true, $this->useOverlayVIA, $this->useOverlayRelative, false);
 
         return false;
     }

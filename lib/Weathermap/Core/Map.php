@@ -365,7 +365,7 @@ class Map extends MapBase
             $this->addItemToZLayer($item, $zIndex);
         }
 
-        MapUtility::debug('Found ' . count($this->seenZLayers) . " z-layers including builtins (0,100).\n");
+        MapUtility::debug('Found ' . count($this->seenZLayers) . " z-layers including builtins (0,1000).\n");
     }
 
     private function addItemToZLayer($item, $zIndex)
@@ -709,8 +709,9 @@ class Map extends MapBase
 
         $fontObject->drawImageString($imageRef, $x, $y, $string, $colour->gdAllocate($imageRef));
 
-        $this->imap->addArea('Rectangle', 'TITLE', '', array($x, $y, $x + $boxwidth, $y - $boxheight));
-        $this->imagemapAreas[] = 'TITLE';
+        $areaName = 'TITLE';
+        $this->imap->addArea('Rectangle', $areaName, '', array($x, $y, $x + $boxwidth, $y - $boxheight));
+        $this->imagemapAreas[] = $areaName;
     }
 
 
@@ -973,12 +974,51 @@ class Map extends MapBase
         }
     }
 
+    protected function drawImageMapOverlay($imageRef, $overlayColor)
+    {
+        $allLayers = array_keys($this->seenZLayers);
+        rsort($allLayers);
+
+//        foreach ($this->imagemapAreas as $areaname) {
+//            $area = $this->imap->getByName($areaname);
+//            $area->draw($imageRef, $overlayColor);
+//        }
+
+        foreach ($allLayers as $z) {
+            $zItems = $this->seenZLayers[$z];
+            if (is_array($zItems)) {
+                // at z=1000, the legends and timestamps live
+                if ($z == 1000) {
+                    // TODO: This is for timestamp and title ONLY - they could be just added like the others once they are objects
+                    foreach ($this->imagemapAreas as $areaname) {
+                        $area = $this->imap->getByName($areaname);
+                        $area->draw($imageRef, $overlayColor);
+                    }
+                }
+
+                // we reverse the array for each zlayer so that the imagemap order
+                // will match up with the draw order (last drawn should be first hit)
+                /** @var MapDataItem $it */
+                foreach (array_reverse($zItems) as $it) {
+                    if (!$it->isTemplate()) {
+                        foreach ($it->getImagemapAreas() as $area) {
+                            $area->draw($imageRef, $overlayColor);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
-     * @param $showVIAOverlay
-     * @param $showRelativeOverlay
+     * Draw the debugging overlays for the editor
+     *
+     * @param $showVIAOverlay (draw VIA circles)
+     * @param $showRelativeOverlay (draw pointers for relative positioned items)
+     * @param $showImageMapOverlay (not selectable in the editor)
      * @param $imageRef
      */
-    protected function drawEditorOverlays($showVIAOverlay, $showRelativeOverlay, $imageRef)
+    protected function drawEditorOverlays($showVIAOverlay, $showRelativeOverlay, $showImageMapOverlay, $imageRef)
     {
         $overlayColor = ImageUtility::myImageColorAllocate($imageRef, 200, 0, 0);
 
@@ -990,6 +1030,10 @@ class Map extends MapBase
         if ($showVIAOverlay) {
             // then overlay VIAs, so they can be seen
             $this->drawViaOverlay($imageRef, $overlayColor);
+        }
+
+        if ($showImageMapOverlay) {
+            $this->drawImageMapOverlay($imageRef, $overlayColor);
         }
     }
 
@@ -1098,7 +1142,8 @@ class Map extends MapBase
         $thumbnailMaxSize = 250,
         $includeNodes = true,
         $showVIAOverlay = false,
-        $showRelativeOverlay = false
+        $showRelativeOverlay = false,
+        $showImagemapOverlay = false
     ) {
         MapUtility::debug("Trace: DrawMap()\n");
 
@@ -1152,7 +1197,7 @@ class Map extends MapBase
 
         // for the editor, we can optionally overlay some other stuff
         if ($this->context == 'editor') {
-            $this->drawEditorOverlays($showVIAOverlay, $showRelativeOverlay, $imageRef);
+            $this->drawEditorOverlays($showVIAOverlay, $showRelativeOverlay, $showImagemapOverlay, $imageRef);
         }
 
         // Ready to output the results...
@@ -1408,10 +1453,9 @@ class Map extends MapBase
                 if ($z == 1000) {
                     MapUtility::debug("     Builtins fit here.\n");
 
-                    // TODO: This is for timestamp and title ONLY - they could be just added like the others once they are objects
-                    foreach ($this->imagemapAreas as $areaname) {
-                        $html .= $this->imap->exactHTML($areaname, $skipNoLinks);
-//                        $html .= "\n";
+                    foreach ($this->imap->shapes as $a) {
+                        $html .= $a->asHTML();
+                        $html .= "\n";
                     }
                 }
 

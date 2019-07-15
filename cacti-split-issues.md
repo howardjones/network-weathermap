@@ -1,6 +1,28 @@
-Editor: font samples is a black box
-Editor: Map Style has a strange orange box at the bottom??
-Editor: lagged imagemap
+# Outstanding Issues
+
+## Editor
+
+Cacti picker is blank
+
+~~Timestamp and Title are in Imagemap, but don't make it into the HTML(? - only Z=1000 items)~~
+
+~~BWlabels have no imagemap box (:2 and :3 _do_ exist, but don't "work") - bwlabel boxes are 1 pixel wide~~
+
+font samples is a black box
+
+Map Style has a strange orange box at the bottom??
+
+lagged imagemap?
+
+Feature: "Lock to" list for nodes shouldn't really include itself
+
+Feature: Via overlay should include an arrowhead
+
+
+
+---
+
+## Mgmt plugin
 
 ~~Settings: Add links to mgmt10.php~~
 
@@ -22,7 +44,13 @@ Editor: lagged imagemap
 
 Add/Edit setting form is missing
 
+---
+## User plugin
+
 handleViewCycleFiltered is missing in user plugin
 
 handleViewCycle is missing in user plugin
 
+## Misc
+
+bwlabels are showing up in MAP imagemap, not the link...

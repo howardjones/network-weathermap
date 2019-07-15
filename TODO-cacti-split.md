@@ -25,5 +25,5 @@
 
 # Current issues
 
-* Cacti picker doesn't work
-* fullscreen cycle can't find jquery (needs several components in vendor/ actually)
+* Now stored in cacti-split-issues.md
+

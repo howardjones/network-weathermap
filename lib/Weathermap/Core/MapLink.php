@@ -396,12 +396,16 @@ class MapLink extends MapDataItem
         $points = array(
             $minX,
             $minY,
+
             $minX,
             $maxY,
+
             $maxX,
             $maxY,
+
             $maxX,
             $minY,
+
             $centre->x - $strWidth / 2,
             $centre->y + $strHeight / 2 + 1
         );
@@ -438,10 +442,13 @@ class MapLink extends MapDataItem
         if (($degreesAngle % 90) == 0) {
             // We optimise for 0, 90, 180, 270 degrees - find the rectangle from the rotated points
             $rectanglePoints = array();
-            $rectanglePoints[] = min($points[0], $points[2]);
-            $rectanglePoints[] = min($points[1], $points[3]);
-            $rectanglePoints[] = max($points[0], $points[2]);
-            $rectanglePoints[] = max($points[1], $points[3]);
+
+            $rectanglePoints[] = min($points[0], $points[4]);
+            $rectanglePoints[] = min($points[1], $points[5]);
+
+            $rectanglePoints[] = max($points[0], $points[4]);
+            $rectanglePoints[] = max($points[1], $points[5]);
+
             $newArea = new HTMLImagemapAreaRectangle(array($rectanglePoints), $areaName, '');
             MapUtility::debug("Adding Rectangle imagemap for $areaName\n");
         } else {
@@ -451,7 +458,7 @@ class MapLink extends MapDataItem
         $newArea->info['direction'] = $direction;
         // Make a note that we added this area
         $this->imagemapAreas[] = $newArea;
-        $this->owner->imap->addArea($newArea);
+        // $this->owner->imap->addArea($newArea);
     }
 
     public function getConfig()

@@ -8,9 +8,9 @@ Cacti picker is blank
 
 ~~BWlabels have no imagemap box (:2 and :3 _do_ exist, but don't "work") - bwlabel boxes are 1 pixel wide~~
 
-font samples is a black box
+~~font samples is a black box~~
 
-Map Style has a strange orange box at the bottom??
+~~Map Style has a strange orange box at the bottom??~~
 
 lagged imagemap?
 

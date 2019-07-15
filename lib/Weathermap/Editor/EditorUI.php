@@ -451,10 +451,10 @@ class EditorUI extends UIBase
         $fontsImageRef = imagecreate(2000, $sampleHeight);
         $keyImageRef = imagecreate(2000, $keyHeight);
 
-//        $white = imagecolorallocate($fontsImageRef, 255, 255, 255);
+        $white = imagecolorallocate($fontsImageRef, 255, 255, 255);
         $black = imagecolorallocate($fontsImageRef, 0, 0, 0);
 
-//        $whitekey = imagecolorallocate($keyImageRef, 255, 255, 255);
+        $whitekey = imagecolorallocate($keyImageRef, 255, 255, 255);
         $blackkey = imagecolorallocate($keyImageRef, 0, 0, 0);
 
         $fonts = $map->fonts->getList();

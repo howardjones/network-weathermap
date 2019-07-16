@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 language: php
 services:
 - mysql
@@ -10,10 +10,17 @@ php:
 env:
 - DB=mysql
 before_install:
+- sudo apt-get update
+- sudo apt-get install -y python-software-properties
+- LC_ALL=C.UTF-8 sudo add-apt-repository -y ppa:ondrej/php
+- sudo apt-get update
+- sudo apt-get install -y apt-transport-https apt-utils curl
+- sudo apt-get install -y php$(phpenv version-name)-cli php$(phpenv version-name)-mysql php$(phpenv version-name)-snmp php$(phpenv version-name)-snmp php$(phpenv version-name)-gd php$(phpenv version-name)-sqlite3
 - mkdir -p build/log
 - mysql -e 'CREATE DATABASE weathermaptest; GRANT ALL ON weathermaptest.* TO weathermaptest@localhost
   identified by "weathermaptest"; FLUSH PRIVILEGES;'
 - cp ./dev/ci/travis-composer.json ./composer.json
+
 install:
 - sudo ./dev/ci/travis-dependencies.sh
 - composer install
@@ -36,11 +43,10 @@ addons:
     - zip
 before_script:
 - mysql weathermaptest < test-suite/data/weathermap-empty.sql
-- phpenv config-add dev/ci/travis.ini
 after_script:
 - vendor/bin/test-reporter
 - php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 - zip -r travis-test-results-${TRAVIS_JOB_NUMBER}.zip test-suite
 script:
 - vendor/bin/parallel-lint --exclude app --exclude vendor .
-- vendor/bin/phpunit --configuration build/phpunit.xml
+- vendor/bin/phpunit --configuration build/phpunit.xm

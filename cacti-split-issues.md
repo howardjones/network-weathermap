@@ -12,13 +12,13 @@ Cacti picker is blank
 
 ~~Map Style has a strange orange box at the bottom??~~
 
-lagged imagemap?
+~~lagged imagemap?~~
 
 Feature: "Lock to" list for nodes shouldn't really include itself
 
 Feature: Via overlay should include an arrowhead
 
-
+Config editing all appears on a single line.
 
 ---
 
@@ -42,7 +42,7 @@ Feature: Via overlay should include an arrowhead
 
 ~~Delete button missing on group list~~
 
-Add/Edit setting form is missing
+~~Add/Edit setting form is missing~~
 
 ---
 ## User plugin
@@ -53,4 +53,4 @@ handleViewCycle is missing in user plugin
 
 ## Misc
 
-bwlabels are showing up in MAP imagemap, not the link...
+~~bwlabels are showing up in MAP imagemap, not the link...~~

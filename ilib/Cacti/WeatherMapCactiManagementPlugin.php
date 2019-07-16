@@ -57,7 +57,10 @@ class WeatherMapCactiManagementPlugin extends UIBase
             'handler' => 'handleMapSettingsDelete',
             'args' => array(array("mapid", "int"), array("id", "int"))
         ),
-        'map_settings_form' => array('handler' => 'handleMapSettingsForm', 'args' => array(array("mapid", "int"))),
+        'map_settings_form' => array(
+            'handler' => 'handleMapSettingsForm',
+            'args' => array(array("mapid", "int"), array("id", "int", true))
+        ),
         'map_settings' => array('handler' => 'handleMapSettingsPage', 'args' => array(array("id", "int"))),
         'save' => array(
             'handler' => 'handleMapSettingsSave',

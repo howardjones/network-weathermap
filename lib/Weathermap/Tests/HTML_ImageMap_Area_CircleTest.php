@@ -34,9 +34,6 @@ class HTMLImagemapAreaCircleTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    /**
-     * @todo Implement testAsHTML().
-     */
     public function testAsHTML()
     {
         // Remove the following lines when you implement this test.
@@ -45,9 +42,6 @@ class HTMLImagemapAreaCircleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<area id="testname" href="testhref" shape="circle" coords="100,100,150,100" />', $output);
     }
 
-    /**
-     * @todo Implement testHitTest().
-     */
     public function testHitTest()
     {
 

@@ -17,12 +17,12 @@ manual:	docs/index.html
 	php dump-keywords.php | pandoc --from=markdown --to=html5  -s -c keywords.css -o docs/keywords.html
 	$(MAKE) -C docs/src VERSION=$(VERSION)
 	cd docs/example && ./bodge-example.sh
-	
+
 clean:
 	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
 	rm -rf $(RELBASE)
 
-release: 
+release:
 	#sql
 	# remove the dev-only dependencies from vendor
 	composer --no-dev update
@@ -39,17 +39,30 @@ release:
 	cd $(RELBASE); mv weathermap $(RELNAME)
 	echo $(RELNAME) built in $(RELBASE)
 
-test:
+testlint:
 	echo "Linting for minimum and maximum PHP versions"
 	vendor/bin/parallel-lint -p php5.6 --exclude app --exclude vendor .
 	vendor/bin/parallel-lint -p php7.2 --exclude app --exclude vendor .
 	vendor/bin/parallel-lint -p php7.3 --exclude app --exclude vendor .
+	vendor/bin/parallel-lint -p php7.4 --exclude app --exclude vendor .
+
+testcode: testlint
+	php -d xdebug.profiler_enable=on vendor/bin/phpunit -c build/phpunit-noconfigs.xml --coverage-html test-suite/code-coverage/
+
+test: testlint
 	php -d xdebug.profiler_enable=off vendor/bin/phpunit -c build/phpunit.xml
 	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
 	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 
-testcoverage:	
+testcoverage: testlint
 	php -d xdebug.profiler_enable=on vendor/bin/phpunit -c build/phpunit.xml --coverage-html test-suite/code-coverage/
+	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
+	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
+
+testfull: testcoverage
+	vendor/bin/phploc --log-xml=build/phploc.xml lib
+	vendor/bin/phpmd lib xml  cleancode,design,unusedcode > build/pmd.xml
+	vendor/bin/phpdox
 
 sql:
 	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_maps > weathermap.sql

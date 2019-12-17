@@ -30,7 +30,8 @@ class LinkGeometry
     protected $splitCurves; // The spines for each direction of the link
     protected $drawnCurves; // The actual list of WMPoints that will be drawn
     protected $midDistance; // The distance along to link where the split for arrowheads will be
-    protected $arrowWidths; // the size
+    protected $arrowWidths; // the width of the arrowhead's widest point
+    protected $arrowSizes; // the width of the arrowhead's widest point
     protected $arrowPoints; // the points where an arrowhead should be started
     protected $arrowIndexes; // the index in the spines where the arrowhead takes over
     protected $midPoint; // the point where both halves meet
@@ -62,10 +63,18 @@ class LinkGeometry
 
         $this->controlPoints = $controlPoints;
 
+        $this->arrowWidths = array();
+        $this->arrowSizes = array();
+        $this->arrowSizes[IN] = 0;
+        $this->arrowWidths[IN] = 0;
+
         foreach ($this->directions as $direction) {
             $this->linkWidths[$direction] = $widths[$direction];
             $this->splitCurves[$direction] = new Spine();
             $this->drawnCurves[$direction] = array();
+
+            $this->arrowWidths[$direction] = $widths[$direction];
+            $this->arrowSizes[$direction] = $widths[$direction];
         }
 
         $this->processControlPoints();
@@ -272,7 +281,19 @@ class LinkGeometry
             throw new WeathermapInternalFail('DrawingEmptySpline');
         }
 
-        if (($this->arrowWidths[IN] + $this->arrowWidths[OUT] * 1.2) > $this->curvePoints->totalDistance()) {
+        foreach ($this->directions as $direction) {
+            list($this->arrowSizes[$direction], $this->arrowWidths[$direction]) = $this->calculateArrowSize(
+                $this->linkWidths[$direction],
+                $this->arrowStyle
+            );
+        }
+
+        if (
+            (
+                ($this->arrowSizes[IN]
+                + $this->arrowSizes[OUT])
+                * 1.2)
+            > $this->curvePoints->totalDistance()) {
             MapUtility::warn('Skipping too-short link [WMWARN50]');
 
             return;

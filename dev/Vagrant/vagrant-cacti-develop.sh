@@ -73,7 +73,7 @@ ln -s /usr/bin/php${PHP_VERSION} /etc/alternatives/php
 apt-get install -y git subversion make xsltproc imagemagick zip curl phpunit nodejs npm pandoc rsync nodejs-legacy php-ast
 for PHP_VERSION in ${PHP_VERSIONS}; do
   echo "Installing development dependencies for PHP ${PHP_VERSION}."
-  apt-get install -y php${PHP_VERSION}-sqlite3
+  apt-get install -y php${PHP_VERSION}-sqlite3 php${PHP_VERSION}-dom
 done
 
 # Again this is not recommended. However otherwise there are file permission issues.

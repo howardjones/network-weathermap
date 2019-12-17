@@ -39,6 +39,7 @@ test-suite/summary-failing.html
 test-suite/failing-images.txt
 test-suite/references/*.conf
 test-suite/tmp-*
+test-suite/code-coverage/*
 
 reports/
 

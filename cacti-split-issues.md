@@ -18,7 +18,7 @@ Feature: "Lock to" list for nodes shouldn't really include itself
 
 Feature: Via overlay should include an arrowhead
 
-Config editing all appears on a single line.
+~~Config editing all appears on a single line.~~
 
 ---
 
@@ -50,6 +50,10 @@ Config editing all appears on a single line.
 handleViewCycleFiltered is missing in user plugin
 
 handleViewCycle is missing in user plugin
+
+map combo box doesn't actually work
+
+~~management links next to full page map title are wrong ( need makeManagementURL() )~~ 
 
 ## Misc
 

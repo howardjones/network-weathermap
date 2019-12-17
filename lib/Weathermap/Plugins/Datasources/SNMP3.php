@@ -293,7 +293,7 @@ class SNMP3 extends Base
                         $this->data[$id] = floatval($results[$id]);
                         $item->addHint("snmp_" . $name . "_raw", $results[$id]);
                     } else {
-                        $this->downCache{$host}++;
+                        $this->downCache[$host]++;
                     }
                 } else {
                     MapUtility::debug("SNMPv3 ReadData: skipping $name channel: OID is '-'\n");

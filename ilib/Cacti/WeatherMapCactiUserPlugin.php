@@ -508,41 +508,50 @@ class WeatherMapCactiUserPlugin extends UIBase
         $maps = $this->manager->getMapsWithAccessAndGroups($userId);
 
         if (sizeof($maps) > 1) {
-            print("Map Combo Box Here");
-        }
 
-        $nullhash = "xxxx";
-        $all_groups = array_map( function($x) {return $x->name; }, $maps );
-        $known_groups = array_unique($all_groups);
-        $ngroups = sizeof($known_groups);
+            $nullhash = "xxxx";
+            $all_groups = array_map(function ($x) {
+                return $x->name;
+            }, $maps);
+            $known_groups = array_unique($all_groups);
+            $ngroups = sizeof($known_groups);
 
-        $current_map = array_filter($maps, function($x) use ($current_id) { return ($x->id == $current_id); });
+            $current_map = array_filter($maps, function ($x) use ($current_id) {
+                return ($x->id == $current_id);
+            });
 
-        if (sizeof($current_map) == 1) {
-            $nullhash = array_shift($current_map)->filehash;
-        }
-
-        $select_box = "";
-
-        $lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
-        foreach ($maps as $map) {
-            if ($ngroups > 1 && $map->name != $lastgroup) {
-                $select_box .= "<option style='font-weight: bold; font-style: italic' value='$nullhash'>" . htmlspecialchars($map->name) . "</option>";
-                $lastgroup = $map->name;
+            if (sizeof($current_map) == 1) {
+                $nullhash = array_shift($current_map)->filehash;
             }
-            $select_box .= '<option ';
-            if ($current_id == $map->id) {
-                $select_box .= " SELECTED ";
-            }
-            $select_box .= 'value="' . $map->filehash . '">';
-            // if we're showing group headings, then indent the map names
-            if ($ngroups > 1) {
-                $select_box .= " - ";
-            }
-            $select_box .= htmlspecialchars($map->titlecache) . '</option>';
-        }
-        print "<select>". $select_box . "</select>";
 
+            $select_box = "";
+
+            $lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
+            foreach ($maps as $map) {
+                if ($ngroups > 1 && $map->name != $lastgroup) {
+                    $select_box .= "<option style='font-weight: bold; font-style: italic' value='$nullhash'>" . htmlspecialchars($map->name) . "</option>";
+                    $lastgroup = $map->name;
+                }
+                $select_box .= '<option ';
+                if ($current_id == $map->id) {
+                    $select_box .= " SELECTED ";
+                }
+                $select_box .= 'value="' . $map->filehash . '">';
+                // if we're showing group headings, then indent the map names
+                if ($ngroups > 1) {
+                    $select_box .= " - ";
+                }
+                $select_box .= htmlspecialchars($map->titlecache) . '</option>';
+            }
+            \html_graph_start_box(3, true);
+            $color = $this->colours["panel"];
+            print "<tr bgcolor=\"$color\" class=\"noprint\"> <form name=\"weathermap_select\" method=\"post\" action=\"\"> <input name=\"action\" value=\"viewmap\" type=\"hidden\"> <td class=\"noprint\"> <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"> <tr class=\"noprint\"> <td nowrap style='white-space: nowrap;' width=\"40\"> &nbsp;<strong>Jump To Map:</strong>&nbsp; </td> <td> ";
+            print "<select>" . $select_box . "</select>";
+            print "&nbsp;<input type=\"image\" src=\"../../images/button_go.gif\" alt=\"Go\" border=\"0\" align=\"absmiddle\">                                                                               ";
+            print " </td> </tr> </table> </td> </form> </tr> ";
+            \html_graph_end_box(false);
+
+        }
     }
 
     private function drawThumbnailView($mapList)
@@ -610,24 +619,25 @@ class WeatherMapCactiUserPlugin extends UIBase
         $mapTitle = $this->getMapTitle($map);
         print '<div class="weathermapholder" id="mapholder_' . $map->filehash . '">';
 
-        \html_start_box(__($mapTitle), '100%', '', '3', 'center', '');
+//        \html_start_box(__($mapTitle), '100%', '', '3', 'center', '');
+        \html_graph_start_box(1, true);
+        $color = $this->colours['panel'];
+        print "<tr bgcolor=\"$color\"><td><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"textHeader\" nowrap>$mapTitle";
 
-        ?>
-        <tr class="even">
-            <td colspan="3">
-                <table width="100%" cellspacing="0" cellpadding="3" border="0">
-                    <tr>
-                        <td align="left" class="textHeaderDark">
-                            <a name="map_<?php echo $map->filehash; ?>">
-                            </a><?php print htmlspecialchars($mapTitle); ?>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td>
-        <?php
+        if ($this->isWeathermapAdmin()) {
+
+            $editURL = $this->makeURL(array("action" => "nothing", "mapname" => $map->configfile), $this->editorURL);
+            $permURL = $this->makeURL(array("action" => "perms_edit", "id" => $map->id), $this->managementURL);
+            $settingsURL = $this->makeURL(array("action" => "map_settings", "id" => $map->id), $this->managementURL);
+
+            print "<span style='font-size: 80%'>";
+            print "[ <a href='$settingsURL'>Map Settings</a> |";
+            print "<a href='$permURL'>Map Permissions</a> |";
+            print "<a href='$editURL'>Edit Map</a> ]";
+            print "</span>";
+        }
+        print "</td></tr></table></td></tr>";
+        print "<tr><td>";
 
         if (file_exists($htmlFileName)) {
             readfile($htmlFileName);

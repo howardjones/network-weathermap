@@ -114,7 +114,7 @@ class SNMP2C extends Base
                         $this->data[IN] = floatval($inResult);
                         $mapItem->addHint("snmp_in_raw", $inResult);
                     } else {
-                        $this->downCache{$host}++;
+                        $this->downCache[$host]++;
                     }
                 }
                 if ($outOID != '-') {
@@ -125,7 +125,7 @@ class SNMP2C extends Base
                         $this->data[OUT] = floatval($outResult);
                         $mapItem->addHint("snmp_out_raw", $outResult);
                     } else {
-                        $this->downCache{$host}++;
+                        $this->downCache[$host]++;
                     }
                 }
 

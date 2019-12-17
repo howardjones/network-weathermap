@@ -43,24 +43,24 @@ add-apt-repository ppa:ondrej/php
 apt-get update -y
 ## For 'real' install:
 apt-get install -y mysql-server-5.7 snmp rrdtool apache2 php-gettext php-xdebug unzip
-for PHP_VERSION in ${PHP_VERSIONS}; do
-  echo "Installing PHP ${PHP_VERSION}."
+for PHP_VER in ${PHP_VERSIONS}; do
+  echo "Installing PHP ${PHP_VER}."
   apt-get install -y \
-    php${PHP_VERSION} php${PHP_VERSION}-common php${PHP_VERSION}-cli \
-    php${PHP_VERSION}-mysql php${PHP_VERSION}-snmp php${PHP_VERSION}-gd php${PHP_VERSION}-mbstring php${PHP_VERSION}-xml \
-    php${PHP_VERSION}-curl libapache2-mod-php${PHP_VERSION}
+    php${PHP_VER} php${PHP_VER}-common php${PHP_VER}-cli \
+    php${PHP_VER}-mysql php${PHP_VER}-snmp php${PHP_VER}-gd php${PHP_VER}-mbstring php${PHP_VER}-xml \
+    php${PHP_VER}-curl libapache2-mod-php${PHP_VER}
 
   # disable the php version
-  a2dismod php${PHP_VERSION}
+  a2dismod php${PHP_VER}
 
   echo "Modifying PHP configuration."
   sed -i -e "s|;error_log = syslog|;error_log = syslog\\nerror_log = ${CACTI_HOME}/log/php_errors.log|" \
  -e "s|;date.timezone =|;date.timezone =\\ndate.timezone = ${TIMEZONE}|" \
- /etc/php/${PHP_VERSION}/apache2/php.ini
+ /etc/php/${PHP_VER}/apache2/php.ini
 
   sed -i -e "s|;error_log = syslog|;error_log = syslog\\nerror_log = ${CACTI_HOME}/log/php_errors.log|" \
    -e "s|;date.timezone =|;date.timezone =\\ndate.timezone = ${TIMEZONE}|" \
-   /etc/php/${PHP_VERSION}/cli/php.ini
+   /etc/php/${PHP_VER}/cli/php.ini
 
 done
 
@@ -71,9 +71,9 @@ ln -s /usr/bin/php${PHP_VERSION} /etc/alternatives/php
 
 # ## For dev/test, we need these too
 apt-get install -y git subversion make xsltproc imagemagick zip curl phpunit nodejs npm pandoc rsync nodejs-legacy php-ast
-for PHP_VERSION in ${PHP_VERSIONS}; do
-  echo "Installing development dependencies for PHP ${PHP_VERSION}."
-  apt-get install -y php${PHP_VERSION}-sqlite3 php${PHP_VERSION}-dom
+for PHP_VER in ${PHP_VERSIONS}; do
+  echo "Installing development dependencies for PHP ${PHP_VER}."
+  apt-get install -y php${PHP_VER}-sqlite3 php${PHP_VER}-dom
 done
 
 # Again this is not recommended. However otherwise there are file permission issues.
@@ -128,9 +128,9 @@ if [[ ${CACTI_VERSION} == 1.* ]]; then
     echo "Adding mysql timezones"
     mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 
-    for PHP_VERSION in ${PHP_VERSIONS}; do
-      echo "Installing Cacti dependencies for PHP ${PHP_VERSION}."
-      apt-get install -y php${PHP_VERSION}-ldap php${PHP_VERSION}-gmp
+    for PHP_VER in ${PHP_VERSIONS}; do
+      echo "Installing Cacti dependencies for PHP ${PHP_VER}."
+      apt-get install -y php${PHP_VER}-ldap php${PHP_VER}-gmp
     done
 
     mysql -uroot <<EOF

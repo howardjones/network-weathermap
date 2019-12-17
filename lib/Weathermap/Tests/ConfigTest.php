@@ -280,6 +280,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 //        $osTag = $osCodename . "-" . self::$phpTag;
         self::$osTag = $osCodename . "-" . self::$phpTag;
 
+        print("OS Tag is " . self::$osTag . "\n");
+
         $osSpecificReferences = $testSuiteRoot . DIRECTORY_SEPARATOR . "references/" . self::$osTag;
         if (is_dir($osSpecificReferences)) {
             self::$osSpecificReferenceDirectory = $osSpecificReferences;

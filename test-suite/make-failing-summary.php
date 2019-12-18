@@ -87,7 +87,7 @@ while (!feof($f)) {
             );
             print "<p>$percent - $pixelsDifferent differences.</p>\n";
 
-            print "<a href='approve.php?cf=" . $conf . "'>Approve left image as new reference</a>\n";
+            print "<a href='approve.php?cf=" . $conf . "&tag=$php_tag'>Approve left image as new reference</a>\n";
             print "<hr>";
         }
     } else {

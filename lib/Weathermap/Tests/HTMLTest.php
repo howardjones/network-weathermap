@@ -38,27 +38,27 @@ class HTMLTest extends \PHPUnit_Framework_TestCase
 //        print_r($l1->imagemapAreas);
 
         $res = $xpath->query('//area');
-        $this->assertEquals(10, count($res), '10 areas. 3 links with 2 areas each (2 arrows) and 2 bwlabels for l2, and one each for timestamp and title)');
+        $this->assertEquals(10, $res->length, '10 areas. 3 links with 2 areas each (2 arrows) and 2 bwlabels for l2, and one each for timestamp and title)');
 
         $res = $xpath->query('//area[@id="LINK:L109:0"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("Note 2", $res[0]->nodeValue);
 
         $res = $xpath->query('//area[@id="LINK:L109:2"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("Note 2", $res[0]->nodeValue);
 
         $res = $xpath->query('//area[@id="LINK:L108:0"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("Note 1", $res[0]->nodeValue);
 
 
         $res = $xpath->query('//area[@id="LINK:L110:0"]/@onmouseover');
-        $this->assertEquals(1, count($res));
+        $this->assertEquals(1, $res->length);
         $this->assertContains("Note 3 with <b>HTML</b>", $res[0]->nodeValue);
 
         $res = $xpath->query('//area[@id="LINK:L110:1"]/@onmouseover');
-        $this->assertEquals(1, count($res));
+        $this->assertEquals(1, $res->length);
         $this->assertContains("Note 3 with <b>HTML</b>", $res[0]->nodeValue);
 
 
@@ -79,30 +79,30 @@ class HTMLTest extends \PHPUnit_Framework_TestCase
         $xpath = new \DomXPath($dom);
 
         $res = $xpath->query('//area');
-        $this->assertEquals(8, count($res));
+        $this->assertEquals(8, $res->length);
 
         $res = $xpath->query('//area[@id="LINK:L108:1"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("Note 1 out", $res[0]->nodeValue);
 
         $res = $xpath->query('//area[@id="LINK:L108:0"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("Note 1 in", $res[0]->nodeValue);
 
         $res = $xpath->query('//area[@id="LINK:L110:0"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("Note 3 In with <b>HTML</b>", $res[0]->nodeValue);
 
         $res = $xpath->query('//area[@id="LINK:L110:1"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("overlib(''", $res[0]->nodeValue);
 
         $res = $xpath->query('//area[@id="LINK:L109:1"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("'Note 2'", $res[0]->nodeValue);
 
         $res = $xpath->query('//area[@id="LINK:L109:0"]/@onmouseover');
-        $this->assertEquals(1, count($res), "There should be exactly one AREA");
+        $this->assertEquals(1, $res->length, "There should be exactly one AREA");
         $this->assertContains("'Note 2 In'", $res[0]->nodeValue);
     }
 }

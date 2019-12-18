@@ -22,6 +22,7 @@
     "ext-snmp": "*"
   },
   "require-dev": {
+    "ext-dom": "*",
     "dealerdirect/phpcodesniffer-composer-installer": "*",
     "phpcompatibility/php-compatibility": "*",
     "phpunit/dbunit": "*",

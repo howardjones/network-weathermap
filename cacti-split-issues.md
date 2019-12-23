@@ -2,7 +2,7 @@
 
 ## Editor
 
-Cacti picker is blank
+~~Cacti picker is blank~~
 
 ~~Timestamp and Title are in Imagemap, but don't make it into the HTML(? - only Z=1000 items)~~
 
@@ -16,7 +16,7 @@ Cacti picker is blank
 
 Feature: "Lock to" list for nodes shouldn't really include itself
 
-Feature: Via overlay should include an arrowhead
+Feature: Relative overlay should include an arrowhead
 
 ~~Config editing all appears on a single line.~~
 

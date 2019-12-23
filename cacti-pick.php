@@ -25,7 +25,7 @@ if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
     $cacti_found = true;
 
-    require_once dirname(__FILE__) . "/lib/Weathermap/Integrations/Cacti/database.php";
+    require_once dirname(__FILE__) . "/ilib/Cacti/database.php";
     require_once dirname(__FILE__) . "/lib/all.php";
 } else {
     $cacti_found = false;

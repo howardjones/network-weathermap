@@ -546,7 +546,7 @@ class WeatherMapCactiUserPlugin extends UIBase
             \html_graph_start_box(3, true);
             $color = $this->colours["panel"];
             print "<tr bgcolor=\"$color\" class=\"noprint\"> <form name=\"weathermap_select\" method=\"post\" action=\"\"> <input name=\"action\" value=\"viewmap\" type=\"hidden\"> <td class=\"noprint\"> <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"> <tr class=\"noprint\"> <td nowrap style='white-space: nowrap;' width=\"40\"> &nbsp;<strong>Jump To Map:</strong>&nbsp; </td> <td> ";
-            print "<select>" . $select_box . "</select>";
+            print "<select name=\"id\">" . $select_box . "</select>";
             print "&nbsp;<input type=\"image\" src=\"../../images/button_go.gif\" alt=\"Go\" border=\"0\" align=\"absmiddle\">                                                                               ";
             print " </td> </tr> </table> </td> </form> </tr> ";
             \html_graph_end_box(false);

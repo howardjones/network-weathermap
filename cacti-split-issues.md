@@ -51,9 +51,9 @@ handleViewCycleFiltered is missing in user plugin
 
 handleViewCycle is missing in user plugin
 
-map combo box doesn't actually work
+~~map combo box doesn't actually work~~
 
-~~management links next to full page map title are wrong ( need makeManagementURL() )~~ 
+~~management links next to full page map title are wrong ( need makeManagementURL() )~~
 
 ## Misc
 

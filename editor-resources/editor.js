@@ -87,8 +87,7 @@ function attach_click_events() {
             console.log(host_url);
             window.location = host_url;
         })
-    }
-    else {
+    } else {
         jQuery("#tb_newfile").click(new_file);
     }
 
@@ -214,14 +213,10 @@ function click_handler(e) {
         if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link') {
             document.getElementById('param').value = getNodeFromID(objectid);
             document.frmMain.submit();
-        }
-
-        else if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link2') {
+        } else if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link2') {
             document.getElementById('param').value = getNodeFromID(objectid);
             document.frmMain.submit();
-        }
-
-        else {
+        } else {
             // Halfway through one operation, the user has done something unexpected.
             // reset back to standard state, and see if we can oblige them
             //		alert('A bit confused');
@@ -257,9 +252,7 @@ function openPickerWindow(url) {
     // make sure it isn't already opened
     if (!newWindow || newWindow.closed) {
         newWindow = window.open("", "cactipicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
-    }
-
-    else if (newWindow.focus) {
+    } else if (newWindow.focus) {
         // window is already open and focusable, so bring it to the front
         newWindow.focus();
     }
@@ -496,6 +489,20 @@ function show_node(name) {
     var mynode = mapdata.Nodes[name];
 
     if (mynode) {
+        var tgt = document.frmMain.node_lock_to;
+        while (tgt.firstChild) {
+            tgt.removeChild(tgt.firstChild);
+        }
+        for (var key in mapdata.Nodes) {
+            if (key !== name && mapdata.Nodes[key].x !== null) {
+                var tmp = document.createElement("option");
+                tmp.value = key;
+                tmp.innerText = key;
+                tgt.appendChild(tmp);
+                console.log(tmp);
+            }
+        }
+
         document.frmMain.action.value = "set_node_properties";
         document.frmMain.node_name.value = name;
         document.frmMain.node_new_name.value = name;
@@ -513,12 +520,10 @@ function show_node(name) {
             // console.log(mynode.iconfile.substring(0,2));
             if (mynode.iconfile.substring(0, 2) === '::') {
                 document.frmMain.node_iconfilename.value = '--AICON--';
-            }
-            else {
+            } else {
                 document.frmMain.node_iconfilename.value = mynode.iconfile;
             }
-        }
-        else {
+        } else {
             document.frmMain.node_iconfilename.value = '--NONE--';
         }
 
@@ -555,9 +560,7 @@ function show_link(name) {
         if (mylink.bw_in === mylink.bw_out) {
             document.frmMain.link_bandwidth_out.value = '';
             document.frmMain.link_bandwidth_out_cb.checked = 1;
-        }
-
-        else {
+        } else {
             document.frmMain.link_bandwidth_out_cb.checked = 0;
             document.frmMain.link_bandwidth_out.value = mylink.bw_out;
         }

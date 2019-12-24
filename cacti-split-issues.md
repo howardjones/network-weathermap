@@ -14,7 +14,7 @@
 
 ~~lagged imagemap?~~
 
-Feature: "Lock to" list for nodes shouldn't really include itself
+~~Feature: "Lock to" list for nodes shouldn't really include itself~~
 
 Feature: Relative overlay should include an arrowhead
 

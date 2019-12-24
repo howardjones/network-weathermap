@@ -121,10 +121,10 @@ class MapManager
     {
         if (is_null($groupId)) {
             // $statement = $this->pdo->prepare("SELECT DISTINCT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  (userid=? OR userid=0) ORDER BY sortorder, id");
-            $statement = $this->pdo->prepare("SELECT DISTINCT group_id, titlecache, filehash, thumb_width, thumb_height, configfile, warncount, sortorder FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  (userid=? OR userid=0) ORDER BY group_id, sortorder");
+            $statement = $this->pdo->prepare("SELECT DISTINCT id, group_id, titlecache, filehash, thumb_width, thumb_height, configfile, warncount, sortorder FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  (userid=? OR userid=0) ORDER BY group_id, sortorder");
             $statement->execute(array($userId));
         } else {
-            $statement = $this->pdo->prepare("SELECT DISTINCT group_id, titlecache, filehash, thumb_width, thumb_height, configfile, warncount, sortorder FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  weathermap_maps.group_id=? AND  (userid=? OR userid=0) ORDER BY group_id, sortorder");
+            $statement = $this->pdo->prepare("SELECT DISTINCT id, group_id, titlecache, filehash, thumb_width, thumb_height, configfile, warncount, sortorder FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  weathermap_maps.group_id=? AND  (userid=? OR userid=0) ORDER BY group_id, sortorder");
             //$statement = $this->pdo->prepare("SELECT DISTINCT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  weathermap_maps.group_id=? AND  (userid=? OR userid=0) ORDER BY sortorder, id");
             $statement->execute(array($groupId, $userId));
         }
@@ -759,9 +759,9 @@ class MapManager
                                 data_source_name VARCHAR(19) NOT NULL,
                                 last_time INT(11) NOT NULL,
                                 last_value VARCHAR(190) NOT NULL,
-                                last_calc VARCHAR(190) NOT NULL, 
-                                sequence INT(11) NOT NULL, 
-                                local_data_id INT(11) NOT NULL DEFAULT 0, 
+                                last_calc VARCHAR(190) NOT NULL,
+                                sequence INT(11) NOT NULL,
+                                local_data_id INT(11) NOT NULL DEFAULT 0,
                                 last_used DATETIME DEFAULT '1900-01-01 00:00:00',
                                 PRIMARY KEY  (id), KEY rrdfile (rrdfile),
                                   KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) ENGINE=Memory";

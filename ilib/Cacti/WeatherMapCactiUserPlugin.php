@@ -336,10 +336,11 @@ class WeatherMapCactiUserPlugin extends UIBase
         $userId = $this->manager->application->getCurrentUserId();
         $fullscreen = false;
         $group = null;
+
         if (isset($request['fullscreen']) && $request['fullscreen'] == 1) {
             $fullscreen = true;
         }
-        if (isset($request['group']) && intval($group) > 0) {
+        if (isset($request['group']) && intval($request['group']) > 0) {
             $group = intval($request['group']);
         }
 
@@ -347,10 +348,12 @@ class WeatherMapCactiUserPlugin extends UIBase
 
         $class = $fullscreen ? "fullscreen" : "inplace";
 
+
         if ($fullscreen) {
             print "<!DOCTYPE html>\n";
             print "<html><head>";
             print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';
+            print "<title>Network Weathermap</title>";
             print "</head><body id='wm_fullscreen'>";
         } else {
             $this->cactiGraphHeader();
@@ -359,69 +362,21 @@ class WeatherMapCactiUserPlugin extends UIBase
         print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
         print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
-
         $this->cactiEnableGraphRefresh();
-        print "<script src='vendor/jquery/dist/jquery.min.js'></script>";
-        print "<script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>";
-        $extra = "";
+
+
+        $extraText = "";
         if ($group > 0) {
-            $extra = " in this group";
+            $extraText = " in this group";
         }
-        ?>
-        <div id="wmcyclecontrolbox" class="<?php print $class ?>">
-            <div id="wm_progress"></div>
-            <div id="wm_cyclecontrols">
-                <a id="cycle_stop" href="?action="><img src="cacti-resources/img/control_stop_blue.png" width="16"
-                                                        height="16"/></a>
-                <a id="cycle_prev" href="#"><img src="cacti-resources/img/control_rewind_blue.png" width="16"
-                                                 height="16"/></a>
-                <a id="cycle_pause" href="#"><img src="cacti-resources/img/control_pause_blue.png" width="16"
-                                                  height="16"/></a>
-                <a id="cycle_next" href="#"><img src="cacti-resources/img/control_fastforward_blue.png" width="16"
-                                                 height="16"/></a>
-                <a id="cycle_fullscreen" href="?action=viewcycle&fullscreen=1&group=<?php echo ($group === null? -1 : $group); ?>"><img
-                        src="cacti-resources/img/arrow_out.png" width="16" height="16"/></a>
-                Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>.
-                Cycling all available maps<?php echo $extra; ?>.
-            </div>
-        </div>
-        <?php
-
-
-
-
+        $this->outputCycleControls($class, $group, $extraText);
 
         print "<div class='all_map_holder $class'>";
 
         $i = 0;
         foreach ($maplist as $map) {
             $i++;
-            print '<div class="weathermapholder" id="mapholder_' . $map->filehash . '">';
-
-            $maptitle = $this->getMapTitle($map);
-
-            if (!$fullscreen) {
-                html_graph_start_box(1, true);
-
-                # OTHER STUFF HERE for title
-
-                print "<tr><td>$maptitle</td></tr>";
-                print "<tr><td>";
-            }
-
-            $htmlfile = $this->outputDirectory . $map->filehash . ".html";
-            if (file_exists($htmlfile)) {
-                include($htmlfile);
-            } else {
-                print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
-            }
-
-            if (!$fullscreen) {
-                print "</td></tr>";
-                \html_graph_end_box();
-            }
-
-            print "</div>";
+            $this->drawOneFullMap($map, !$fullscreen, false);
         }
 
         print "</div>";
@@ -431,20 +386,7 @@ class WeatherMapCactiUserPlugin extends UIBase
             $this->cactiFooter();
         }
 
-        $refreshtime = $this->manager->application->getAppSetting("weathermap_cycle_refresh", 10);
-        $poller_cycle = $this->manager->application->getAppSetting("poller_interval", 300);
-        ?>
-        <script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
-        <script type="text/javascript">
-            $(document).ready(function () {
-                WMcycler.start({
-                    fullscreen: <?php echo($fullscreen ? "1" : "0"); ?>,
-                    poller_cycle: <?php echo $poller_cycle * 1000; ?>,
-                    period: <?php echo $refreshtime * 1000; ?>});
-            });
-        </script>
-        <?php
-
+        $this->outputCycleCode($fullscreen);
     }
 
     public function handleViewCycleFiltered($request, $appObject)
@@ -544,7 +486,7 @@ class WeatherMapCactiUserPlugin extends UIBase
     {
         $groupCycleURL = $this->makeURL(
             array(
-                "action" => "viewcycle_filtered",
+                "action" => "viewcycle",
                 "group" => $limitingToGroup
             )
         );
@@ -732,30 +674,36 @@ class WeatherMapCactiUserPlugin extends UIBase
         print '</div> ';
     }
 
-    private function drawOneFullMap($map)
+    private function drawOneFullMap($map, $includeHeaderBar = true, $includeAdminLinks = true)
     {
         $htmlFileName = $this->outputDirectory . DIRECTORY_SEPARATOR . $map->filehash . ".html";
         $mapTitle = $this->getMapTitle($map);
         print '<div class="weathermapholder" id="mapholder_' . $map->filehash . '">';
 
-//        \html_start_box(__($mapTitle), '100%', '', '3', 'center', '');
         \html_graph_start_box(1, true);
-        $color = $this->colours['panel'];
-        print "<tr bgcolor=\"$color\"><td><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"textHeader\" nowrap>$mapTitle";
 
-        if ($this->isWeathermapAdmin()) {
+        if ($includeHeaderBar) {
+            $color = $this->colours['header_panel'];
+            print "<tr bgcolor=\"$color\"><td><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"textHeader\" nowrap>$mapTitle";
 
-            $editURL = $this->makeURL(array("action" => "nothing", "mapname" => $map->configfile), $this->editorURL);
-            $permURL = $this->makeURL(array("action" => "perms_edit", "id" => $map->id), $this->managementURL);
-            $settingsURL = $this->makeURL(array("action" => "map_settings", "id" => $map->id), $this->managementURL);
+            if ($includeAdminLinks && $this->isWeathermapAdmin()) {
 
-            print "<span style='font-size: 80%'>";
-            print "[ <a href='$settingsURL'>Map Settings</a> |";
-            print "<a href='$permURL'>Map Permissions</a> |";
-            print "<a href='$editURL'>Edit Map</a> ]";
-            print "</span>";
+                $editURL = $this->makeURL(array("action" => "nothing", "mapname" => $map->configfile),
+                    $this->editorURL);
+                $permURL = $this->makeURL(array("action" => "perms_edit", "id" => $map->id), $this->managementURL);
+                $settingsURL = $this->makeURL(array("action" => "map_settings", "id" => $map->id),
+                    $this->managementURL);
+
+                print "<span style='font-size: 80%'>";
+                print "[ <a href='$settingsURL'>Map Settings</a> |";
+                print "<a href='$permURL'>Map Permissions</a> |";
+                print "<a href='$editURL'>Edit Map</a> ]";
+                print "</span>";
+            }
+
+            print "</td></tr></table></td></tr>";
         }
-        print "</td></tr></table></td></tr>";
+
         print "<tr><td>";
 
         if (file_exists($htmlFileName)) {
@@ -878,5 +826,48 @@ class WeatherMapCactiUserPlugin extends UIBase
 
     public function cactiRowStart($i)
     {
+    }
+
+    private function outputCycleControls($controlMode, $groupFilter, $extraText)
+    {
+        ?>
+        <div id="wmcyclecontrolbox" class="<?php print $controlMode ?>">
+            <div id="wm_progress"></div>
+            <div id="wm_cyclecontrols">
+                <a id="cycle_stop" href="?action="><img src="cacti-resources/img/control_stop_blue.png" width="16"
+                                                        height="16"/></a>
+                <a id="cycle_prev" href="#"><img src="cacti-resources/img/control_rewind_blue.png" width="16"
+                                                 height="16"/></a>
+                <a id="cycle_pause" href="#"><img src="cacti-resources/img/control_pause_blue.png" width="16"
+                                                  height="16"/></a>
+                <a id="cycle_next" href="#"><img src="cacti-resources/img/control_fastforward_blue.png" width="16"
+                                                 height="16"/></a>
+                <a id="cycle_fullscreen"
+                   href="?action=viewcycle&fullscreen=1&group=<?php echo($groupFilter === null ? -1 : $groupFilter); ?>"><img
+                        src="cacti-resources/img/arrow_out.png" width="16" height="16"/></a>
+                Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>.
+                Cycling all available maps<?php echo $extraText; ?>.
+            </div>
+        </div>
+        <?php
+    }
+
+    private function outputCycleCode($fullscreen)
+    {
+        $refreshtime = $this->manager->application->getAppSetting("weathermap_cycle_refresh", 10);
+        $poller_cycle = $this->manager->application->getAppSetting("poller_interval", 300);
+        ?>
+        <script src='vendor/jquery/dist/jquery.min.js'></script>
+        <script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>
+        <script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                WMcycler.start({
+                    fullscreen: <?php echo($fullscreen ? "1" : "0"); ?>,
+                    poller_cycle: <?php echo $poller_cycle * 1000; ?>,
+                    period: <?php echo $refreshtime * 1000; ?>});
+            });
+        </script>
+        <?php
     }
 }

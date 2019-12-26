@@ -58,3 +58,11 @@ handleViewCycle is missing in user plugin
 ## Misc
 
 ~~bwlabels are showing up in MAP imagemap, not the link...~~
+
+
+## Notes
+
+Before paratest
+
+    make test  238.31s user 9.02s system 111% cpu 3:42.46 total
+

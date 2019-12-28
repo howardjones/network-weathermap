@@ -267,9 +267,7 @@ class MapUtility
             $distance = intval($matches[2]);
             $radianAngle = deg2rad($angle);
 
-            $offsets = array($distance * sin($radianAngle), -$distance * cos($radianAngle));
-
-            return $offsets;
+            return array($distance * sin($radianAngle), -$distance * cos($radianAngle));
         }
 
         self::warn("Got a position offset that didn't make sense ($offsetstring).");

@@ -59,7 +59,7 @@ class HTMLImagemapAreaRectangle extends HTMLImagemapArea
 
     public function asJSONData()
     {
-        $data = array(
+        return array(
             'shape' => 'rect',
             'name' => $this->name,
             'minx' => $this->x1,
@@ -69,8 +69,6 @@ class HTMLImagemapAreaRectangle extends HTMLImagemapArea
             'href' => $this->href,
             'extrahtml' => $this->extrahtml
         );
-
-        return $data;
     }
 
     public function __toString()

@@ -19,6 +19,7 @@ class MapRuntime
     private $htmlOutputFileName;
     private $imageOutputFileName;
     private $resultsFileName;
+    private $statsFileName;
     private $tempImageFileName;
     private $thumbnailFileName;
 
@@ -60,6 +61,7 @@ class MapRuntime
         $this->thumbnailFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".thumb." . $pollerConfig->imageFormat;
 
         $this->resultsFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".results.txt";
+        $this->statsFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".stats.txt";
         $this->tempImageFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".tmp.png";
 
         $this->duration = 0;
@@ -232,7 +234,7 @@ class MapRuntime
 
         $this->manager->application->setAppSetting("weathermap_last_finished_file", $this->description);
 
-        $stats = json_encode($this->getStats());
+        $stats = json_encode($this->getStats(), JSON_PRETTY_PRINT);
 
         $this->manager->updateMap(
             $this->mapConfig->id,
@@ -243,7 +245,7 @@ class MapRuntime
                 'stats' => $stats
             )
         );
-
+        $this->writeTextFile($this->statsFileName, $stats);
         unset($map);
 
         return true;
@@ -278,6 +280,23 @@ class MapRuntime
             }
         }
     }
+
+    private function writeTextFile($filename, $content)
+    {
+        $fd = @fopen($filename, 'w');
+        if ($fd != false) {
+            fwrite($fd, $content);
+            fclose($fd);
+            MapUtility::debug("Wrote to $filename");
+        } else {
+            if (file_exists($filename)) {
+                MapUtility::warn("Failed to overwrite $filename - permissions of existing file are wrong? [WMPOLL02]\n");
+            } else {
+                MapUtility::warn("Failed to create $filename - permissions of output directory are wrong? [WMPOLL03]\n");
+            }
+        }
+    }
+
 
     /**
      * @param Map $map

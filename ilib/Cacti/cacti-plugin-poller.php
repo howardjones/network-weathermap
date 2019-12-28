@@ -1,7 +1,6 @@
 <?php
 
 use Weathermap\Integrations\Cacti\CactiApplicationInterface;
-use function Weathermap\Poller\runMaps;
 
 function weathermap_poller_output($rrdUpdateArray)
 {
@@ -168,17 +167,13 @@ function weathermap_poller_bottom()
     } else {
         // if we're due, run the render updates
         if (($renderperiod == 0) || (($rendercounter % $renderperiod) == 0)) {
-            // TODO: This is horrible!
             $baseDir = dirname(dirname(dirname(__FILE__)));
 
-            // TODO: this will replace poller-common/runMaps
             $poller = new \Weathermap\Poller\Poller($baseDir, $app, $weathermapPollerStartTime);
             \cacti_log("New preflight: \n", true, "WEATHERMAP");
             $poller->preFlight();
             \cacti_log("New runmaps: \n", true, "WEATHERMAP");
             $poller->run();
-            \cacti_log("Old runmaps: \n", true, "WEATHERMAP");
-//            runMaps($baseDir);
         } else {
             if ($quietlogging == 0) {
                 \cacti_log(

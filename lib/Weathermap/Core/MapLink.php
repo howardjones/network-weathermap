@@ -62,6 +62,7 @@ class MapLink extends MapDataItem
      * @param string $name
      * @param string $template
      * @param Map $owner
+     * @throws \Exception
      */
     public function __construct($name, $template, $owner)
     {

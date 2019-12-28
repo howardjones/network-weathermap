@@ -25,6 +25,8 @@ class SimpleTemplate
 
     /**
      * Set a template variable.
+     * @param $name string
+     * @param $value string
      */
     public function set($name, $value)
     {

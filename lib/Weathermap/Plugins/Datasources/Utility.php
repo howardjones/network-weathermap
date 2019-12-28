@@ -112,8 +112,10 @@ class Utility
     }
 
     /**
-     * @param $localDataId
-     * @param $to_set
+     * Grab additional data from Cacti's SNMP cache
+     * (usually interface speed and description)
+     *
+     * @param $localDataId int
      * @return array
      */
     public static function getCactiSnmpCache($localDataId)

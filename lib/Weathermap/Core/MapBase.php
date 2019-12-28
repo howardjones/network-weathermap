@@ -166,8 +166,7 @@ class MapBase
         }
 
         if ($recalculate) {
-            $affected = $this->recalculate();
-            return $affected;
+            return $this->recalculate();
         }
         return array($this->name);
     }
@@ -182,8 +181,6 @@ class MapBase
          *
          */
         throw new WeathermapUnimplementedException('Dynamic dependencies not implemented yet');
-
-        return 0;
     }
 
     public function addConfigValue($keyname, $value, $recalculate = false)
@@ -203,8 +200,7 @@ class MapBase
         }
 
         if ($recalculate) {
-            $affected = $this->recalculate();
-            return $affected;
+            return $this->recalculate();
         }
         return array($this->name);
     }

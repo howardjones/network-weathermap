@@ -11,7 +11,7 @@ use Weathermap\Core\Utility;
 // this is the easiest way to keep it all consistent!
 
 
-function runMaps($mydir)
+function DEADrunMaps($mydir)
 {
     global $weathermap_debugging;
     global $weathermapPollerStartTime;

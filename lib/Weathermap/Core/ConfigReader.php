@@ -1185,9 +1185,7 @@ class ConfigReader
         fclose($fileHandle);
 
         $this->currentSource = $filename;
-        $result = $this->readConfigLines($lines);
-
-        return $result;
+        return $this->readConfigLines($lines);
     }
 
     public function readConfigLines($inputLines)

@@ -89,9 +89,7 @@ class Vector
         if (($this->dx == 0) && ($this->dy == 0)) {
             return 0;
         }
-        $squaredLength = ($this->dx) * ($this->dx) + ($this->dy) * ($this->dy);
-
-        return $squaredLength;
+        return ($this->dx) * ($this->dx) + ($this->dy) * ($this->dy);
     }
 
     /**

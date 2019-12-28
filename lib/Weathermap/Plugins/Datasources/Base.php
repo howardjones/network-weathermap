@@ -48,8 +48,8 @@ class Base
      *
      * Default implementation just checks the regexps in regexpsHandled[], so you may not need to implement at all.
      *
+     * @param $targetString string A single 'word' from the TARGET line
      * @return bool Returns true or false, depending on whether it wants to handle this TARGET
-     *
      */
     public function recognise($targetString)
     {

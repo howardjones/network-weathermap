@@ -1609,7 +1609,7 @@ LINK secondlink
  on each link. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Two styles are currently available: 'classic' leaves the box horizontal, 
  regardless of the direction of the link. 'angled' rotates the box to follow the 
- directiong of the link arrow. </p> 
+ direction of the link arrow. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_BWFONT">BWFONT</a> 
  <em>must be a TrueType font</em> as these are the only font type to support 
  rotating text. </p> 

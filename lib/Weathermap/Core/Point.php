@@ -67,9 +67,7 @@ class Point
      */
     public function vectorToPoint($p2)
     {
-        $v = new Vector($p2->x - $this->x, $p2->y - $this->y);
-
-        return $v;
+        return new Vector($p2->x - $this->x, $p2->y - $this->y);
     }
 
     public function lineToPoint($p2)
@@ -134,9 +132,7 @@ class Point
         $newX = (1 - $ratio) * $this->x + $ratio * ($point2->x);
         $newY = (1 - $ratio) * $this->y + $ratio * ($point2->y);
 
-        $newPoint = new Point($newX, $newY);
-
-        return $newPoint;
+        return new Point($newX, $newY);
     }
 
     public function asString()

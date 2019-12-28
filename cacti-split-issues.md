@@ -2,9 +2,9 @@
 
 ## Poller
 
-Move to using new Poller/Runtime code
+~~Move to using new Poller/Runtime code~~
 
-* make the stats consistent (targets:0)
+* ~~make the stats consistent (targets:0)~~
 
 * add some more useful stats (nlinks, nnodes, target plugins, nvias, ncurves, nangles, pix dimensions, pix format)
 
@@ -71,6 +71,7 @@ Feature: Relative overlay should include an arrowhead
 
 ~~bwlabels are showing up in MAP imagemap, not the link...~~
 
+the random-bits and CLI tools need some love
 
 ## Notes
 

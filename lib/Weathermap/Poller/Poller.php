@@ -157,15 +157,18 @@ class Poller
     }
 
     /**
+     * Check if it's possible to create files in a directory
+     *
+     * @param $directory string
      * @return string
      */
     protected function testWritable($directory)
     {
-        $testfile = $directory . DIRECTORY_SEPARATOR . "weathermap.permissions.test";
-        $testfd = @fopen($testfile, 'w');
-        if ($testfd) {
-            fclose($testfd);
-            unlink($testfile);
+        $testFileName = $directory . DIRECTORY_SEPARATOR . "weathermap.permissions.test";
+        $testHandle = @fopen($testFileName, 'w');
+        if ($testHandle) {
+            fclose($testHandle);
+            unlink($testFileName);
             return true;
         }
         return false;

@@ -22,7 +22,6 @@ class Base
     /**
      * The only API for a PreProcessor - do whatever it is that you are supposed to do.
      *
-     * @param Map $map the WeatherMap main object
      * @return bool Success/Failure? Not currently interpreted.
      */
     public function run()

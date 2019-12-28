@@ -100,8 +100,7 @@ class TabFile extends Base
             return null;
         }
 
-        $fileHandle = fopen($fullpath, "r");
-        return $fileHandle;
+        return fopen($fullpath, "r");
     }
 }
 

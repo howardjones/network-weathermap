@@ -343,6 +343,7 @@ class EditorUI extends UIBase
 
     public function __construct()
     {
+        parent::__construct();
         $this->editor = new Editor();
     }
 
@@ -518,6 +519,8 @@ class EditorUI extends UIBase
     /**
      * @param string[] $params
      * @param Editor $editor
+     * @return mixed
+     * @throws WeathermapInternalFail
      */
     public function cmdCloneNode($params, $editor)
     {
@@ -797,7 +800,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      *
-     * @returns bool
+     * @return bool
      */
     public function cmdGetItemConfig($params, $editor)
     {
@@ -814,6 +817,7 @@ class EditorUI extends UIBase
     /**
      * @param string[] $params
      * @param Editor $editor
+     * @throws WeathermapInternalFail
      */
     public function cmdReplaceNodeConfig($params, $editor)
     {
@@ -823,6 +827,7 @@ class EditorUI extends UIBase
     /**
      * @param string[] $params
      * @param Editor $editor
+     * @throws WeathermapInternalFail
      */
     public function cmdReplaceLinkConfig($params, $editor)
     {
@@ -832,6 +837,7 @@ class EditorUI extends UIBase
     /**
      * @param string[] $params
      * @param Editor $editor
+     * @throws WeathermapInternalFail
      */
     public function cmdMoveLegend($params, $editor)
     {
@@ -845,6 +851,7 @@ class EditorUI extends UIBase
     /**
      * @param string[] $params
      * @param Editor $editor
+     * @throws WeathermapInternalFail
      */
     public function cmdMoveTimestamp($params, $editor)
     {
@@ -854,6 +861,10 @@ class EditorUI extends UIBase
         $editor->placeTimestamp($x, $y);
     }
 
+    /**
+     * @param $params
+     * @param $editor
+     */
     public function cmdMoveTitle($params, $editor)
     {
         $x = $this->snap($params['x']);

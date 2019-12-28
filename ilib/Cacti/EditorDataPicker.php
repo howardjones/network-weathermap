@@ -256,20 +256,22 @@ class EditorDataPicker extends UIBase
     }
 
     /** usortNaturalNames - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
-     * @arg $a - the first string to compare
-     * @arg $b - the second string to compare
-     * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
-     * $b is equal to $b */
+     * @param $a string - the first string to compare
+     * @param $b string - the second string to compare
+     * @return int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+     * $b is equal to $b
+     */
     public function usortNaturalNames($a, $b)
     {
         return strnatcasecmp($a['name'], $b['name']);
     }
 
     /** usortNaturalDescriptions - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
-     * @arg $a - the first string to compare
-     * @arg $b - the second string to compare
-     * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
-     * $b is equal to $b */
+     * @param $a string - the first string to compare
+     * @param $b string - the second string to compare
+     * @return int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+     * $b is equal to $b
+     */
     public function usortNaturalDescriptions($a, $b)
     {
         return strnatcasecmp($a['description'], $b['description']);

@@ -68,13 +68,11 @@ class MapItem extends MapBase
 
     public function asConfigData()
     {
-        $config = array(
+        return array(
             'name'=>$this->name,
             'type'=>$this->myType(),
             'vars'=>$this->hints
         );
-
-        return $config;
     }
 
     /**

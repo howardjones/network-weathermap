@@ -252,11 +252,9 @@ class ImageLoader
         if ($this->isCacheable($scaleWidth, $scaleHeight)) {
             MapUtility::debug("Caching [$key]=$iconImageRef\n");
             $this->cache[$key] = $iconImageRef;
-            $finalImageRef = $this->imageduplicate($iconImageRef);
-            return $finalImageRef;
+            return $this->imageduplicate($iconImageRef);
         } else {
-            $finalImageRef = $iconImageRef;
-            return $finalImageRef;
+            return $iconImageRef;
         }
     }
 

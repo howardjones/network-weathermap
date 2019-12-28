@@ -74,6 +74,7 @@ class MapNode extends MapDataItem
      * @param string $name
      * @param string $template
      * @param Map $owner
+     * @throws \Exception
      */
     public function __construct($name, $template, $owner)
     {
@@ -165,8 +166,8 @@ class MapNode extends MapDataItem
     }
 
     /**
-     * @param resource $imageRef
      * @param Map $map
+     * @throws WeathermapInternalFail
      */
     public function preRender(&$map)
     {
@@ -844,6 +845,7 @@ class MapNode extends MapDataItem
      * @param Colour $backgroundColour
      * @param resource $nodeImageRef
      * @param Rectangle $labelBox
+     * @throws \Exception
      */
     private function drawLabel(&$map, $textPoint, $backgroundColour, $nodeImageRef, $labelBox)
     {
@@ -1222,6 +1224,7 @@ class MapNode extends MapDataItem
      * @param Colour $labelColour
      * @param Map map
      * @return array
+     * @throws \Exception
      */
     private function calculateAICONColours($labelColour, &$map)
     {

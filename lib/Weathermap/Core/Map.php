@@ -555,6 +555,7 @@ class Map extends MapBase
      * @param string $itemname
      * @param string $type
      * @return Map|MapDataItem
+     * @throws WeathermapInternalFail
      */
     private function processStringFindReferredObject(&$context, $itemname, $type)
     {
@@ -882,7 +883,7 @@ class Map extends MapBase
                 fputs(
                     $fileHandle,
                     sprintf(
-                        "%s\t%f\t%f\r\n",
+                        "%s\t%f\t%f\t%f\r\n",
                         $prefix,
                         $mapItem->name,
                         $mapItem->absoluteUsages[IN],

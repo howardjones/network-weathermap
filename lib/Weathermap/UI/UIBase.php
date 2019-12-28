@@ -137,9 +137,7 @@ class UIBase
 
         if (isset($command['handler'])) {
             $handler = $command['handler'];
-            $result = $this->$handler($params, $appObject);
-
-            return $result;
+            return $this->$handler($params, $appObject);
         }
 
         print "NOPE";

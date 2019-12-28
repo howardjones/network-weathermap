@@ -51,7 +51,7 @@ class Time extends Base
             $timezone = $matches[1];
             $timezoneLowerCase = strtolower($timezone);
 
-            $allTimezones = \DateTimeZone::listIdentifiers();
+            $allTimezones = DateTimeZone::listIdentifiers();
 
             foreach ($allTimezones as $tz) {
                 if (strtolower($tz) == $timezoneLowerCase) {

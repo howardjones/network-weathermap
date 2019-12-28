@@ -687,7 +687,6 @@ class Editor
      * @param MapLink $link - the link to tidy
      * @param int $linknumber - if this is part of a group, which number in the group
      * @param int $linktotal - if this is part of a group, how many total in the group
-     * @param bool $ignoreTidied - whether to take notice of the "_tidied" hint
      */
     private function tidyOneLink($link, $linknumber = 1, $linktotal = 1)
     {

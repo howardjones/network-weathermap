@@ -29,6 +29,7 @@ class Poller
     public $quietLogging;
 
     public $outputDirectory;
+    public $baseDirectory;
 
     public $config;
 
@@ -36,16 +37,11 @@ class Poller
 
     public function __construct($baseDirectory, $applicationInterface, $pollerStartTime = 0)
     {
-        $this->config = new PollerConfig();
-        // TODO: fill in the pollerConfig
-
+        $this->baseDirectory = $baseDirectory;
         $this->configDirectory = $baseDirectory . DIRECTORY_SEPARATOR . 'configs';
         $this->outputDirectory = $baseDirectory . DIRECTORY_SEPARATOR . 'output';
 
         $this->manager = new MapManager(weathermap_get_pdo(), $this->configDirectory, $applicationInterface);
-
-        $this->imageFormat = strtolower($this->manager->application->getAppSetting("weathermap_output_format", "png"));
-        $this->rrdtoolPath = $this->manager->application->getAppSetting("path_rrdtool", "rrdtool");
 
         $this->totalWarnings = 0;
         $this->warningNotes = "";
@@ -54,10 +50,13 @@ class Poller
 
         $this->startTime = microtime(true);
 
-        $this->pollerStartTime = $pollerStartTime;
-        if ($pollerStartTime == 0) {
-            $this->pollerStartTime = intval($this->startTime);
-        }
+        $this->config = new PollerConfig();
+        $this->config->configDirectory = $this->configDirectory;
+        $this->config->outputDirectory = $this->outputDirectory;
+        $this->config->cronTime = ($pollerStartTime == 0 ? intval($this->startTime) : $pollerStartTime);
+        $this->config->imageFormat = strtolower($this->manager->application->getAppSetting("weathermap_output_format", "png"));
+        $this->config->rrdtoolFileName = $this->manager->application->getAppSetting("path_rrdtool", "rrdtool");
+        $this->config->thumbnailSize = $this->manager->application->getAppSetting("weathermap_thumbsize", "200");
     }
 
     public function preFlight()
@@ -74,6 +73,14 @@ class Poller
         $userNote = "";
         if ($username != "") {
             $userNote = "($username)";
+        }
+
+        if (!is_dir($this->configDirectory)) {
+            MapUtility::warn("Config directory ($this->configDirectory) doesn't exist! This is probably a software bug [WMPOLL09]\n");
+            $this->totalWarnings++;
+            $this->warningNotes .= " (Config directory problem prevents any maps running WMPOLL09)";
+
+            return;
         }
 
         if (!is_dir($this->outputDirectory)) {
@@ -100,6 +107,7 @@ class Poller
     public function run()
     {
         if (!$this->canRun) {
+            MapUtility::debug("run() quitting - preflight issue");
             return;
         }
 
@@ -113,6 +121,9 @@ class Poller
 
         MapUtility::debug("Iterating all maps.");
 
+        $originalWorkingDir = getcwd();
+        chdir($this->baseDirectory);
+
         foreach ($maplist as $map) {
             $runtime = new MapRuntime($this->config, $map, $this->manager);
             $ran = $runtime->run();
@@ -123,6 +134,7 @@ class Poller
 
             $this->totalWarnings += $runtime->warncount;
         }
+        chdir($originalWorkingDir);
 
         $this->calculateStats();
         $this->manager->application->setAppSetting("weathermap_last_finish_time", time());

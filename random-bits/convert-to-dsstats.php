@@ -174,7 +174,7 @@ foreach ($allMapItems as $myobj) {
                     if ($db_rrdname != $rrdfile) {
                         wm_debug("ConvertDS: Looking for $db_rrdname in the database.");
 
-                        $SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='" . PDO::quote($db_rrdname) . "'";
+                        $SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='" . (new PDO)->quote($db_rrdname) . "'";
                         wm_debug("ConvertDS: " . $SQLcheck);
                         $results = db_fetch_assoc($SQLcheck);
 

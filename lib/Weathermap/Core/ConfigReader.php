@@ -1076,8 +1076,13 @@ class ConfigReader
     }
 
 
-// parseString is based on code from:
-// http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
+    public function getLineCount()
+    {
+        return $this->lineCount;
+    }
+
+    // parseString is based on code from:
+    // http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
     public function parseString($input)
     {
         $output = array(); // Array of Output

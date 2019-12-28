@@ -214,6 +214,10 @@ class MapRuntime
             );
         }
 
+        $map->stats->set("n_nodes", count($map->nodes));
+        $map->stats->set("n_links", count($map->links));
+        $map->stats->set("n_scales", count($map->scales));
+
         $map->cleanUp();
 
         $this->checkPoint("end");
@@ -226,15 +230,17 @@ class MapRuntime
 
         $this->stats = $map->stats->get();
 
-
         $this->manager->application->setAppSetting("weathermap_last_finished_file", $this->description);
+
+        $stats = json_encode($this->getStats());
 
         $this->manager->updateMap(
             $this->mapConfig->id,
             array(
                 'titlecache' => $map->processString($map->title, $map),
                 'warncount' => intval($this->warncount),
-                'runtime' => floatval($mapDuration)
+                'runtime' => floatval($mapDuration),
+                'stats' => $stats
             )
         );
 

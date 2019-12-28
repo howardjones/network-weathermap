@@ -1,6 +1,18 @@
 # Outstanding Issues
 
+## Poller
+
+Move to using new Poller/Runtime code
+
+* make the stats consistent (targets:0)
+
+* add some more useful stats (nlinks, nnodes, target plugins, nvias, ncurves, nangles, pix dimensions, pix format)
+
+
+
 ## Editor
+
+Map Style - setting label to bits doesn't change anything
 
 ~~Cacti picker is blank~~
 
@@ -47,9 +59,9 @@ Feature: Relative overlay should include an arrowhead
 ---
 ## User plugin
 
-handleViewCycleFiltered is missing in user plugin
+~~handleViewCycleFiltered is missing in user plugin~~
 
-handleViewCycle is missing in user plugin
+~~handleViewCycle is missing in user plugin~~
 
 ~~map combo box doesn't actually work~~
 

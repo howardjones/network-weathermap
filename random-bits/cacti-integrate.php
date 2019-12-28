@@ -167,7 +167,7 @@ if ($inputmapfile == '' || $outputmapfile == '') {
 // figure out which template has interface traffic. This might be wrong for you.
 $data_template = "Interface - Traffic";
 $data_template_id =
-    db_fetch_cell("select id from data_template where name='" . mysql_real_escape_string($data_template) . "'");
+    db_fetch_cell("select id from data_template where name='" . (new PDO)->quote($data_template) . "'");
 
 $map = new WeatherMap;
 
@@ -209,7 +209,7 @@ foreach ($map->nodes as $node) {
 // by now, if there was a host_id, all 3 are populated. If not, then we should try one of the others to get a host_id
     else {
         if ($address != '') {
-            $res2 = db_fetch_row("select id,description from host where hostname='" . mysql_real_escape_string($address)
+            $res2 = db_fetch_row("select id,description from host where hostname='" . (new PDO)->quote($address)
                 . "'");
 
             if ($res2) {
@@ -223,7 +223,7 @@ foreach ($map->nodes as $node) {
             }
         } elseif ($hostname != '') {
             $res3 =
-                db_fetch_row("select id,hostname from host where description='" . mysql_real_escape_string($hostname)
+                db_fetch_row("select id,hostname from host where description='" . (new PDO)->quote($hostname)
                     . "'");
 
             if ($res3) {
@@ -311,7 +311,7 @@ foreach ($map->links as $link) {
                         $SQL =
                             sprintf(
                                 "select data_local.id, data_source_path, host_snmp_cache.snmp_index from data_template_data, data_local,snmp_query, host_snmp_cache where data_template_data.local_data_id=data_local.id and host_snmp_cache.snmp_query_id = snmp_query.id and data_local.host_id=host_snmp_cache.host_id and data_local.snmp_query_id=host_snmp_cache.snmp_query_id  and data_local.snmp_index=host_snmp_cache.snmp_index and host_snmp_cache.host_id=%d and host_snmp_cache.field_name='%s' and host_snmp_cache.field_value='%s' and data_local.data_template_id=%d order by data_template_data.id desc limit 1;",
-                                $tgt_host, $field, mysql_real_escape_string($interface), $data_template_id);
+                                $tgt_host, $field, (new PDO)->quote($interface), $data_template_id);
                         $res4 = db_fetch_row($SQL);
 
                         if ($res4)

@@ -177,6 +177,8 @@ class Map extends MapBase
         $this->fonts->init();
 
         $this->stats = new Stats();
+        $this->stats->set("total_targets", 0);
+        $this->stats->set("config_lines", 0);
 
         $this->pluginManager = new PluginManager($this);
 
@@ -742,6 +744,7 @@ class Map extends MapBase
             $reader->readConfigFile($input);
             $this->configfile = $input;
         }
+        $this->stats->set("config_lines", $reader->getLineCount());
 
         $this->postReadConfigTasks();
 

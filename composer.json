@@ -17,6 +17,8 @@
     "bramus/monolog-colored-line-formatter": "~2.0",
     "ext-json": "*",
     "ext-pdo": "*",
+    "ext-dom": "*",
+    "ext-mysql": "*",
     "ext-posix": "*",
     "ext-gd": "*",
     "ext-snmp": "*"

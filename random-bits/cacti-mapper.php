@@ -34,7 +34,7 @@ if (!function_exists("cacti_snmp_get")) {
 
 # figure out which template has interface traffic. This might be wrong for you.
 $data_template = "Interface - Traffic";
-$data_template_id = db_fetch_cell("SELECT id FROM data_template WHERE name='" . mysql_real_escape_string($data_template) . "'");
+$data_template_id = db_fetch_cell("SELECT id FROM data_template WHERE name='" . (new PDO)->quote($data_template) . "'");
 
 $Interfaces_SQL = "SELECT host.snmp_version,host.snmp_community,host.snmp_username,host.snmp_password,host.snmp_auth_protocol,host.snmp_priv_passphrase,host.snmp_priv_protocol,host.snmp_context,host.snmp_port,host.snmp_timeout,host.description, host.hostname, host.disabled, host_snmp_cache.* FROM host_snmp_cache,host WHERE host_snmp_cache.host_id=host.id AND (field_name='ifDescr' OR field_name='ifName' OR field_name='ifIP' OR field_name='ifAlias') AND host.disabled<>'on' AND field_value<>'127.0.0.1' AND field_value<>'0.0.0.0' AND host.status=3 AND host.snmp_version>0;";
 $queryrows = db_fetch_assoc($Interfaces_SQL);

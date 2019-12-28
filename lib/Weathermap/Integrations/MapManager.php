@@ -181,6 +181,7 @@ class MapManager
             "group_id",
             "thumb_width",
             "thumb_height",
+            "stats",
             "titlecache"
         ); // allowed fields
         list($set, $values) = $this->buildSet($data, $allowed);
@@ -720,6 +721,7 @@ class MapManager
                                 thumb_height INT(11) NOT NULL DEFAULT 0,
                                 schedule VARCHAR(32) NOT NULL DEFAULT '*',
                                 archiving SET('on','off') NOT NULL DEFAULT 'off',
+                                stats TEXT NOT NULL,
                                 PRIMARY KEY  (id)
                         );";
         }
@@ -757,10 +759,10 @@ class MapManager
             $databaseUpdates[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id INT(11) NOT NULL AUTO_INCREMENT,
                                 rrdfile VARCHAR(190) NOT NULL,
                                 data_source_name VARCHAR(19) NOT NULL,
-                                last_time INT(11) NOT NULL,
-                                last_value VARCHAR(190) NOT NULL,
-                                last_calc VARCHAR(190) NOT NULL,
-                                sequence INT(11) NOT NULL,
+                                last_time INT(11) NOT NULL DEFAULT 0,
+                                last_value VARCHAR(190) NOT NULL DEFAULT '',
+                                last_calc VARCHAR(190) NOT NULL DEFAULT '',
+                                sequence INT(11) NOT NULL DEFAULT 0,
                                 local_data_id INT(11) NOT NULL DEFAULT 0,
                                 last_used DATETIME DEFAULT '1900-01-01 00:00:00',
                                 PRIMARY KEY  (id), KEY rrdfile (rrdfile),
@@ -808,6 +810,9 @@ class MapManager
                     "ALTER TABLE weathermap_maps ADD runtime DOUBLE NOT NULL DEFAULT 0 AFTER warncount",
                     "ALTER TABLE weathermap_maps ADD lastrun DATETIME AFTER runtime",
                     "ALTER TABLE weathermap_maps ADD debug SET('on','off','once') NOT NULL DEFAULT 'off' AFTER warncount;"
+                ),
+                'stats' => array(
+                    "ALTER TABLE weathermap_maps ADD stats TEXT NOT NULL AFTER archiving;"
                 )
             );
 

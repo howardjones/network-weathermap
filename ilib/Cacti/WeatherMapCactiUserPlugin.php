@@ -46,15 +46,6 @@ class WeatherMapCactiUserPlugin extends UIBase
             'args' => array(array("id", "maphash"))
         ),
 
-        'viewcycle_fullscreen' => array(
-            'handler' => 'handleViewCycleFullscreen',
-            'args' => array(array("id", "maphash"))
-        ),
-        'viewcycle_filtered_fullscreen' => array(
-            'handler' => 'handleViewCycleFilteredFullscreen',
-            'args' => array(array("id", "maphash"), array("group_id", "int", true))
-        ),
-
         'viewcycle' => array(
             'handler' => 'handleViewCycle',
             'args' => array(
@@ -63,10 +54,6 @@ class WeatherMapCactiUserPlugin extends UIBase
             )
         ),
 
-        'viewcycle_filtered' => array(
-            'handler' => 'handleViewCycleFiltered',
-            'args' => array(array("group_id", "int", true))
-        ),
         ':: DEFAULT ::' => array(
             'handler' => 'handleDefaultView',
             'args' => array(
@@ -321,16 +308,6 @@ class WeatherMapCactiUserPlugin extends UIBase
         $this->cactiFooter();
     }
 
-    public function handleViewCycleFullscreen($request, $appObject)
-    {
-        print "Unimplemented handleViewCycleFullscreen";
-    }
-
-    public function handleViewCycleFilteredFullscreen($request, $appObject)
-    {
-        print "Unimplemented handleViewCycleFilteredFullscreen";
-    }
-
     public function handleViewCycle($request, $appObject)
     {
         $userId = $this->manager->application->getCurrentUserId();
@@ -348,7 +325,6 @@ class WeatherMapCactiUserPlugin extends UIBase
 
         $class = $fullscreen ? "fullscreen" : "inplace";
 
-
         if ($fullscreen) {
             print "<!DOCTYPE html>\n";
             print "<html><head>";
@@ -359,11 +335,11 @@ class WeatherMapCactiUserPlugin extends UIBase
             $this->cactiGraphHeader();
             $this->outputMapHeader($maplist, false, $group);
         }
+
         print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
         print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
         $this->cactiEnableGraphRefresh();
-
 
         $extraText = "";
         if ($group > 0) {
@@ -373,9 +349,7 @@ class WeatherMapCactiUserPlugin extends UIBase
 
         print "<div class='all_map_holder $class'>";
 
-        $i = 0;
         foreach ($maplist as $map) {
-            $i++;
             $this->drawOneFullMap($map, !$fullscreen, false);
         }
 
@@ -387,11 +361,6 @@ class WeatherMapCactiUserPlugin extends UIBase
         }
 
         $this->outputCycleCode($fullscreen);
-    }
-
-    public function handleViewCycleFiltered($request, $appObject)
-    {
-        print "Unimplemented handleViewCycleFiltered";
     }
 
 

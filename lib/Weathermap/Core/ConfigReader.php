@@ -1218,6 +1218,7 @@ class ConfigReader
 
             if ((!$lineMatched) && ($buffer != '')) {
                 MapUtility::warn("Unrecognised config on line $this->lineCount: $buffer\n");
+                $this->mapObject->stats->increment('config_errors');
             }
         }
 

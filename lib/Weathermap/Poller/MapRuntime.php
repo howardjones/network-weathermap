@@ -216,9 +216,7 @@ class MapRuntime
             );
         }
 
-        $map->stats->set("n_nodes", count($map->nodes));
-        $map->stats->set("n_links", count($map->links));
-        $map->stats->set("n_scales", count($map->scales));
+        $this->extractStats($map);
 
         $map->cleanUp();
 
@@ -329,5 +327,66 @@ class MapRuntime
                 }
             }
         }
+    }
+
+    /**
+     * @param Map $map
+     */
+    private function extractStats(Map $map)
+    {
+        $map->stats->set("n_nodes", count($map->nodes));
+        $map->stats->set("n_links", count($map->links));
+        $map->stats->set("n_scales", count($map->scales));
+
+        $n_vias = 0;
+        $n_curves = 0;
+        $n_angles = 0;
+
+        $target_stats = array();
+
+        foreach ($map->links as $link) {
+            $via_count = count($link->viaList);
+            if ($via_count > 0) {
+                $n_vias += $via_count;
+                if ($link->viaStyle == "angled") {
+                    $n_angles += $via_count;
+                }
+                if ($link->viaStyle == "curved") {
+                    $n_curves += $via_count;
+                }
+            }
+        }
+
+        foreach ($map->buildAllItemsList() as $item) {
+            foreach ($item->targets as $target) {
+                $tgt_plugin = $target->pluginName;
+                if (!array_key_exists($tgt_plugin, $target_stats)) {
+                    $target_stats[$tgt_plugin] = array("count" => 0, "valid" => 0);
+                }
+                $target_stats[$tgt_plugin]['count']++;
+                if ($target->hasValidData()) {
+                    $target_stats[$tgt_plugin]['valid']++;
+                }
+            }
+        }
+
+        foreach ($target_stats as $name => $plugin) {
+            foreach ($plugin as $key => $value) {
+                $map->stats->set("tgt_" . $name . "_" . $key, $value);
+            }
+        }
+
+        $poller_output = "no";
+        if ($map->getHint("rrd_use_poller_output", 0) == 1) {
+            $poller_output = "yes";
+        }
+        $map->stats->set("tgt_RRDTool_poller_output", $poller_output);
+
+        $map->stats->set("n_vias", $n_vias);
+        $map->stats->set("n_curves", $n_curves);
+        $map->stats->set("n_angles", $n_angles);
+
+        $map->stats->set("width", $map->width);
+        $map->stats->set("height", $map->height);
     }
 }

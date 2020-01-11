@@ -179,6 +179,7 @@ class Map extends MapBase
         $this->stats = new Stats();
         $this->stats->set("total_targets", 0);
         $this->stats->set("config_lines", 0);
+        $this->stats->set("config_errors", 0);
 
         $this->pluginManager = new PluginManager($this);
 

@@ -14,7 +14,7 @@ class Target
     public $finalTargetString;
     private $originalTargetString;
 
-    private $pluginName;
+    public $pluginName;
     /** @var Base */
     private $pluginObject;
     private $scaleFactor = 1.0;

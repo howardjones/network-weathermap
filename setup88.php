@@ -26,8 +26,6 @@ require_once dirname(__FILE__) . "/ilib/Cacti/database.php";
 require_once dirname(__FILE__) . "/ilib/Cacti/cacti88-plugin-hooks.php";
 require_once dirname(__FILE__) . "/ilib/Cacti/cacti-plugin-poller.php";
 
-// and the old (to be replaced) Giant Function Of Everything for drawing maps
-require_once dirname(__FILE__) . "/lib/Weathermap/Poller/poller-common.php";
 
 
 function plugin_weathermap_version()

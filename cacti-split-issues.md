@@ -6,7 +6,7 @@
 
 * ~~make the stats consistent (targets:0)~~
 
-* add some more useful stats (nlinks, nnodes, target plugins, nvias, ncurves, nangles, pix dimensions, pix format)
+* add some more useful stats (~~nlinks~~,~~nnodes~~, target plugins, ~~nvias~~, ~~ncurves~~, ~~nangles~~, pix dimensions, pix format)
 
 
 

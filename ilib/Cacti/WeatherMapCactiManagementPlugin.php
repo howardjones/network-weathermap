@@ -62,6 +62,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             'args' => array(array("mapid", "int"), array("id", "int", true))
         ),
         'map_settings' => array('handler' => 'handleMapSettingsPage', 'args' => array(array("id", "int"))),
+        'map_stats' => array('handler' => 'handleMapStatsPage', 'args' => array(array("id", "int"))),
         'save' => array(
             'handler' => 'handleMapSettingsSave',
             'args' => array(
@@ -696,7 +697,6 @@ class WeatherMapCactiManagementPlugin extends UIBase
         header("Location: " . $this->makeURL(array("header" => "false")));
     }
 
-
 // *****************************************************************************************
 // These ones need overrides (UI stuff)
     /**
@@ -729,6 +729,22 @@ class WeatherMapCactiManagementPlugin extends UIBase
             $this->cactiFooter();
         }
     }
+
+
+    protected function handleMapStatsPage($request, $appObject) {
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            $this->cactiHeader();
+
+            $map = $this->manager->getMap($request['id']);
+
+            print("<h2>Map Statistics</h2>");
+            print("<p>These statistics can help with diagnosing performance issues for this map. There is no identifiable information in them, so it is safe to share.</p>");
+            print("<pre>" . $map->stats . "</pre>");
+
+            $this->footerLinks();
+            $this->cactiFooter();
+        }    }
+
 
     /**
      * @param $request
@@ -868,6 +884,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             __('Last Run'),
             __('Active'),
             __('Settings'),
+            __('Stats'),
             __('Sort Order'),
             __('Accessible By')
         );
@@ -906,6 +923,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print '</a>';
 
             print '</td>';
+            print '<td></td>';
             print '<td></td>';
             print '<td></td>';
             print '<td></td>';
@@ -972,7 +990,13 @@ class WeatherMapCactiManagementPlugin extends UIBase
                 print '</a>';
                 print '</td>';
 
+                print '<td><a href="' . $this->makeURL(array(
+                        "action" => "map_stats",
+                        "id" => $map->id
+                    )) . '">Stats</a></td>';
+
                 print '<td>';
+
 
                 $up_url = $this->makeURL(
                     array(

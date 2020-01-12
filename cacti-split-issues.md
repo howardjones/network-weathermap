@@ -6,9 +6,9 @@
 
 * ~~make the stats consistent (targets:0)~~
 
-* add some more useful stats (~~nlinks~~,~~nnodes~~, target plugins, ~~nvias~~, ~~ncurves~~, ~~nangles~~, pix dimensions, pix format)
+* ~~add some more useful stats (nlinks,nnodes, target plugins, nvias, ncurves, nangles, pix dimensions, pix format)~~
 
-
+* memory leak in map generation (now we can see stats!)
 
 ## Editor
 
@@ -28,7 +28,7 @@ Map Style - setting label to bits doesn't change anything
 
 ~~Feature: "Lock to" list for nodes shouldn't really include itself~~
 
-Feature: Relative overlay should include an arrowhead
+Feature: Relative overlay should include an arrowhead (?)
 
 ~~Config editing all appears on a single line.~~
 
@@ -71,7 +71,9 @@ Feature: Relative overlay should include an arrowhead
 
 ~~bwlabels are showing up in MAP imagemap, not the link...~~
 
-the random-bits and CLI tools need some love
+* the random-bits and CLI tools need some love
+
+* cacti-rebuild needs to use Runtime
 
 ## Notes
 

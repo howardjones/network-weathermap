@@ -19,6 +19,16 @@ class CactiApplicationInterface extends ApplicationInterface
         return $cacti_locale;
     }
 
+    public function getAppVersion()
+    {
+        global $config;
+        if (isset($config) and isset($config['cacti_version'])) {
+            return $config['cacti_version'];
+        }
+
+        return "";
+    }
+
     public function getAppSetting($name, $defaultValue = "")
     {
         $statement = $this->pdo->prepare("SELECT value FROM settings WHERE name=?");
@@ -129,7 +139,7 @@ class CactiApplicationInterface extends ApplicationInterface
         if ($this->isNewCacti()) {
             return "weathermap-cacti10-plugin.php";
         }
-        
+
         if ($this->isOldCacti()) {
             return "weathermap-cacti88-plugin.php";
         }

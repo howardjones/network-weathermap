@@ -26,6 +26,11 @@ class ApplicationInterface
         return "en";
     }
 
+    public function getAppVersion()
+    {
+        return "";
+    }
+
     public function getAppSetting($name, $defaultValue = "")
     {
         return $defaultValue;

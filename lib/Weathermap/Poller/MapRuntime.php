@@ -232,7 +232,7 @@ class MapRuntime
 
         $this->manager->application->setAppSetting("weathermap_last_finished_file", $this->description);
 
-        $stats = json_encode($this->getStats(), JSON_PRETTY_PRINT);
+        $stats_json = json_encode($this->getStats(), JSON_PRETTY_PRINT);
 
         $this->manager->updateMap(
             $this->mapConfig->id,
@@ -240,10 +240,10 @@ class MapRuntime
                 'titlecache' => $map->processString($map->title, $map),
                 'warncount' => intval($this->warncount),
                 'runtime' => floatval($mapDuration),
-                'stats' => $stats
+                'stats' => $stats_json
             )
         );
-        $this->writeTextFile($this->statsFileName, $stats);
+        $this->writeTextFile($this->statsFileName, $stats_json);
         unset($map);
 
         return true;
@@ -251,10 +251,40 @@ class MapRuntime
 
     public function getStats()
     {
+        global $config;
+
+        $env = array(
+            "php_version" => phpversion(),
+            "php_os" => php_uname(),
+            "sql_version" => $this->manager->getDatabaseVersion(),
+            "weathermap_version" => WEATHERMAP_VERSION,
+            "host_app_version" => "",
+            "gd_version" => ""
+        );
+
+        if (file_exists("/etc/lsb-release")) {
+            $release_info = parse_ini_file("/etc/lsb-release");
+            $env['php_os'] = $release_info['DISTRIB_DESCRIPTION'];
+        }
+        if (file_exists("/etc/redhat-release")) {
+            $fd = fopen("/etc/redhat-release");
+            $version_line = fgets($fd);
+            fclose($fd);
+            $env['php_os'] = $version_line;
+        }
+
+        if (function_exists('gd_info')) {
+            $gdinfo = gd_info();
+            $env['gd_version'] = $gdinfo['GD Version'];
+        }
+
+        $env['host_app_version'] = $this->manager->application->getAppVersion();
+
         return array(
             "memory" => $this->memory,
             "times" => $this->times,
             "stats" => $this->stats,
+            "environment" => $env
         );
     }
 
@@ -334,9 +364,12 @@ class MapRuntime
      */
     private function extractStats(Map $map)
     {
-        $map->stats->set("n_nodes", count($map->nodes));
-        $map->stats->set("n_links", count($map->links));
-        $map->stats->set("n_scales", count($map->scales));
+        # remove the 'DEFAULT' and ':: DEFAULT ::' from the counts for links and nodes
+        $map->stats->set("n_nodes", count($map->nodes) - 2);
+        $map->stats->set("n_links", count($map->links) - 2);
+
+        # remove the 'none' scale from the count for scales
+        $map->stats->set("n_scales", count($map->scales) - 1);
 
         $n_vias = 0;
         $n_curves = 0;

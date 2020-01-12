@@ -28,6 +28,17 @@ class MapManager
         $this->application = $applicationInterface;
     }
 
+    public function getDatabaseVersion()
+    {
+        if (isset($this->pdo)) {
+            $server = $this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION);
+            $client = $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
+
+            return "$server || $client";
+        }
+        return "";
+    }
+
     public function getMap($mapId)
     {
         $statement = $this->pdo->prepare("SELECT * FROM weathermap_maps WHERE id=?");

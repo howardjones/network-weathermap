@@ -29,20 +29,32 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# For WEATHERMAP_VERSION="mount":
 	config.vm.synced_folder "../../", "/var/www/html/cacti/plugins/weathermap"
 
-  config.vm.define :develop do |develop|
-
-	  develop.vm.provision :shell, :path => "vagrant-cacti-develop.sh", privileged: true
-	  develop.vm.box = "ubuntu/xenial64"
-	  develop.vm.box_version = "20180802.0.0"
+  config.vm.define :develop16 do |develop16|
+	  develop16.vm.provision :shell, :path => "vagrant-cacti-develop16.sh", privileged: true
+	  develop16.vm.box = "ubuntu/xenial64"
 
 	  # Forward apache.
-	  develop.vm.network "forwarded_port", guest:80, host: 8016
+	  develop16.vm.network "forwarded_port", guest:80, host: 8017
 
 	  # Forward MySQL.
 	  #config.vm.network "forwarded_port", guest: 3306, host: 3306
 
-	  develop.vm.hostname = "weathermap-dev-3"
-	  develop.vm.post_up_message = "Cacti should be available on http://localhost:8016/cacti"
+	  develop16.vm.hostname = "weathermap-dev-16"
+	  develop16.vm.post_up_message = "Cacti should be available on http://localhost:8017/cacti"
+  end
+
+  config.vm.define :develop18 do |develop18|
+	  develop18.vm.provision :shell, :path => "vagrant-cacti-develop18.sh", privileged: true
+	  develop18.vm.box = "ubuntu/bionic64"
+
+	  # Forward apache.
+	  develop18.vm.network "forwarded_port", guest:80, host: 8016
+
+	  # Forward MySQL.
+	  #config.vm.network "forwarded_port", guest: 3306, host: 3306
+
+	  develop18.vm.hostname = "weathermap-dev-18"
+	  develop18.vm.post_up_message = "Cacti should be available on http://localhost:8016/cacti"
   end
 
   config.vm.provider "virtualbox" do |vb|

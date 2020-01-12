@@ -23,7 +23,7 @@ class CactiApplicationInterface extends ApplicationInterface
     {
         global $config;
         if (isset($config) and isset($config['cacti_version'])) {
-            return $config['cacti_version'];
+            return "Cacti ".$config['cacti_version'];
         }
 
         return "";

@@ -739,7 +739,11 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
             print("<h2>Map Statistics</h2>");
             print("<p>These statistics can help with diagnosing performance issues for this map. There is no identifiable information in them, so it is safe to share.</p>");
-            print("<pre>" . $map->stats . "</pre>");
+            if ($map->stats != "") {
+                print("<pre>" . $map->stats . "</pre>");
+            } else {
+                print ("<p>There are no statistics for this map yet.</p>");
+            }
 
             $this->footerLinks();
             $this->cactiFooter();
@@ -990,11 +994,13 @@ class WeatherMapCactiManagementPlugin extends UIBase
                 print '</a>';
                 print '</td>';
 
-                print '<td><a href="' . $this->makeURL(array(
-                        "action" => "map_stats",
-                        "id" => $map->id
-                    )) . '">Stats</a></td>';
-
+                print '<td>';
+                if ($map->stats != "") {
+                    print '<a href="' . $this->makeURL(array(
+                            "action" => "map_stats",
+                            "id" => $map->id
+                        )) . '">Stats</a></td>';
+                }
                 print '<td>';
 
 

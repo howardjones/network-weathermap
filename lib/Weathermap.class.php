@@ -708,7 +708,7 @@ function LoadPlugins( $type="data", $dir="lib/datasources" )
 	wm_debug("Beginning to load $type plugins from $dir\n");
         
     if ( ! file_exists($dir)) {
-        $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
+        $dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . $dir;
         wm_debug("Relative path didn't exist. Trying $dir\n");
     }
 	# $this->datasourceclasses = array();

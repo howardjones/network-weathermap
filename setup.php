@@ -376,7 +376,7 @@ function weathermap_setup_table () {
 		if (!in_array('weathermap_data', $tables)) {
 			$sql[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id int(11) NOT NULL auto_increment,
 				rrdfile varchar(255) NOT NULL,data_source_name varchar(19) NOT NULL default '',
-				  last_time int(11) NOT NULL,last_value varchar(255) NOT NULL default '',
+				  last_time int(11) NOT NULL,last_value varchar(255) NOT NULL default 0,
 				last_calc varchar(255) NOT NULL, sequence int(11) NOT NULL, local_data_id int(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
 				  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) ENGINE=MyISAM";
 		}

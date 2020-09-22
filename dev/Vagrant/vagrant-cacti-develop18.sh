@@ -123,6 +123,10 @@ echo "Listening on all devices."
 sed -i -e "s|bind-address		= 127.0.0.1|bind-address		= 0.0.0.0|" \
   /etc/mysql/mariadb.conf.d/50-server.cnf
 
+    bash -c "cat > /etc/mysql/mariadb.conf.d/98-strict.cnf" <<'EOF'
+[mysqld]
+sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+EOF
 
 if [[ ${CACTI_VERSION} == 1.* ]]; then
     # Cacti 1.x insists on these
@@ -151,6 +155,7 @@ innodb_flush_log_at_timeout=3
 innodb_read_io_threads=32
 innodb_write_io_threads=16
 EOF
+
 
     service mysql restart
     service apache2 restart

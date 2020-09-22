@@ -79,5 +79,7 @@ Feature: Relative overlay should include an arrowhead (?)
 
 Before paratest
 
-    make test  238.31s user 9.02s system 111% cpu 3:42.46 total
+php5.6    make test  238.31s user 9.02s system 111% cpu 3:42.46 total
+php7.4    make test  82.48s user 7.46s system 136% cpu 1:05.85 total
+
 

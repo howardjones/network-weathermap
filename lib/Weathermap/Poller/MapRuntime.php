@@ -280,9 +280,16 @@ class MapRuntime
 
         $env['host_app_version'] = $this->manager->application->getAppVersion();
 
+        $previous = $this->times[0];
+        $calculated_times = array();
+        foreach ($this->times as $label => $time) {
+            $calculated_times[$label] = array($time, $time - $previous, $time - $this->times['start']);
+            $previous = $time;
+        }
+
         return array(
             "memory" => $this->memory,
-            "times" => $this->times,
+            "times" => $calculated_times,
             "stats" => $this->stats,
             "environment" => $env
         );

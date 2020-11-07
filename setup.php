@@ -708,9 +708,9 @@ function weathermap_poller_output($rrd_update_array) {
 				
 	    if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Looking for $file ($local_data_id) (".$required['data_source_path'].")\n",true,"WEATHERMAP");
 		
-		if( isset($rrd_update_array[$file]) && is_array($rrd_update_array[$file]) && isset($rrd_update_array[$file]['times']) && is_array($rrd_update_array[$file]['times']) && isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname} ) )
+		if( isset($rrd_update_array[$file]) && is_array($rrd_update_array[$file]) && isset($rrd_update_array[$file]['times']) && is_array($rrd_update_array[$file]['times']) && isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])][$dsname] ) )
 		{
-			$value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
+			$value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])][$dsname];
 			$time = key($rrd_update_array[$file]['times']);
 			if (read_config_option("log_verbosity") >= POLLER_VERBOSITY_MEDIUM) 
 				cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n",true,"WEATHERMAP");

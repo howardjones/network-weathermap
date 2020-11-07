@@ -111,7 +111,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 					} 
 					else
 					{
-						$this->down_cache{$host}++; 
+						$this->down_cache[$host]++;
 					}
 				}
 				if($out_oid != '-')
@@ -126,7 +126,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 					} 
 					else
 					{
-						$this->down_cache{$host}++; 
+						$this->down_cache[$host]++;
 					}
 				}
 				

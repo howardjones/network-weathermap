@@ -1,6 +1,6 @@
-## PHP Network Weathermap 0.98a
+## PHP Network Weathermap 0.98b
 
-This is PHP Network Weathermap, version 0.98a by Howard Jones (howie@thingy.com)
+This is PHP Network Weathermap, version 0.98b by Howard Jones (howie@thingy.com)
 
 See the docs sub-directory for full HTML documentation, FAQ and example config.
 

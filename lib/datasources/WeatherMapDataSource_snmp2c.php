@@ -52,19 +52,19 @@ class WeatherMapDataSource_snmp2c extends WeatherMapDataSource
         $retries = 2;
         $abort_count = 0;
 
-        if($map->get_hint("snmp_timeout") != '') {
+        if ($map->get_hint("snmp_timeout") != '') {
             $timeout = intval($map->get_hint("snmp_timeout"));
-            wm_debug("Timeout changed to ".$timeout." microseconds.\n");
+            wm_debug("Timeout changed to " . $timeout . " microseconds.\n");
         }
 
-        if($map->get_hint("snmp_abort_count") != '') {
+        if ($map->get_hint("snmp_abort_count") != '') {
             $abort_count = intval($map->get_hint("snmp_abort_count"));
             wm_debug("Will abort after $abort_count failures for a given host.\n");
         }
 
-        if($map->get_hint("snmp_retries") != '') {
+        if ($map->get_hint("snmp_retries") != '') {
             $retries = intval($map->get_hint("snmp_retries"));
-            wm_debug("Number of retries changed to ".$retries.".\n");
+            wm_debug("Number of retries changed to " . $retries . ".\n");
         }
 
         if (preg_match("/^snmp2c:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {

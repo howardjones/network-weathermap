@@ -1,6 +1,6 @@
 <?php
-// PHP Weathermap 0.98a
-// Copyright Howard Jones, 2005-2019 howie@thingy.com
+// PHP Weathermap 0.98b
+// Copyright Howard Jones, 2005-2020 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the MIT License
 
@@ -11,7 +11,7 @@ require_once "geometry.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION = "0.98a";
+$WEATHERMAP_VERSION = "0.98b";
 $weathermap_debugging = false;
 $weathermap_map = "";
 $weathermap_warncount = 0;

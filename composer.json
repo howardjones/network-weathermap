@@ -12,7 +12,9 @@
   "require": {
     "phpdocumentor/phpdocumentor": "2.*",
     "pear/console_commandline": "^1.2",
-    "pear/console_getopt": "^1.4"
+    "pear/console_getopt": "^1.4",
+    "ext-snmp": "*",
+    "ext-json": "*"
   },
   "require-dev": {
 	      "wimg/php-compatibility": "*",

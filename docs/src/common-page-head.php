@@ -23,7 +23,7 @@
 <div id = "header">
     <h1>PHP Weathermap <?php echo $WEATHERMAP_VERSION; ?> </h1>
 
-    <h4>Copyright &copy; 2005-2019 Howard Jones,
+    <h4>Copyright &copy; 2005-2020 Howard Jones,
     <tt><a href = "mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a
         href = "http://www.network-weathermap.com/">Website</a>)</h4>
 </div>

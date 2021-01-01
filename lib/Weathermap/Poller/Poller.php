@@ -35,12 +35,14 @@ class Poller
 
     public $canRun;
 
-    public function __construct($baseDirectory, $applicationInterface, $pollerStartTime = 0)
+    private $context;
+
+    public function __construct($baseDirectory, $applicationInterface, $context, $pollerStartTime = 0)
     {
         $this->baseDirectory = $baseDirectory;
         $this->configDirectory = $baseDirectory . DIRECTORY_SEPARATOR . 'configs';
         $this->outputDirectory = $baseDirectory . DIRECTORY_SEPARATOR . 'output';
-
+        $this->context = $context;
         $this->manager = new MapManager(weathermap_get_pdo(), $this->configDirectory, $applicationInterface);
 
         $this->totalWarnings = 0;
@@ -54,7 +56,8 @@ class Poller
         $this->config->configDirectory = $this->configDirectory;
         $this->config->outputDirectory = $this->outputDirectory;
         $this->config->cronTime = ($pollerStartTime == 0 ? intval($this->startTime) : $pollerStartTime);
-        $this->config->imageFormat = strtolower($this->manager->application->getAppSetting("weathermap_output_format", "png"));
+        $this->config->imageFormat = strtolower($this->manager->application->getAppSetting("weathermap_output_format",
+            "png"));
         $this->config->rrdtoolFileName = $this->manager->application->getAppSetting("path_rrdtool", "rrdtool");
         $this->config->thumbnailSize = $this->manager->application->getAppSetting("weathermap_thumbsize", "200");
     }
@@ -125,7 +128,7 @@ class Poller
         chdir($this->baseDirectory);
 
         foreach ($maplist as $map) {
-            $runtime = new MapRuntime($this->config, $map, $this->manager);
+            $runtime = new MapRuntime($this->config, $map, $this->manager, $this->context);
             $ran = $runtime->run();
             if ($ran) {
                 MapUtility::notice(json_encode($runtime->getStats()));

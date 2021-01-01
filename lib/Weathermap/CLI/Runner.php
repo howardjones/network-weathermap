@@ -5,8 +5,13 @@ namespace Weathermap\CLI;
 use GetOpt\GetOpt;
 use GetOpt\Option;
 use GetOpt\ArgumentException;
+use Weathermap\Core\ConfigReader;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapUtility;
+use Weathermap\Integrations\SingleRun\SingleRunApplicationInterface;
+use Weathermap\Integrations\MapManager;
+use Weathermap\Poller\MapRuntime;
+use Weathermap\Poller\PollerConfig;
 
 /**
  * The CLI map-creation tool
@@ -25,6 +30,9 @@ class Runner
     private $configFile;
     private $imageFile = "";
     private $htmlFile = "";
+    private $statsFile = "";
+
+    private $useRuntime = true;
 
     public function run()
     {
@@ -34,12 +42,44 @@ class Runner
         $this->translateRuntimeOptionsToSettings();
         $this->translateDebugOptionsToSettings();
 
-        $this->map = new Map();
-        $this->map->rrdtool = $rrdtool;
-        $this->map->context = "cli";
+        // TODO: it would be good if this used MapRuntime (would need a stub ApplicationInterface)
+        if ($this->useRuntime) {
 
-        if ($this->makeMap()) {
-            $this->postRun();
+            $pollerConfig = new PollerConfig();
+            $pollerConfig->configDirectory = ".";
+            $pollerConfig->outputDirectory = ".";
+            $pollerConfig->cronTime = microtime(true);
+            $pollerConfig->imageFormat = "png";
+            $pollerConfig->rrdtoolFileName = $rrdtool;
+            $pollerConfig->thumbnailSize = 0;
+
+            # This would normally be the output from PDO
+            $mapConfig = new \stdClass();
+            $mapConfig->id = "map-id";
+            $mapConfig->configfile=$this->configFile;
+            $mapConfig->filehash="";
+            $mapConfig->schedule="*";
+            $mapConfig->groupname="group";
+            $mapConfig->group_id="0";
+
+            $api = new SingleRunApplicationInterface(null);
+            $manager = new MapManager(null, ".", $api);
+
+            $runtime = new MapRuntime($pollerConfig, $mapConfig, $manager, "cli");
+            $ran = $runtime->run(array($this, "postRun"));
+            if ($ran && $this->statsFile != "") {
+                MapUtility::notice(json_encode($runtime->getStats()));
+            }
+//            $this->postRun($runtime->getMap());
+
+        } else {
+            $this->map = new Map();
+            $this->map->rrdtool = $rrdtool;
+            $this->map->context = "cli";
+
+            if ($this->makeMap()) {
+                $this->postRun();
+            }
         }
     }
 
@@ -97,6 +137,10 @@ class Runner
                     ->setDescription('filename to write HTML. Default weathermap.html')
                     ->setArgumentName('filename')
                     ->setDefaultValue(''),
+                Option::create(null, 'statsoutput', GetOpt::REQUIRED_ARGUMENT)
+                    ->setDescription('filename to write statistics JSON')
+                    ->setArgumentName('filename')
+                    ->setDefaultValue(''),
                 Option::create(null, 'image-uri', GetOpt::REQUIRED_ARGUMENT)
                     ->setArgumentName('uri')
                     ->setDescription('URI to prefix <img> tags in HTML output'),
@@ -111,22 +155,22 @@ class Runner
     {
         $opt->addOptions(
             array(
-            Option::create(null, 'define', GetOpt::MULTIPLE_ARGUMENT)
-                ->setArgumentName('name=value')
-                ->setDescription('Define internal variables (equivalent to global SET in config file)'),
+                Option::create(null, 'define', GetOpt::MULTIPLE_ARGUMENT)
+                    ->setArgumentName('name=value')
+                    ->setDescription('Define internal variables (equivalent to global SET in config file)'),
 
-            Option::create(null, 'bulge', GetOpt::NO_ARGUMENT)
-                ->setDescription('Enable link-bulging mode. See manual.'),
-            Option::create(null, 'no-data', GetOpt::NO_ARGUMENT)
-                ->setDescription('skip the data-reading process (just a \'grey\' map)'),
-            Option::create(null, 'sizedebug', GetOpt::NO_ARGUMENT)
-                ->setDescription('show the maximum possible value instead of the current one'),
+                Option::create(null, 'bulge', GetOpt::NO_ARGUMENT)
+                    ->setDescription('Enable link-bulging mode. See manual.'),
+                Option::create(null, 'no-data', GetOpt::NO_ARGUMENT)
+                    ->setDescription('skip the data-reading process (just a \'grey\' map)'),
+                Option::create(null, 'sizedebug', GetOpt::NO_ARGUMENT)
+                    ->setDescription('show the maximum possible value instead of the current one'),
 
-            Option::create(null, 'debug', GetOpt::NO_ARGUMENT)
-                ->setDescription('produce (LOTS) of debugging information during run'),
-            Option::create(null, 'no-warn', GetOpt::REQUIRED_ARGUMENT)
-                ->setDescription('suppress warnings with listed errorcodes (comma-separated)')
-                ->setArgumentName('WMxxx_errorcode'),
+                Option::create(null, 'debug', GetOpt::NO_ARGUMENT)
+                    ->setDescription('produce (LOTS) of debugging information during run'),
+                Option::create(null, 'no-warn', GetOpt::REQUIRED_ARGUMENT)
+                    ->setDescription('suppress warnings with listed errorcodes (comma-separated)')
+                    ->setArgumentName('WMxxx_errorcode'),
             )
         );
     }
@@ -138,19 +182,22 @@ class Runner
     {
         $opt->addOptions(
             array(
-            Option::create(null, 'randomdata', GetOpt::NO_ARGUMENT)
-                ->setDescription('skip the data-reading process, generate random data'),
-            Option::create(null, 'uberdebug', GetOpt::NO_ARGUMENT)
-                ->setDescription('produce even more debug information'),
-            Option::create(null, 'setdebug', GetOpt::NO_ARGUMENT)
-                ->setDescription('produce debug information related to map variables (SET)'),
+                Option::create(null, 'randomdata', GetOpt::NO_ARGUMENT)
+                    ->setDescription('skip the data-reading process, generate random data'),
+                Option::create(null, 'uberdebug', GetOpt::NO_ARGUMENT)
+                    ->setDescription('produce even more debug information'),
+                Option::create(null, 'setdebug', GetOpt::NO_ARGUMENT)
+                    ->setDescription('produce debug information related to map variables (SET)'),
 
-            Option::create(null, 'dump-config', GetOpt::REQUIRED_ARGUMENT)
-                ->setArgumentName('filename')
-                ->setDescription('(development) dump config to a new file (testing editor)'),
-            Option::create(null, 'dump-json', GetOpt::REQUIRED_ARGUMENT)
-                ->setArgumentName('filename')
-                ->setDescription('(development) dump JSON config to a new file'),
+                Option::create(null, 'dump-config', GetOpt::REQUIRED_ARGUMENT)
+                    ->setArgumentName('filename')
+                    ->setDescription('(development) dump config to a new file (testing editor)'),
+                Option::create(null, 'dump-json', GetOpt::REQUIRED_ARGUMENT)
+                    ->setArgumentName('filename')
+                    ->setDescription('(development) dump JSON config to a new file'),
+                Option::create(null, 'dump-parser', GetOpt::REQUIRED_ARGUMENT)
+                    ->setArgumentName('filename')
+                    ->setDescription('(development) dump config parser rules to a new file'),
             )
         );
     }
@@ -161,6 +208,7 @@ class Runner
 
         $this->configFile = $this->getOpt->getOption('config');
         $this->htmlFile = $this->getOpt->getOption('htmloutput');
+        $this->statsFile = $this->getOpt->getOption('statsoutput');
         $this->imageFile = $this->getOpt->getOption('output');
         $this->optionsOutput['imageuri'] = $this->getOpt->getOption('image-uri');
 
@@ -240,7 +288,6 @@ class Runner
             $this->mapSettingsPostConfig();
             $this->getMapData();
 
-            // TODO: it would be good if this used MapRuntime (would need a stub ApplicationInterface)
 
             if ($this->imageFile != '') {
                 $this->map->drawMap($this->imageFile);
@@ -248,7 +295,6 @@ class Runner
             }
 
             $this->outputHTML();
-
             return true;
         }
         return false;
@@ -329,30 +375,53 @@ class Runner
         }
     }
 
-    private function postRun()
+    public function postRun($map)
     {
         if ($this->getOpt->getOption('dump-config') != '') {
-            $this->map->writeConfig($this->getOpt->getOption('dump-config'));
+            $map->writeConfig($this->getOpt->getOption('dump-config'));
         }
 
         if ($this->getOpt->getOption('dump-json') != '') {
             $fd = fopen($this->getOpt->getOption('dump-json'), "w");
-            fputs($fd, $this->map->getJSONConfig());
+            fputs($fd, $map->getJSONConfig());
+            fclose($fd);
+        }
+
+        if ($this->getOpt->getOption('dump-parser') != '') {
+            $fd = fopen($this->getOpt->getOption('dump-parser'), "w");
+            $m = new Map();
+            $reader = new ConfigReader($m);
+            $keywords = $reader->getAllKeywords();
+            $last_scope = "-_-_";
+            foreach ($keywords as $scopeKeyword) {
+                $p = explode("_", $scopeKeyword);
+                $scope = $p[0];
+                $keyword = $p[1];
+                if ($scope != $last_scope) {
+                    fputs($fd, "\n# $scope\n");
+                    $last_scope = $scope;
+                }
+                fputs($fd, "  * $keyword\n");
+            }
             fclose($fd);
         }
 
         if ($this->map->dataoutputfile != '') {
-            $this->map->writeDataFile($this->map->dataoutputfile);
+            $map->writeDataFile($this->map->dataoutputfile);
+        }
+
+        if ($this->map->statsoutputfile != '') {
+            $map->writeStatistics($this->map->statsoutputfile);
         }
 
         if ($this->getOpt->getOption('setdebug') === 1) {
-            $this->dumpSetDebugInfo();
+            $this->dumpSetDebugInfo($map);
         }
     }
 
-    private function dumpSetDebugInfo()
+    private function dumpSetDebugInfo($map)
     {
-        foreach ($this->map->buildAllItemsList() as $item) {
+        foreach ($map->buildAllItemsList() as $item) {
             print "$item->name :\n";
             foreach ($item->hints as $n => $v) {
                 print "  SET $n = $v\n";

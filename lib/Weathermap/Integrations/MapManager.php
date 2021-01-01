@@ -38,7 +38,7 @@ class MapManager
         }
         return "";
     }
-
+    
     public function getMap($mapId)
     {
         $statement = $this->pdo->prepare("SELECT * FROM weathermap_maps WHERE id=?");
@@ -162,6 +162,11 @@ class MapManager
 
     public function updateMap($mapId, $data)
     {
+        // for this specific function, it's OK to do this so that the MapRuntime can continue
+        if (is_null($this->pdo)) {
+            return;
+        }
+
         $allowed = array(
             "active",
             "sortorder",
@@ -420,6 +425,11 @@ class MapManager
 
     public function getMapSettings($mapId)
     {
+        // for this specific function, it's OK to do this so that the MapRuntime can continue
+        if (is_null($this->pdo)) {
+            return new \stdClass();
+        }
+
         // globals
         if ($mapId == 0) {
             $statement = $this->pdo->query("SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0");

@@ -1,0 +1,9 @@
+{
+  "$id": "https://network-weathermap.com/map.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Weathermap Map",
+  "type" "object",
+  "properties": {
+
+  }
+}

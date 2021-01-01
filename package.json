@@ -22,6 +22,10 @@
   },
   "homepage": "https://github.com/howardjones/network-weathermap#readme",
   "dependencies": {
-    "jquery": "^3.4.1"
+    "ajv": "^6.12.6",
+    "ajv-cli": "^3.3.0",
+    "generate-schema": "^2.6.0",
+    "jquery": "^3.4.1",
+    "pajv": "^1.2.0"
   }
 }

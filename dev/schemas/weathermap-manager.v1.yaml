@@ -1,0 +1,291 @@
+openapi: 3.0.0
+info:
+  title: Weathermap Manager
+  version: '1.0.0'
+  license:
+    name: MIT
+  description: 'API between management pages in host application, and MapManager'
+servers:
+  - url: 'http://localhost:3000'
+tags:
+  - name: "maps"
+    description: "manage scheduling and options for maps"
+  - name: "auth"
+    description: "manage users and groups"
+  - name: "mapgroups"
+    description: "manage groups of maps"
+paths:
+  '/maps/{map_id}':    
+    parameters:
+      - schema:
+          type: string
+        name: map_id
+        in: path
+        required: true
+    get:
+      summary: Get a Map
+      tags: ["maps"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'
+      operationId: get-map
+      parameters: []
+    delete:
+      tags: ["maps"]
+      summary: ''
+      operationId: delete-map
+      responses:
+        '200':
+          description: OK
+  '/maps':
+    get:
+      summary: Get all Maps
+      tags: ["maps"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Map'
+      operationId: get-maps
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: group_id
+    parameters: []
+  /users:
+    get:
+      summary: Get a list of Users
+      tags: ["users"]
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+      operationId: get-users
+  '/users/{user_id}':
+    parameters:
+      - schema:
+          type: string
+        name: user_id
+        in: path
+        required: true
+    get:
+      summary: Get a single User
+      tags: ["users"]
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      operationId: get-user
+  /mapgroups:
+    get:
+      summary: Get a list of all MapGroups
+      tags: ["mapgroups"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MapGroup'
+      operationId: get-mapgroups
+  '/mapgroups/{group_id}':
+    parameters:
+      - schema:
+          type: string
+        name: group_id
+        in: path
+        required: true
+    get:
+      summary: Get a single MapGroup
+      tags: ["mapgroups"]
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapGroup'
+      operationId: get-mapgroup
+    delete:
+      summary: ''
+      operationId: delete-mapgroup
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        full_name:
+          type: string
+    Map:
+      title: Map
+      type: object
+      properties:
+        id:
+          type: string
+        config_filename:
+          type: string
+        last_run:
+          type: integer
+        title:
+          type: string
+        last_duration:
+          type: number
+        last_errorcount:
+          type: integer
+        output_image_filename:
+          type: string
+        output_html_filename:
+          type: string
+        output_stats_filename:
+          type: string
+        filehash:
+          type: string
+        config:
+          type: string
+        thumb_width:
+          type: integer
+        thumb_height:
+          type: integer
+        schedule:
+          type: string
+        archiving:
+          type: string
+        loglevel:
+          type: string
+        enabled:
+          type: boolean
+        group_id:
+          type: string
+        sortorder:
+          type: number
+        stats:
+          type: string
+      x-examples: {}
+    ConfigItem:
+      title: ConfigItem
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        value:
+          type: string
+    MapSetting:
+      title: MapSetting
+      type: object
+      properties:
+        id:
+          type: string
+        map_id:
+          type: string
+        map_group_id:
+          type: string
+        name:
+          type: string
+        value:
+          type: string
+        type:
+          type: string
+          enum:
+            - global
+            - group
+            - map
+    MapGroup:
+      title: MapGroup
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        sortorder:
+          type: number
+    UserGroup:
+      title: UserGroup
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    Permission:
+      title: Permission
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        group_id:
+          type: string
+        map_id:
+          type: string
+        mapgroup_id:
+          type: string
+        role:
+          type: string
+          enum:
+            - view
+            - read-map
+            - edit-map
+            - config-map
+            - run-map
+    UserConfigItem:
+      title: UserConfigItem
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        name:
+          type: string
+        value:
+          type: string
+    MapFile:
+      title: MapFile
+      type: object
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        title:
+          type: string
+        in_use:
+          type: boolean
+  securitySchemes: {}
+
+  

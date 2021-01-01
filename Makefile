@@ -41,16 +41,17 @@ release:
 
 testlint:
 	echo "Linting for minimum and maximum PHP versions"
-	vendor/bin/parallel-lint -p php5.6 --exclude app --exclude vendor .
-	vendor/bin/parallel-lint -p php7.2 --exclude app --exclude vendor .
-	vendor/bin/parallel-lint -p php7.3 --exclude app --exclude vendor .
-	vendor/bin/parallel-lint -p php7.4 --exclude app --exclude vendor .
+	vendor/bin/parallel-lint -p php5.6 --exclude app --exclude vendor --exclude dev .
+	vendor/bin/parallel-lint -p php7.2 --exclude app --exclude vendor --exclude dev .
+	vendor/bin/parallel-lint -p php7.3 --exclude app --exclude vendor --exclude dev .
+	vendor/bin/parallel-lint -p php7.4 --exclude app --exclude vendor --exclude dev .
+	vendor/bin/parallel-lint -p php8.0 --exclude app --exclude vendor --exclude dev .
 
 testcode: testlint
-	php -d xdebug.profiler_enable=on vendor/bin/phpunit -c build/phpunit-noconfigs.xml --coverage-html test-suite/code-coverage/
+	php -d xdebug.profiler_enable=on -d xdebug.mode=coverage vendor/bin/phpunit -c build/phpunit-noconfigs.xml --coverage-html test-suite/code-coverage/
 
 test: testlint
-	php -d xdebug.profiler_enable=off vendor/bin/phpunit -c build/phpunit.xml
+	php -d xdebug.profiler_enable=off -d xdebug.mode=coverage vendor/bin/phpunit -c build/phpunit.xml
 	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
 	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 

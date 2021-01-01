@@ -185,7 +185,7 @@ class SNMP3 extends Base
             MapUtility::warn("SNMPv3 ReadData snmp3_" . $profileName . "_import is set but not running in Cacti");
             return $params;
         }
-        // this is something that should be cached or done in prefetch
+        // TODO: this is something that should be cached or done in prefetch
         $result = \db_fetch_assoc(
             sprintf(
                 "select * from host where snmp_version=3 and id=%d LIMIT 1",

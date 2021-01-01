@@ -38,7 +38,7 @@ function expandSuffixes($val)
     );
 
     if ($val != '') {
-        $last = strtolower($val{strlen($val) - 1});
+        $last = strtolower($val[strlen($val) - 1]);
         $val = intval($val);
 
         if (isset($suffixes[$last])) {

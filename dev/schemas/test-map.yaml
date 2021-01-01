@@ -1,0 +1,120 @@
+---
+title: The map title
+map:
+  width: 800
+  height: 600
+  background: ukmap.png
+  kilo: 1024
+  background-color: purple
+  includes:
+    - common.yaml
+outputs:
+  html: file.html
+  image: image.png
+  stats: stats.json
+  data: data.txt
+scales:
+  DEFAULT:
+    bands:
+      - row1
+    font: 2
+    legend:
+      style: classic
+      position: [ 10,10 ]
+fonts:
+  10: arial.ttf 10
+colors:
+  red: [ 255,0,0 ]
+  txgrey: [ 192,192,192,128 ]
+variables:
+  global1: value1
+objects:
+  title:
+    position: [ 300,10 ]
+    font: 10
+    colors:
+      text: red
+  time:
+    position: [ 300,10 ]
+    font: 10
+    style: mindata
+    colors:
+      text: red
+nodes:
+  node1:
+    position: [ 22, 40 ]
+    template: DEFAULT
+    z-order: 100
+    infourl: http://thingy.com/poop.html
+    hoverurl: http://thingy.com/image.png
+    notes: some notes
+    label:
+      text: "My First Node"
+      font: 2
+      offset: [ -3, 4 ]
+      angle: 45
+    icon:
+      file: "image.png"
+      size: [ 32,32 ]
+      colors:
+    data:
+      channels:
+        - cpu
+        - mem
+      targets:
+        - somefile.rrd
+      maxvalues:
+        - 4K
+
+  node2:
+    label: "My other node"
+    position: [ 100,100 ]
+links:
+  - from: node1
+    to: node2
+    infourl: http://thingy.com/poop.html
+    hoverurl: http://thingy.com/image.png
+    notes: some notes
+    arrow:
+      width: 7
+      style: compact
+      split: 50
+      oneway: true
+    comments:
+      font: 2
+      style: edge
+      colors:
+        text: gray
+      text:
+        - in
+        - out
+    labels:
+      style: angled
+      font: 4
+      positions:
+        - 75
+        - 25
+      colors:
+        text: black
+        outline: black
+        background: white
+      text:
+        - input
+        - output
+    z-order: 33
+    via:
+      - [ 100,100 ]
+      - [ node2, 0,-40 ]
+    data:
+      channels:
+        - in
+        - out
+        - inerr
+        - outerr
+      targets:
+        - somefile.rrd
+      maxvalues:
+        - 1G
+        - 1G
+        - absolute
+        - absolute

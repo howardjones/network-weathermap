@@ -17,9 +17,18 @@ if (!file_exists(dirname(__FILE__) . '/../vendor/autoload.php')) {
 
 require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
+use Monolog\Processor\IntrospectionProcessor;
+use Monolog\Processor\MemoryPeakUsageProcessor;
+use Monolog\Processor\MemoryUsageProcessor;
 use Weathermap\Core\WMDebugFactory;
+use Monolog\Logger;
+
 
 // Turn on ALL error reporting for now.
 error_reporting(E_ALL | E_STRICT);
 
-$wmDebugLogger = WMDebugFactory::create();
+# TODO - this should vary (Handlers) depending on if we're in CLI, Editor or Cacti
+$wmLogger = new Monolog\Logger("weathermap");
+$wmLogger->pushProcessor(new IntrospectionProcessor());
+$wmLogger->pushProcessor(new MemoryUsageProcessor());
+$wmLogger->pushProcessor(new MemoryPeakUsageProcessor());

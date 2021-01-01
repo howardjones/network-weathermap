@@ -389,8 +389,8 @@ foreach ($map->links as $link) {
                 if ($map_widths) {
                     foreach ($width_map as $map_speed => $map_width) {
                         if ($total_speed <= $map_speed) {
-                            $map->links[$name]->width = $width_map{$map_speed};
-                            print "    WIDTH " . $width_map{$map_speed}. "\n";
+                            $map->links[$name]->width = $width_map[$map_speed];
+                            print "    WIDTH " . $width_map[$map_speed]. "\n";
                             continue 2;
                         }
                     }

@@ -40,30 +40,44 @@ class MapRuntime
     private $memory = array();
     private $stats = array();
 
+    private $context;
+
     /**
      * MapRuntime constructor.
      * @param PollerConfig $pollerConfig
      * @param stdClass $mapSpec
      * @param MapManager $manager
      */
-    public function __construct($pollerConfig, $mapSpec, $manager)
+    public function __construct($pollerConfig, $mapSpec, $manager, $context)
     {
         $this->manager = $manager;
         $this->mapConfig = $mapSpec;
         $this->pollerConfig = $pollerConfig;
+        $this->context = $context;
 
         $this->rrdtoolPath = $pollerConfig->rrdtoolFileName;
         $this->thumbnailSize = $pollerConfig->thumbnailSize;
 
         $this->mapConfigFileName = $pollerConfig->configDirectory . DIRECTORY_SEPARATOR . $mapSpec->configfile;
-        $this->htmlOutputFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".html";
-        $this->imageOutputFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . "." . $pollerConfig->imageFormat;
-        $this->thumbnailFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".thumb." . $pollerConfig->imageFormat;
 
-        $this->resultsFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".results.txt";
-        $this->statsFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".stats.txt";
-        $this->tempImageFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".tmp.png";
+        if ($mapSpec->filehash != "") {
+            $this->htmlOutputFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".html";
+            $this->imageOutputFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . "." . $pollerConfig->imageFormat;
+            $this->thumbnailFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".thumb." . $pollerConfig->imageFormat;
 
+            $this->resultsFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".results.txt";
+            $this->statsFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".stats.txt";
+            $this->tempImageFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".tmp.png";
+        } else {
+            // TODO - figure out what the correct CLI paths should be
+            $this->htmlOutputFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".html";
+            $this->imageOutputFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . "." . $pollerConfig->imageFormat;
+            $this->thumbnailFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".thumb." . $pollerConfig->imageFormat;
+
+            $this->resultsFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".results.txt";
+            $this->statsFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".stats.txt";
+            $this->tempImageFileName = $pollerConfig->outputDirectory . DIRECTORY_SEPARATOR . $mapSpec->filehash . ".tmp.png";
+        }
         $this->duration = 0;
         $this->warncount = 0;
 
@@ -111,7 +125,10 @@ class MapRuntime
         $this->timeStamp($name);
     }
 
-    public function run()
+    /**
+     * @return bool did it run a map or not
+     */
+    public function run($postRunCallback=null)
     {
         if (!$this->preChecks()) {
             return false;
@@ -132,7 +149,7 @@ class MapRuntime
         $this->checkPoint("start");
 
         $map = new Map;
-        $map->context = "cacti";
+        $map->context = $this->context;
 
         // we can grab the rrdtool path from Cacti's config, in this case
         $map->rrdtool = $this->rrdtoolPath;
@@ -152,7 +169,7 @@ class MapRuntime
         $this->checkPoint("data-read");
 
         $configuredImageURI = $map->imageuri;
-        $map->imageuri = $this->manager->application->getMapImageURL($this->mapConfig->filehash);
+        $map->imageuri = $this->manager->application->getMapImageURL($this->mapConfig);
 
         $note = Utility::buildMemoryCheckString("");
         MapUtility::notice(
@@ -205,7 +222,7 @@ class MapRuntime
             $map->writeDataFile($map->dataoutputfile);
         }
 
-        // TODO: will this ever be 0?
+        // From CLI, this will be 0 so no thumb is generated
         if (intval($map->thumbWidth) > 0) {
             $this->manager->updateMap(
                 $this->mapConfig->id,
@@ -217,6 +234,16 @@ class MapRuntime
         }
 
         $this->extractStats($map);
+
+        // Call a delegate if it was given (for some CLI debug functions)
+        if (!is_callable($postRunCallback)) {
+            MapUtility::notice("Calling post-run callback");
+            call_user_func($postRunCallback, $map);
+        } else {
+            if (!is_null($postRunCallback)) {
+                MapUtility::warn("Got a callback but it wasn't a callable");
+            }
+        }
 
         $map->cleanUp();
 
@@ -280,7 +307,9 @@ class MapRuntime
 
         $env['host_app_version'] = $this->manager->application->getAppVersion();
 
-        $previous = $this->times[0];
+        print_r($this->times);
+
+        $previous = reset($this->times);
         $calculated_times = array();
         foreach ($this->times as $label => $time) {
             $calculated_times[$label] = array($time, $time - $previous, $time - $this->times['start']);

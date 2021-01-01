@@ -1207,15 +1207,13 @@ class Map extends MapBase
 
         // Ready to output the results...
 
-        if ($imageFileName == 'null') {
-            // do nothing at all - we just wanted the HTML AREAs for the editor or HTML output
-        } else {
+        if ($imageFileName != 'null') {
             // write to the standard output (for the editor)
             if ($imageFileName == '') {
                 imagepng($imageRef);
             } else {
                 $this->writeImageFile($imageFileName, $imageRef);
-                if ($thumbnailFileName != '') {
+                if ($thumbnailFileName != '' && $thumbnailMaxSize > 0) {
                     $this->createThumbnailFile($thumbnailFileName, $thumbnailMaxSize, $imageRef);
                 }
             }

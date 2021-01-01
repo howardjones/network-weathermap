@@ -23,3 +23,5 @@ $weathermap_debug_suppress = array(
 
 // don't output warnings/errors for these codes (WMxxx)
 $weathermap_error_suppress = array();
+
+

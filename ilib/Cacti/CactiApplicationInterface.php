@@ -115,18 +115,18 @@ class CactiApplicationInterface extends ApplicationInterface
         return false;
     }
 
-    public function getMapURL($mapId)
+    public function getMapURL($mapConfig)
     {
         $pluginName = $this->getPluginName();
 
-        return sprintf("%s?action=viewmap&id=%s", $pluginName, $mapId);
+        return sprintf("%s?action=viewmap&id=%s", $pluginName, $mapConfig->id);
     }
 
-    public function getMapImageURL($mapId)
+    public function getMapImageURL($mapConfig)
     {
         $pluginName = $this->getPluginName();
 
-        return sprintf("%s?action=viewimage&id=%s&time=%d", $pluginName, $mapId, time());
+        return sprintf("%s?action=viewimage&id=%s&time=%d", $pluginName, $mapConfig->id, time());
     }
 
     /**

@@ -59,14 +59,14 @@ class ApplicationInterface
         return false;
     }
 
-    public function getMapURL($mapId)
+    public function getMapURL($mapConfig)
     {
-        return sprintf("output/%s.html", $mapId);
+        return sprintf("output/%s.html", $mapConfig->id);
     }
 
-    public function getMapImageURL($mapId)
+    public function getMapImageURL($mapConfig)
     {
-        return sprintf("output/%s.png", $mapId);
+        return sprintf("output/%s.png", $mapConfig->id);
     }
 
     public function buildLogger($log)

@@ -1,7 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 *.iml
-
+venv/
 tmp/
 
 # Build process artifacts:
@@ -9,7 +9,6 @@ build
 build/*
 dist/*
 composer.phar
-composer.lock
 !build/phpmd.xml
 !build/phpunit.xml
 !build/phpdox.xml
@@ -71,3 +70,6 @@ dev/Vagrant/*-post-install.sql
 
 # React generated files
 cacti-resources/*/*.map
+
+# jsonschema generated libraries:
+dev/schemas/out/

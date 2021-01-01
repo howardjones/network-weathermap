@@ -16,15 +16,83 @@ namespace Weathermap\Core;
  */
 class MapUtility
 {
-
-    public static function debug2($string)
+    public static function debug($string)
     {
-        global $wmDebugLogger;
+        global $wmLogger;
+        global $weathermap_debug_suppress;
 
-        $wmDebugLogger->log($string);
+        if (func_num_args() > 1) {
+            $args = func_get_args();
+            $string = call_user_func_array('sprintf', $args);
+        }
+
+        $callingFunction = '';
+        if (function_exists('debug_backtrace')) {
+            $bt = debug_backtrace();
+            $index = 1;
+            #   $class = (isset($bt[$index]['class']) ? $bt[$index]['class'] : '');
+            $function = (isset($bt[$index]['function']) ? $bt[$index]['function'] : '');
+            $index = 0;
+            $file = (isset($bt[$index]['file']) ? basename($bt[$index]['file']) : '');
+            $line = (isset($bt[$index]['line']) ? $bt[$index]['line'] : '');
+
+            $callingFunction = " $function@$file:$line";
+
+            if (is_array($weathermap_debug_suppress) && in_array(
+                    strtolower($function),
+                    $weathermap_debug_suppress
+                )) {
+                return;
+            }
+        }
+
+        $wmLogger->debug($string, ["function" => $callingFunction]);
     }
 
-    public static function debug($string)
+    public static function notice($string)
+    {
+        global $wmLogger;
+        $wmLogger->info($string);
+    }
+
+    public static function warn($string, $noticeOnly = false)
+    {
+        global $wmLogger;
+        global $weathermap_map;
+        global $weathermap_warncount;
+        global $weathermap_error_suppress;
+
+        $message = '';
+        $code = '';
+
+        if (preg_match('/\[(WM\w+)\]/', $string, $matches)) {
+            $code = $matches[1];
+        }
+
+        if ((true === is_array($weathermap_error_suppress))
+            && (true === array_key_exists(strtoupper($code), $weathermap_error_suppress))
+        ) {
+            self::debug("$code is suppressed\n");
+            // This error code has been deliberately disabled.
+            return false;
+        }
+
+        if (!$noticeOnly) {
+            $weathermap_warncount++;
+            $message .= 'WARNING: ';
+        }
+
+        $message .= ($weathermap_map == '' ? '' : $weathermap_map . ': ') . rtrim($string);
+
+        $extra = array();
+        if ($code != "") {
+            $extra['code'] = $code;
+        }
+
+        $wmLogger->warning($string, $extra);
+    }
+
+    public static function old_debug($string)
     {
         global $weathermap_debugging;
         global $weathermap_map;
@@ -49,9 +117,9 @@ class MapUtility
                 $callingFunction = " [$function@$file:$line]";
 
                 if (is_array($weathermap_debug_suppress) && in_array(
-                    strtolower($function),
-                    $weathermap_debug_suppress
-                )) {
+                        strtolower($function),
+                        $weathermap_debug_suppress
+                    )) {
                     return;
                 }
             }
@@ -84,7 +152,7 @@ class MapUtility
         }
     }
 
-    public static function notice($string, $noticeOnly = false)
+    public static function old_notice($string, $noticeOnly = false)
     {
         // TODO: This is ugly for now, but will be OK again once there's a logger object
         // (the quietLogging check will just translate to loglevel=NOTICE or loglevel=WARN)
@@ -94,7 +162,7 @@ class MapUtility
         }
     }
 
-    public static function warn($string, $noticeOnly = false)
+    public static function old_warn($string, $noticeOnly = false)
     {
         global $weathermap_map;
         global $weathermap_warncount;

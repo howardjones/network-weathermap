@@ -48,7 +48,7 @@ for PHP_VER in ${PHP_VERSIONS}; do
   apt-get install -y \
     php${PHP_VER} php${PHP_VER}-common php${PHP_VER}-cli \
     php${PHP_VER}-mysql php${PHP_VER}-snmp php${PHP_VER}-gd php${PHP_VER}-mbstring php${PHP_VER}-xml \
-    php${PHP_VER}-curl libapache2-mod-php${PHP_VER}
+    php${PHP_VER}-curl libapache2-mod-php${PHP_VER} php${PHP_VER}-zip
 
   # disable the php version
   a2dismod php${PHP_VER}

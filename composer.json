@@ -14,10 +14,11 @@
     "pear/console_commandline": "^1.2",
     "pear/console_getopt": "^1.4",
     "ext-snmp": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "ext-gd": "*"
   },
   "require-dev": {
-	      "wimg/php-compatibility": "*",
+    "wimg/php-compatibility": "*",
     "phpunit/dbunit": "*",
     "codeclimate/php-test-reporter": "*",
     "phpunit/phpunit": "~5",
@@ -33,7 +34,7 @@
     "phploc/phploc": "^4.0"
   },
   "scripts": {
-	      "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wimg/php-compatibility",
-	          "post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wimg/php-compatibility"
+    "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wimg/php-compatibility",
+    "post-update-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wimg/php-compatibility"
   }
 }

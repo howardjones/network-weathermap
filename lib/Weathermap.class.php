@@ -8,6 +8,7 @@ require_once "HTML_ImageMap.class.php";
 
 require_once "WeatherMap.functions.php";
 require_once "geometry.php";
+require_once "WMPoint.class.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 

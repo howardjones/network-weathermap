@@ -16,8 +16,8 @@
     "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
-    "html-loader": "^0.5.5",
-    "react-scripts": "^3.0.1",
+    "html-loader": "^4.2.0",
+    "react-scripts": "^5.0.1",
     "watch": "^1.0.2"
   },
   "scripts": {

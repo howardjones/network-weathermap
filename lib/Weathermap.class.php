@@ -23,7 +23,7 @@ $WM_config_keywords2 = array();
 
 // don't produce debug output for these functions
 $weathermap_debug_suppress = array(
-    'processstring',
+//    'processstring',
     'mysprintf'
 );
 
@@ -272,6 +272,12 @@ class WeatherMap extends WeatherMapBase
     var $colourtable = array();
     var $warncount = 0;
 
+    var $numscales;
+    var $dumpconfig;
+    var $labelstyle;
+
+    var $fonts;
+    var $image;
 
     function __construct()
     {
@@ -498,7 +504,7 @@ class WeatherMap extends WeatherMapBase
         }
 
         if (($fontnumber > 0) && ($fontnumber < 6)) {
-            imagestring($image, $fontnumber, $x, $y - imagefontheight($fontnumber), $string, $colour);
+            imagestring($image, $fontnumber, ceil($x), ceil($y - imagefontheight($fontnumber)), $string, $colour);
             if ($angle != 0) {
                 wm_warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
             }
@@ -577,7 +583,7 @@ class WeatherMap extends WeatherMapBase
 
     function ProcessString($input, &$context, $include_notes = true, $multiline = false)
     {
-        # debug("ProcessString: input is $input\n");
+        wm_debug("ProcessString: input is $input\n");
 
         assert('is_scalar($input)');
 
@@ -596,7 +602,6 @@ class WeatherMap extends WeatherMapBase
 
         $output = $input;
 
-        # while( preg_match("/(\{[^}]+\})/",$input,$matches) )
         while (preg_match('/(\{(?:node|map|link)[^}]+\})/', $input, $matches)) {
             $value = "[UNKNOWN]";
             $format = "";
@@ -606,7 +611,7 @@ class WeatherMap extends WeatherMapBase
             if (preg_match('/\{(node|map|link):([^}]+)\}/', $key, $matches)) {
                 $type = $matches[1];
                 $args = $matches[2];
-                # debug("ProcessString: type is ".$type.", arguments are ".$args."\n");
+                wm_debug("ProcessString: type is ".$type.", arguments are ".$args."\n");
 
                 if ($type == 'map') {
                     $the_item = $this;
@@ -617,12 +622,12 @@ class WeatherMap extends WeatherMapBase
                 }
 
                 if (($type == 'link') || ($type == 'node')) {
-                    if (preg_match("/([^:]+):([^:]+):*([^:]*)/", $args, $matches)) {
+		    wm_debug("ProcessString: working on args ".$args."\n");
+                    if (preg_match("/([^:]+):([^:]+):*(.*)/", $args, $matches)) {
                         $itemname = $matches[1];
                         $args = $matches[2];
                         $format = $matches[3];
-
-                        #				debug("ProcessString: item is $itemname, and args are now $args\n");
+			wm_debug("ProcessString: item is $itemname, and args are now $args; and format is \"$format\"\n");
 
                         $the_item = null;
                         if (($itemname == "this") && ($type == strtolower($context->my_type()))) {
@@ -686,18 +691,42 @@ class WeatherMap extends WeatherMapBase
             }
             wm_debug("ProcessString: replacing " . $key . " with $value\n");
 
-            # if($format != '') $value = sprintf($format,$value);
             if ($format != '') {
-
-                #		debug("Formatting with mysprintf($format,$value)\n");
-                $value = mysprintf($format, $value, $this->kilo);
+		if ( preg_match('/^%/', $format) ) {
+		    # Format is simply for sprintf
+		    wm_debug("Formatting with mysprintf($format,$value)\n");
+		    $value = mysprintf($format,$value, $this->kilo);
+		} else {
+		    # Format is comma-separated list of modifiers
+		    wm_debug("Formatting $value with modifiers list: $format\n");
+		    $func_list = preg_replace('/^\s+|\s+$/', '', str_getcsv($format, ','));
+		    foreach ($func_list as $f) {
+			switch ($f) {
+			    case 'uc' :
+				$value = strtoupper($value);
+				wm_debug("Value changed to: $value by function: $f\n");
+				break;
+			    case 'lc' :
+				$value = strtolower($value);
+				wm_debug("Value changed to: $value by function: $f\n");
+				break;
+			    default :
+				$match = preg_split('~(?<!\\\\)/~', $f, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+				if (isset($match[0]) && 
+				    isset($match[1]) ) {
+				    wm_debug("Detected regular expression: $match[0], replacement string: $match[1]\n");
+				    $value = preg_replace('/' . $match[0] . '/', $match[1], $value);
+				    wm_debug("Value changed to: $value by function: $f\n");
+				}
+				break;
+			}
+		    }
+		}
             }
-
-            #	debug("ProcessString: formatted to $value\n");
             $input = str_replace($key, '', $input);
             $output = str_replace($key, $value, $output);
         }
-        #debug("ProcessString: output is $output\n");
+	wm_debug("ProcessString: output is $output\n");
         return ($output);
     }
 
@@ -1708,16 +1737,16 @@ class WeatherMap extends WeatherMapBase
     {
         // add a timestamp to the corner, so we can tell if it's all being updated
         # $datestring = "Created: ".date("M d Y H:i:s",time());
-        # $this->datestamp=strftime($this->stamptext, time());
+        # $this->datestamp=wm_strftime($this->stamptext, time());
 
         switch ($which) {
             case "MIN":
-                $stamp = strftime($this->minstamptext, $this->min_data_time);
+                $stamp = wm_strftime($this->minstamptext, $this->min_data_time);
                 $pos_x = $this->mintimex;
                 $pos_y = $this->mintimey;
                 break;
             case "MAX":
-                $stamp = strftime($this->maxstamptext, $this->max_data_time);
+                $stamp = wm_strftime($this->maxstamptext, $this->max_data_time);
                 $pos_x = $this->maxtimex;
                 $pos_y = $this->maxtimey;
                 break;
@@ -2013,8 +2042,8 @@ class WeatherMap extends WeatherMapBase
                     array('LINK', "/^\s*WIDTH\s+(\d+\.\d+)\s*$/i", array('width' => 1)),
                     array('LINK', '/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i', array('arrowstyle' => 1)),
                     array('LINK', '/^\s*VIASTYLE\s+(curved|angled)\s*$/i', array('viastyle' => 1)),
-                    array('LINK', '/^\s*INCOMMENT\s+(.*)\s*$/i', array('comments[IN]' => 1)),
-                    array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('comments[OUT]' => 1)),
+                    array('LINK', '/^\s*INCOMMENT\s+(.*)\s*$/i', array('comments[IN]' => 1, 'incomment' => 1)),
+                    array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('comments[OUT]' => 1, 'outcomment' => 1)),
                     array('LINK', '/^\s*BWFONT\s+(\d+)\s*$/i', array('bwfont' => 1)),
                     array('LINK', '/^\s*COMMENTFONT\s+(\d+)\s*$/i', array('commentfont' => 1)),
                     array('LINK', '/^\s*COMMENTSTYLE\s+(edge|center)\s*$/i', array('commentstyle' => 1)),
@@ -2250,10 +2279,11 @@ class WeatherMap extends WeatherMapBase
                 if (($last_seen == 'NODE' || $last_seen == 'LINK') && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer,
                         $matches)) {
                     $linematched++;
-                    # $targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
-                    $rawtargetlist = $matches[1] . " ";
 
                     if ($args[0] == 'TARGET') {
+			// Store raw target list. Is used in editor
+			$curobj->target = $matches[1];
+
                         // wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
                         $curobj->targets = array();
                         array_shift($args); // take off the actual TARGET keyword
@@ -2270,7 +2300,7 @@ class WeatherMap extends WeatherMapBase
                             // 5 => the plugin to use to pull data
                             $newtarget = array('', '', $filename, $linecount, $arg, "", "");
                             if ($curobj) {
-                                wm_debug("  TARGET: $arg\n");
+                                wm_debug("  TARGET: $arg\n"); 
                                 $curobj->targets[] = $newtarget;
                             }
                         }
@@ -2329,8 +2359,8 @@ class WeatherMap extends WeatherMapBase
                         wm_warn("IN/OUTOVERLIBGRAPH make no sense for a NODE! [WMWARN42]\n");
                     } else {
                         if ($last_seen == 'LINK' || $last_seen == 'NODE') {
-
-                            $urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
+			    $urls = str_getcsv($matches[2], " ");
+			    $urls = array_map(function ($a) { return (strpos($a, " ") != FALSE ) ? '"'. $a . '" ' : $a; }, $urls );
 
                             if ($matches[1] == 'IN') {
                                 $index = IN;
@@ -3279,7 +3309,7 @@ class WeatherMap extends WeatherMapBase
         } else {
             $maptime = time();
         }
-        $this->datestamp = strftime($this->stamptext, $maptime);
+        $this->datestamp = wm_strftime($this->stamptext, $maptime);
 
         // do the basic prep work
         if ($this->background != '') {
@@ -3672,7 +3702,7 @@ class WeatherMap extends WeatherMapBase
                                 if ($n > 0) {
                                     $overlibhtml .= '&lt;br /&gt;';
                                 }
-                                $overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url, $myobj) . "&gt;";
+				$overlibhtml .= "&lt;img $img_extra src=" . html_escape($this->ProcessString($url, $myobj), FALSE) . "&gt;";
                                 $n++;
                             }
                         }

@@ -41,6 +41,8 @@ class WeatherMapNode extends WeatherMapItem
 	var $cachefile;
 	var $usescale;
 	var $useiconscale;
+	var $aiconoutlinecolour,
+	    $aiconfillcolour;
 	var $scaletype, $iconscaletype;
 	var $inscalekey,$outscalekey;
 	var $inscaletag, $outscaletag;
@@ -501,8 +503,8 @@ class WeatherMapNode extends WeatherMapItem
 							{
 								$scalefactor = $icon_h/$this->iconscaleh;
 							}
-							$new_width = $icon_w / $scalefactor;
-							$new_height = $icon_h / $scalefactor;
+							$new_width = ceil($icon_w / $scalefactor);
+							$new_height = ceil($icon_h / $scalefactor);
 							$scaled = imagecreatetruecolor($new_width, $new_height);
 							imagealphablending($scaled,false);
 							imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w, $icon_h);
@@ -615,7 +617,7 @@ class WeatherMapNode extends WeatherMapItem
 		// Draw the icon, if any
 		if(isset($icon_im))
 		{
-			imagecopy($node_im, $icon_im, $icon_x1, $icon_y1, 0, 0, imagesx($icon_im), imagesy($icon_im));
+			imagecopy($node_im, $icon_im, ceil($icon_x1), ceil($icon_y1), 0, 0, imagesx($icon_im), imagesy($icon_im));
 			imagedestroy($icon_im);
 		}
 
@@ -632,21 +634,21 @@ class WeatherMapNode extends WeatherMapItem
 			// if there's an icon, then you can choose to have no background
 			if(! $col->is_none() )
 			{
-			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
+			    imagefilledrectangle($node_im, ceil($label_x1), ceil($label_y1), ceil($label_x2), ceil($label_y2), $col->gdallocate($node_im));
 			}
 
 			if ($this->selected)
 			{
-				imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $map->selected);
+				imagerectangle($node_im, ceil($label_x1), ceil($label_y1), ceil($label_x2), ceil($label_y2), $map->selected);
 				// would be nice if it was thicker, too...
-				wimagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1, $map->selected);
+				wimagerectangle($node_im, ceil($label_x1 + 1), ceil($label_y1 + 1), ceil($label_x2 - 1), ceil($label_y2 - 1), $map->selected);
 			}
 			else
 			{
 				$olcol = new Colour($this->labeloutlinecolour);
 				if ($olcol->is_real())
 				{
-					imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $olcol->gdallocate($node_im));
+					imagerectangle($node_im, ceil($label_x1), ceil($label_y1), ceil($label_x2), ceil($label_y2), $olcol->gdallocate($node_im));
 				}
 			}
 			#}
@@ -716,7 +718,7 @@ class WeatherMapNode extends WeatherMapItem
 		if(isset($this->image))
 		{
 			imagealphablending($im, true);
-			imagecopy ( $im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image) );
+			imagecopy ( $im, $this->image, ceil($this->x - $this->centre_x), ceil($this->y - $this->centre_y), 0, 0, imagesx($this->image), imagesy($this->image) );
 		}
 
 	}

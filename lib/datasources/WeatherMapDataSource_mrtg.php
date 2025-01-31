@@ -39,10 +39,10 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			while (!feof($fd))
 			{
 				$buffer=fgets($fd, 4096);
-				wm_debug("MRTG ReadData: Matching on '${matchvalue}in $matchperiod' and '${matchvalue}out $matchperiod'\n");
+				wm_debug("MRTG ReadData: Matching on '{$matchvalue}in $matchperiod' and '{$matchvalue}out $matchperiod'\n");
 
-				if (preg_match("/<\!-- ${matchvalue}in $matchperiod ([-+]?\d+\.?\d*) -->/", $buffer, $matches)) { $data[IN] = $matches[1] * 8; }
-				if (preg_match("/<\!-- ${matchvalue}out $matchperiod ([-+]?\d+\.?\d*) -->/", $buffer, $matches)) { $data[OUT] = $matches[1] * 8; }
+				if (preg_match("/<\!-- {$matchvalue}in $matchperiod ([-+]?\d+\.?\d*) -->/", $buffer, $matches)) { $data[IN] = $matches[1] * 8; }
+				if (preg_match("/<\!-- {$matchvalue}out $matchperiod ([-+]?\d+\.?\d*) -->/", $buffer, $matches)) { $data[OUT] = $matches[1] * 8; }
 			}
 			fclose($fd);
 			# don't bother with the modified time if the target is a URL

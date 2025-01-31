@@ -10,6 +10,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 	var $addresscache = array();
 	var $donepings = FALSE;
 	var $results = array();
+	var $fping_cmd;
 
 	function Init(&$map)
 	{

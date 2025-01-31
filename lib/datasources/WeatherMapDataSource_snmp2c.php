@@ -13,8 +13,8 @@
 // TARGET snmp2c:public:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
 // (that is, TARGET snmp:community:host:in_oid:out_oid
 
-class WeatherMapDataSource_snmp2c extends WeatherMapDataSource
-{
+class WeatherMapDataSource_snmp2c extends WeatherMapDataSource {
+    var $down_cache;
 
     function Init(&$map)
     {

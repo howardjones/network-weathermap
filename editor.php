@@ -404,7 +404,9 @@ else
 		    $map->links[$link_name]->width = floatval($_REQUEST['link_width']);
 		    $map->links[$link_name]->infourl[IN] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
 		    $map->links[$link_name]->infourl[OUT] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
-		    $urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
+		    $urls = wm_parse_string($_REQUEST['link_hover']);
+		    $urls = array_map(function ($a) { return (strpos($a, " ") != FALSE ) ? '"'. $a . '" ' : $a; }, $urls );
+
 		    $map->links[$link_name]->overliburl[IN] = $urls;
 		    $map->links[$link_name]->overliburl[OUT] = $urls;
 		    
@@ -413,29 +415,7 @@ else
 		    $map->links[$link_name]->commentoffset_in =  intval($_REQUEST['link_commentposin']);
 		    $map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']); 
 
-		    // $map->links[$link_name]->target = $_REQUEST['link_target'];
-
-		    $targets = preg_split('/\s+/',$_REQUEST['link_target'],-1,PREG_SPLIT_NO_EMPTY); 
-		    $new_target_list = array();
-
-		    foreach ($targets as $target)
-		    {
-			// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-			$newtarget = array($target,'traffic_in','traffic_out',0,$target);
-
-			// if it's an RRD file, then allow for the user to specify the
-			// DSs to be used. The default is traffic_in, traffic_out, which is
-			// OK for Cacti (most of the time), but if you have other RRDs...
-			if(preg_match("/(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/i",$target,$matches))
-			{
-				$newtarget[0] = $matches[1];
-				$newtarget[1] = $matches[2];
-				$newtarget[2] = $matches[3];
-			}
-			// now we've (maybe) messed with it, we'll store the array of target specs
-			$new_target_list[] = $newtarget;
-		    }
-		    $map->links[$link_name]->targets = $new_target_list;
+		    $map->links[$link_name]->target = trim($_REQUEST['link_target']);
 
 		    $bwin = $_REQUEST['link_bandwidth_in'];
 		    $bwout = $_REQUEST['link_bandwidth_out'];
@@ -927,7 +907,7 @@ else
 	}
 
 	// get the list from the images/ folder too
-	$imlist = get_imagelist("images");
+	$imlist = get_imagelist([ "icons", "images" ]);
 	
 	$fontlist = array();
 	
@@ -949,7 +929,7 @@ else
 ?>
 	</style>
   <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" />
-<script src="vendor/jquery/dist/jquery.min.js" type="text/javascript"></script>
+<script src="vendor/jquery.min.js" type="text/javascript"></script>
 <script src="editor-resources/editor.js" type="text/javascript"></script>
 	<script type="text/javascript">
 	
@@ -1030,45 +1010,44 @@ else
 	#print $map->imap->subHTML("LINK:");
                 
 ?>
-	</div><!-- Node Properties -->
+	</div>
 
+	<!-- Node Properties -->
 	<div id="dlgNodeProperties" class="dlgProperties">
 	  <div class="dlgTitlebar">
-		Node Properties
-		<input size="6" name="node_name" type="hidden" />
+	    Node Properties
+	      <input size="6" name="node_name" type="hidden" />
 		<ul>
 		  <li><a id="tb_node_submit" class="wm_submit" title="Submit any changes made">Submit</a></li>
 		  <li><a id="tb_node_cancel" class="wm_cancel" title="Cancel any changes">Cancel</a></li>
 		</ul>
 	  </div>
-
 	  <div class="dlgBody">
-		<table>
-		<tr>
-			<th>Position</th>
-			<td><input id="node_x" name="node_x" size=4 type="text" />,<input id="node_y" name="node_y" size=4 type="text" /></td>
-		</tr>
-		  <tr>
-			<th>Internal Name</th>
-			<td><input id="node_new_name" name="node_new_name" type="text" /></td>
-		  </tr>
-		  <tr>
-			<th>Label</th>
-			<td><input id="node_label" name="node_label" type="text" /></td>
-		  </tr>
-		  <tr>
-			<th>Info URL</th>
-			<td><input id="node_infourl" name="node_infourl" type="text" /></td>
-		  </tr>
-		  <tr>
-			<th>'Hover' Graph URL</th>
-			<td><input id="node_hover" name="node_hover" type="text" />
-			<span class="cactinode"><a id="node_cactipick">[Pick from Cacti]</a></span></td>
-		  </tr>
-		  <tr>
-			<th>Icon Filename</th>
-			<td><select id="node_iconfilename" name="node_iconfilename">
-
+	    <table>
+	      <tr>
+		<th>Position</th>
+		<td><input id="node_x" name="node_x" size=4 type="text" />,<input id="node_y" name="node_y" size=4 type="text" /></td>
+	      </tr>
+	      <tr>
+		<th>Internal Name</th>
+		<td><input id="node_new_name" name="node_new_name" type="text" /></td>
+	      </tr>
+	      <tr>
+		<th>Label</th>
+		<td><input id="node_label" name="node_label" type="text" /></td>
+	      </tr>
+	      <tr>
+		<th>Info URL</th>
+		<td><input class="input500" id="node_infourl" name="node_infourl" type="text" /></td>
+	      </tr>
+	      <tr>
+		<th>'Hover' Graph URL</th>
+		<td><input class="input500" id="node_hover" name="node_hover" type="text" />
+		    <span class="cactinode"><a id="node_cactipick">[Pick from Cacti]</a></span></td>
+	      </tr>
+	      <tr>
+		<th>Icon Filename</th>
+		<td><select id="node_iconfilename" name="node_iconfilename">
 <?php
 	if(count($imlist)==0)
 	{
@@ -1086,16 +1065,16 @@ else
 	}
 ?>
 		</select></td>
-		  </tr>
-		  <tr>
-			<th></th>
-			<td>&nbsp;</td>
-		  </tr>
-		  <tr>
-			<th></th>
-			<td><a id="node_move" class="dlgTitlebar">Move</a><a class="dlgTitlebar" id="node_delete">Delete</a><a class="dlgTitlebar" id="node_clone">Clone</a><a class="dlgTitlebar" id="node_edit">Edit</a></td>
-		  </tr>
-		</table>
+	      </tr>
+	      <tr>
+		<th></th>
+		<td>&nbsp;</td>
+	      </tr>
+	      <tr>
+		<th></th>
+		<td><a id="node_move" class="dlgTitlebar">Move</a><a class="dlgTitlebar" id="node_delete">Delete</a><a class="dlgTitlebar" id="node_clone">Clone</a><a class="dlgTitlebar" id="node_edit">Edit</a></td>
+	      </tr>
+	    </table>
 	  </div>
 
 	  <div class="dlgHelp" id="node_help">
@@ -1103,104 +1082,91 @@ else
 		item selected. It should wrap onto several lines, if it's
 		necessary for it to do that.
 	  </div>
-	</div><!-- Node Properties -->
-
-
-
+	</div>
 
 	<!-- Link Properties -->
-
 	<div id="dlgLinkProperties" class="dlgProperties">
 	  <div class="dlgTitlebar">
-		Link Properties
-
-		<ul>
-		  <li><a title="Submit any changes made"  class="wm_submit" id="tb_link_submit">Submit</a></li>
-		  <li><a title="Cancel any changes" class="wm_cancel" id="tb_link_cancel">Cancel</a></li>
-		</ul>
+	    Link Properties
+	      <ul>
+		<li><a title="Submit any changes made"  class="wm_submit" id="tb_link_submit">Submit</a></li>
+		<li><a title="Cancel any changes" class="wm_cancel" id="tb_link_cancel">Cancel</a></li>
+	      </ul>
 	  </div>
-
 	  <div class="dlgBody">
-		<div class="comment">
-		  Link from '<span id="link_nodename1">%NODE1%</span>' to '<span id="link_nodename2">%NODE2%</span>'
-		</div>
+	    <div class="comment">
+	      Link from '<span id="link_nodename1">%NODE1%</span>' to '<span id="link_nodename2">%NODE2%</span>'
+	    </div>
 
-		<input size="6" name="link_name" type="hidden" />
+	    <input size="6" name="link_name" type="hidden" />
 
-		  <table width="100%">
-			<tr>
-			  <th>Maximum Bandwidth<br />
-			  Into '<span id="link_nodename1a">%NODE1%</span>'</th>
-			  <td><input size="8" id="link_bandwidth_in" name="link_bandwidth_in" type=
-			  "text" /> bits/sec</td>
-			</tr>
-			<tr>
-			  <th>Maximum Bandwidth<br />
-			  Out of '<span id="link_nodename1b">%NODE1%</span>'</th>
-			  <td><input type="checkbox" id="link_bandwidth_out_cb" name=
-			  "link_bandwidth_out_cb" value="symmetric" />Same As
-			  'In' or <input id="link_bandwidth_out" name="link_bandwidth_out"
-			  size="8" type="text" /> bits/sec</td>
-			</tr>
-			<tr>
-			  <th>Data Source</th>
-			  <td><input id="link_target" name="link_target" type="text" /> <span class="cactilink"><a id="link_cactipick">[Pick
-			  from Cacti]</a></span></td>
-			</tr>
-			<tr>
-			  <th>Link Width</th>
-			  <td><input id="link_width" name="link_width" size="3" type="text" />
-			  pixels</td>
-			</tr>
-			<tr>
-			  <th>Info URL</th>
-			  <td><input id="link_infourl" size="30" name="link_infourl" type="text" /></td>
-			</tr>
-			<tr>
-			  <th>'Hover' Graph URL</th>
-			  <td><input id="link_hover"  size="30" name="link_hover" type="text" /></td>
-			</tr>
-
-
-                        <tr>
-                               <th>IN Comment</th>
-                               <td><input id="link_commentin" size="25" name="link_commentin" type="text" />
-                                        <select id="link_commentposin" name="link_commentposin">
-                                                    <option value=95>95%</option>
-                                                    <option value=90>90%</option>
-                                                    <option value=80>80%</option>
-                                                    <option value=70>70%</option>
-                                                    <option value=60>60%</option>
-                                        </select>
-                               </td>
-                        </tr>
-                        <tr>
-                               <th>OUT Comment</th>
-                               <td><input id="link_commentout" size="25" name="link_commentout" type="text" />
-                                        <select id="link_commentposout" name="link_commentposout">
-                                                    <option value=5>5%</option>
-                                                    <option value=10>10%</option>
-                                                    <option value=20>20%</option>
-                                                    <option value=30>30%</option>
-                                                    <option value=40>40%</option>
-                                                    <option value=50>50%</option>
-                                        </select>
-                               </td>
-                        </tr> 
-		  
-			<tr>
-			  <th></th>
-			  <td>&nbsp;</td>
-			</tr>
-			<tr>
-			  <th></th>
-			  <td><a class="dlgTitlebar" id="link_delete">Delete
-			  Link</a><a class="dlgTitlebar" id="link_edit">Edit</a><a
-					  class="dlgTitlebar" id="link_tidy">Tidy</a><a
-							class="dlgTitlebar" id="link_via">Via</a> 
-                        </td>
-			</tr>
-		  </table>
+	    <table width="100%">
+	      <tr>
+		<th>Maximum Bandwidth<br />
+		    Into '<span id="link_nodename1a">%NODE1%</span>'</th>
+		<td><input size="8" id="link_bandwidth_in" name="link_bandwidth_in" type="text" /> bits/sec</td>
+	      </tr>
+	      <tr>
+		<th>Maximum Bandwidth<br />
+		    Out of '<span id="link_nodename1b">%NODE1%</span>'</th>
+		<td><input type="checkbox" id="link_bandwidth_out_cb" name="link_bandwidth_out_cb" value="symmetric" />Same As 'In' or <input id="link_bandwidth_out" name="link_bandwidth_out"	size="8" type="text" /> bits/sec</td>
+	      </tr>
+	      <tr>
+		<th>Data Source</th>
+		<td><input class="input500" id="link_target" name="link_target" type="text" /> 
+		    <span class="cactilink"><a id="link_cactipick">[Pick from Cacti]</a></span></td>
+	      </tr>
+	      <tr>
+		<th>Link Width</th>
+		<td><input id="link_width" name="link_width" size="3" type="text" /> pixels</td>
+	      </tr>
+	      <tr>
+		<th>Info URL</th>
+		<td><input class="input500" id="link_infourl" name="link_infourl" type="text" /></td>
+	      </tr>
+	      <tr>
+		<th>'Hover' Graph URL</th>
+		<td><input class="input500" id="link_hover"  name="link_hover" type="text" /></td>
+	      </tr>
+	      <tr>
+		<th>IN Comment</th>
+                <td><input id="link_commentin" size="25" name="link_commentin" type="text" />
+                    <select id="link_commentposin" name="link_commentposin">
+                      <option value=95>95%</option>
+                      <option value=90>90%</option>
+                      <option value=80>80%</option>
+                      <option value=70>70%</option>
+                      <option value=60>60%</option>
+                    </select>
+                </td>
+	      </tr>
+	      <tr>
+		<th>OUT Comment</th>
+		<td><input id="link_commentout" size="25" name="link_commentout" type="text" />
+		    <select id="link_commentposout" name="link_commentposout">
+		      <option value=5>5%</option>
+		      <option value=10>10%</option>
+		      <option value=20>20%</option>
+		      <option value=30>30%</option>
+		      <option value=40>40%</option>
+		      <option value=50>50%</option>
+		    </select>
+		</td>
+	      </tr> 
+	      <tr>
+		<th></th>
+		<td>&nbsp;</td>
+	      </tr>
+	      <tr>
+		<th></th>
+		<td>
+		  <a class="dlgTitlebar" id="link_delete">Delete Link</a>
+		  <a class="dlgTitlebar" id="link_edit">Edit</a>
+		  <a class="dlgTitlebar" id="link_tidy">Tidy</a>
+		  <a class="dlgTitlebar" id="link_via">Via</a> 
+		</td>
+	      </tr>
+	    </table>
 	  </div>
 
 	  <div class="dlgHelp" id="link_help">
@@ -1208,7 +1174,7 @@ else
 		item selected. It should wrap onto several lines, if it's
 		necessary for it to do that.
 	  </div>
-	</div><!-- Link Properties -->
+	</div>
 
 	<!-- Map Properties -->
 
@@ -1434,7 +1400,7 @@ else
 
 	  <div class="dlgBody">
 		<p>You can edit the map items directly here.</p>
-                <textarea wrap="no" id="item_configtext" name="item_configtext" cols=40 rows=15></textarea>
+                <textarea wrap="no" id="item_configtext" name="item_configtext" cols=105 rows=15></textarea>
 	  </div>
 
 	  <div class="dlgHelp" id="images_help">

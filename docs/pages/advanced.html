@@ -84,10 +84,10 @@
 
  <p>The format for the tokens is simple: </p> 
 
- <div class = "definition">{node:<em>nodename</em>:<em>variablename</em>} 
+ <div class = "definition">{node:<em>nodename</em>:<em>variablename</em>[:<em>format</em>]} 
  </div> 
 
- <div class = "definition">{link:<em>linkname</em>:<em>variablename</em>} 
+ <div class = "definition">{link:<em>linkname</em>:<em>variablename</em>[:<em>format</em>]} 
  </div> 
 
  <div class = "definition">{map:<em>variablename</em>} 
@@ -297,8 +297,10 @@
  <p>To allow you to control better how the values of special tokens are used, 
  you can add a final part inside the token that specifies the format. </p> 
 
- <p>This borrows the '%' format from the printf() function in C, PHP, perl 
- and many other languages, but adds a couple of Weathermap-specific extras: </p> 
+ <p>Format can be provided with two options:
+ <ul>
+ <li>One which borrows the '%' format from the printf() function in C, PHP, perl 
+ and many other languages, but adds a couple of Weathermap-specific extras:
 
  <table> 
  <tr><th>{link:this:bandwidth_in:%d}</th><td>force to integer</td> 
@@ -327,6 +329,16 @@
 
  </tr> 
  </table> 
+ </li>
+ <li>Second form is a comma-separated list of modifiers. Currently supported modifiers are: <em>uc</em> - will convert result value to uppercase; <em>lc</em> - will convert
+ result value to lowercase; and finally you can use a <em>regular expression</em> to modify result value. Here is some examples:
+ <table>
+ <tr><th>{node:_linkstart_:label:lc}</th><td>Get the label of NODE where link starts and convert it to lowercase</td></tr>
+ <tr><th>{node:_linkstart_:label:uc, /a/b/}</th><td>Get the label of NODE where link starts, convert it to uppercase and then replace all occurrences of &quot;a&quot; with &quot;b&quot;</td></tr>
+ </table>
+ </li>
+ </ul>
+ </p>
 
  <h2 id = "tweaks"><a href="config-reference.html#GLOBAL_SET">SETting</a> Hint Variables to tweak maps</h2> 
 

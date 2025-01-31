@@ -120,7 +120,7 @@ function show_editor_startpage()
 
 	$matches=0;
 
-	print '<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
+	print '<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="vendor/jquery.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
 		. '</title></head><body>';
 
 	print '<div id="nojs" class="alert"><b>WARNING</b> - ';
@@ -378,23 +378,24 @@ function extract_with_validation($array, $paramarray, $prefix = "")
 function get_imagelist($imagedir)
 {
 	$imagelist = array();
+	$imagedirs = is_array($imagedir) ? $imagedir : array($imagedir);
 
-	if (is_dir($imagedir)) {
-		$n=0;
-		$dh=opendir($imagedir);
+	foreach ($imagedirs as $id) {
+		if (is_dir($id)) {
+			$n=0;
+			$dh=opendir($id);
+			if ($dh) {
+				while ($file=readdir($dh)) {
+					$realfile=$id . DIRECTORY_SEPARATOR . $file;
+					$uri = $id . "/" . $file;
 
-		if ($dh) {
-			while ($file=readdir($dh)) {
-				$realfile=$imagedir . DIRECTORY_SEPARATOR . $file;
-				$uri = $imagedir . "/" . $file;
-
-				if (is_readable($realfile) && ( preg_match('/\.(gif|jpg|png)$/i',$file) )) {
-					$imagelist[] = $uri;
-					$n++;
+					if (is_readable($realfile) && ( preg_match('/\.(gif|jpg|png)$/i',$file) )) {
+						$imagelist[] = $uri;
+						$n++;
+					}
 				}
+				closedir ($dh);
 			}
-
-			closedir ($dh);
 		}
 	}
 	return ($imagelist);

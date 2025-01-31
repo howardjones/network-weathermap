@@ -89,7 +89,7 @@
 ./editor-resources/editor.css
 ./editor-resources/editor.js
 ./editor-resources/index.php
-./vendor/jquery/dist/jquery.min.js
+./vendor/jquery.min.js
 ./images/application.png
 ./images/application_side_list.png
 ./images/application_xp_terminal.png

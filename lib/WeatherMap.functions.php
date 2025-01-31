@@ -120,6 +120,122 @@ function wm_warn($string,$notice_only=FALSE)
 	}
 }
 
+// strftime is deprecated since PHP 8.0
+function wm_strftime($format, $date) {
+    $dt = new DateTime('@' . $date);
+    $dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+    $format = preg_replace( [
+	'/\%A/',	// national representation of the full weekday name
+	'/\%a/',	// national representation of the abbreviated weekday name
+	'/\%B/',	// national representation of the full month name
+	'/\%b/',	// national representation of the abbreviated month name
+	'/\%C/',	// (year / 100) as decimal number; single digits are preceded by a zero.
+	'/\%c/',	// national representation of time and date
+	'/\%D/',	// equivalent to "%m/%d/%y"
+	'/\%d/',	// the day of the month as a decimal number (01-31)
+	'/\%e/',	// the day of the month as a decimal number (1-31); single digits are preceded by a blank.
+	'/\%F/',	// equivalent to "%Y-%m-%d"
+	'/\%G/',	// a year as a decimal number with century.  This year
+			// is the one that contains the greater part of the week (Monday as
+			// the first day of the week)
+	'/\%g/',	// the same year as in “%G”, but as a decimal numwithout century (00
+	'/\%H/',	// the hour (24-hour clock) as a decimal number (00-23)
+	'/\%h/',	// the same as %b
+	'/\%I/',	// the hour (12-hour clock) as a decimal number (01-12)
+	'/\%j/',	// the day of the year as a decimal number (001-366)
+	'/\%k/',	// the hour (24-hour clock) as a decimal number (0-23); single digits are preceded by a blank
+	'/\%l/',	// the hour (12-hour clock) as a decimal number (1-12); single digits are preceded by a blank
+	'/\%M/',	// the minute as a decimal number (00-59)
+	'/\%m/',	// the month as a decimal number (01-12)
+	'/\%n/',	// a newline
+	'/\%p/',	// national representation of either "ante meridiem" (AM) or "post meridiem" (PM)
+	'/\%R/',	// equivalent to "%H:%M"
+	'/\%r/',	// equivalent to "%I:%M:%S %p"
+	'/\%S/',	// the second as a decimal number (00-60)
+	'/\%s/',	// the number of seconds since the Epoch, UTC
+	'/\%T/',	// equivalent to "%H:%M:%S"
+	'/\%t/',	// a tab
+	'/\%U/',	// have to be the week number of the year with Sunday as the first day of the week) as a decimal number (00-53)
+			// but currently is the same as %V
+	'/\%u/',	// the weekday (Monday as the first day of the week) as a decimal number (1-7).
+	'/\%V/',	// the week number of the year (Monday as the first day
+			// of the week) as a decimal number (01-53).  If the week containing
+			// January 1 has four or more days in the new year, then it is week 1;
+			// otherwise it is the last week of the previous year, and the next
+			// week is week 1.
+	'/\%v/',	// equivalent to "%e-%b-%Y"
+	'/\%W/',	// have to be the week number of the year (Monday as the first day of the week) as a decimal number (00-53)
+			// but currently is the same as %V
+	'/\%w/',	// have to be the weekday with Sunday as the first day of the week as a decimal number (0-6)
+	'/\%X/',	// have to be national representation of the time, currently is the same as "%T"
+	'/\%x/',	// have to be national representation of the date, currently is the same as "%d/%m/%Y"
+			// but currently is the same as %u
+	'/\%Y/',	// the year with century as a decimal number
+	'/\%y/',	// the year without century as a decimal number
+	'/\%Z/',	// the time zone name
+	'/\%z/',	// the time zone offset from UTC
+			// a leading plus sign stands for east of UTC, a minus sign for west of UTC, hours and
+			// minutes follow with two digits each and no delimiter between them
+			// (common form for RFC 822 date headers)
+	'/\%\+/',       // have to be national representation of the date and time (the
+			// format is similar to that produced by date(1))
+			// but currently is date formatted in RFC222/RFC5322
+	'/\%\%/',       // % character
+    ],[
+	$dt->format('l'),				// %A
+	$dt->format('D'),				// %a
+	$dt->format('F'),				// %B
+	$dt->format('M'),				// %b
+	sprintf("%02d", intval($dt->format('Y')/100)),	// %C
+	$dt->format('r'),				// %c
+	$dt->format('d/m/y'),				// %D
+	$dt->format('d'),				// %d
+	sprintf("%2s", $dt->format('j')),		// %e
+	$dt->format('Y-m-d'),				// %F
+	$dt->format('o'),				// %G
+	sprintf("%02d", fmod($dt->format('o'), 100)),	// %g
+	$dt->format('H'),				// %H
+	$dt->format('M'),				// %h
+	$dt->format('h'),				// %I
+	sprintf("%03d", $dt->format('z')+1),		// %j
+	sprintf("%2s", $dt->format('G')),		// %k
+	sprintf("%2s", $dt->format('g')),		// %l
+	$dt->format('i'),				// %M
+	$dt->format('m'),				// %m
+	"\n",						// %n
+	$dt->format('A'),				// %p
+	$dt->format('H:i'),				// %R
+	$dt->format('h:i:s A'),				// %r
+	$dt->format('s'),				// %S
+	$dt->format('U'),				// %s
+	$dt->format('H:i:s'),				// %T
+	"\t",						// %t
+	sprintf("%02d", $dt->format('W')),		// %U
+	$dt->format('N'),				// %u
+	sprintf("%02d", $dt->format('W')),		// %V
+	sprintf("%2s-%s-%s",
+	    $dt->format('j'),
+	    $dt->format('M'),
+	    $dt->format('Y')),				// %v
+	sprintf("%02d", $dt->format('W')),		// %W
+	$dt->format('N'),				// %w
+	$dt->format('H:i:s'),				// %X
+	$dt->format('d/m/Y'),				// %x
+	$dt->format('Y'),				// %Y
+	$dt->format('y'),				// %y
+	$dt->format('T'),				// %Z
+	sprintf("%s%02d%02d",
+	    $dt->format('Z') < 0 ? "-" : "+",
+	    $dt->format('Z') / 3600,
+	    fmod($dt->format('Z'), 3600)),		// %z
+	$dt->format('r'),				// %+
+	'%'						// %%
+    ],
+    $format);
+
+    return $format;
+}
+
 function js_escape($str, $wrap=TRUE)
 {
 	$str=str_replace('\\', '\\\\', $str);
@@ -128,6 +244,13 @@ function js_escape($str, $wrap=TRUE)
 	if($wrap) $str='"' . $str . '"';
 
 	return ($str);
+}
+
+function html_escape($str, $wrap=TRUE)
+{
+        $str=str_replace('"', '&quot;', $str);
+        if($wrap) $str='"' . $str . '"';
+        return ($str);
 }
 
 function mysprintf($format, $value, $kilo = 1000)
@@ -146,7 +269,7 @@ function mysprintf($format, $value, $kilo = 1000)
 			// we don't really need the justification (pre-.) part...
 		}
 		wm_debug("KMGT formatting $value with $spec.\n");
-		$result = nice_scalar($value, $kilo, $places);
+		$result = nice_scalar((float)$value, $kilo, $places);
 		$output = preg_replace("/%" . $spec . "k/", $format, $result);
 	} elseif (preg_match('/%(-*)(\d*)([Tt])/', $format, $matches)) {
 		$spec = $matches [3];
@@ -254,8 +377,9 @@ function wm_parse_string($input)
         // If, at this point, we are not within a phrase, the prepared phrase is complete and can be added to the array
         if (($cPhraseQuote === null) && ($sPhrase != null))
         {
-            $output[] = $sPhrase;
-            $sPhrase = null;
+	    // Remove escape backslashes from phrase
+	    $output[] = preg_replace('/\\\([' . $sQuotes .' ])/', "$1", $sPhrase);
+	    $sPhrase = null;
         }
     }
     while ($sToken !== false);      // Stop when we receive FALSE from strtok()
@@ -861,8 +985,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	$marker_purple = imagecolorallocate($image, 255,0,255);
 	$marker_cyan = imagecolorallocate($image, 0,255,255);
 
-	draw_spine($image, $curvepoints, $marker_grey);
-	draw_spine_chain($image, $curvepoints, $marker_grey);
+#	draw_spine($image, $curvepoints, $marker_grey);
+#	draw_spine_chain($image, $curvepoints, $marker_grey);
 
 	if($unidirectional)
 	{
@@ -886,7 +1010,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	    list($halfway_x,$halfway_y,$halfwayindex) = find_distance_coords($curvepoints,$halfway);
 	#    print "Midpoint is: $totaldistance  $halfway  $halfwayindex   $halfway_x,$halfway_y\n";
 
-        wm_draw_marker_diamond($image, $marker_red, $halfway_x,$halfway_y);
+#        wm_draw_marker_diamond($image, $marker_red, $halfway_x,$halfway_y);
 
 	    $spine[OUT] = array();
 	    $spine[IN] = array();
@@ -914,8 +1038,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	// now we have two seperate spines, with distances, so that the arrowhead is the end of each.
 	// (or one, if it's unidir)
 
-    draw_spine_chain($image, $spine[IN], $marker_green, 5);
-//    draw_spine_chain($image, $spine[OUT], $marker3, 20);
+#    draw_spine_chain($image, $spine[IN], $marker_green, 5);
+#    draw_spine_chain($image, $spine[OUT], $marker3, 20);
 
 	// so we can loop along the spine for each one as a seperate entity
 
@@ -959,11 +1083,11 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			# wm_draw_marker_diamond($image, $map->selected, $pre_mid_x, $pre_mid_y, 5);
 			# imagearc($image,$pre_mid_x, $pre_mid_y ,15,15,0,360,$map->selected);
 
-            wm_draw_marker_diamond($image, $marker_purple, $spine[$dir][$pre_midindex+1][X],$spine[$dir][$pre_midindex+1][Y]);
-            wm_draw_marker_diamond($image, $marker_purple, $spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y]);
+#            wm_draw_marker_diamond($image, $marker_purple, $spine[$dir][$pre_midindex+1][X],$spine[$dir][$pre_midindex+1][Y]);
+#            wm_draw_marker_diamond($image, $marker_purple, $spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y]);
 
-            wm_draw_marker_diamond($image, $marker_purple, $pre_mid_x,$pre_mid_y, 20);
-            wm_draw_marker_diamond($image, $marker_purple, $spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y]);
+#            wm_draw_marker_diamond($image, $marker_purple, $pre_mid_x,$pre_mid_y, 20);
+#            wm_draw_marker_diamond($image, $marker_purple, $spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y]);
 
 			# imagearc($image,$spine[$dir][$pre_midindex+1][X],$spine[$dir][$pre_midindex+1][Y],20,20,0,360,$map->selected);
 			# imagearc($image,$spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y],20,20,0,360,$map->selected);
@@ -1001,14 +1125,14 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			$oldn = count($spine[$dir]);
 
             wm_debug("Simplified to $newn points from $oldn\n");
-            draw_spine($image,$simple,$marker_purple);
-            draw_spine_chain($image,$simple,$marker_purple, 3);
+#            draw_spine($image,$simple,$marker_purple);
+#            draw_spine_chain($image,$simple,$marker_purple, 3);
 
 			if ($newn <3) {
 			    linear_expand($spine[$dir]);
 			    $newnewn = count($spine[$dir]);
                 wm_debug("Expanded to $newnewn points\n");
-                draw_spine($image,$simple,$marker_cyan);
+#                draw_spine($image,$simple,$marker_cyan);
             }
 
 			# if($draw_skeleton) draw_spine_chain($im,$simple,$blue, 12);
@@ -1146,8 +1270,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 				}
 			}
 
-			wm_draw_marker_circle($image, $marker_purple, $finalpoints[count($finalpoints)-2], $finalpoints[count($finalpoints)-1]);
-			wm_draw_marker_circle($image, $marker_purple, $reversepoints[count($reversepoints)-2], $reversepoints[count($reversepoints)-1]);
+#			wm_draw_marker_circle($image, $marker_purple, $finalpoints[count($finalpoints)-2], $finalpoints[count($finalpoints)-1]);
+#			wm_draw_marker_circle($image, $marker_purple, $reversepoints[count($reversepoints)-2], $reversepoints[count($reversepoints)-1]);
 
 			// at this end, we add the arrowhead
 
@@ -1370,7 +1494,7 @@ function simplify_spine(&$input, $epsilon=1e-10)
     $c = count($input)-2;
     $skipped=0;
 
-    dump_spine($input);
+#    dump_spine($input);
 
     for($n=1; $n<=$c; $n++)
     {
@@ -1418,7 +1542,7 @@ function simplify_spine(&$input, $epsilon=1e-10)
     $y1 = $input[$c+1][Y];
     wm_debug("   Adding $x1,$y1 to the end");
 
-    dump_spine($output);
+#    dump_spine($output);
 
     return $output;
 }
@@ -1974,7 +2098,7 @@ function wimagepolygon($image, $points, $num_points, $color)
 
 	metadump("POLY $num_points ".$pts." $r $g $b $a");
 
-	return(imagepolygon($image, $points, $num_points, $color));
+	return(imagepolygon($image, array_splice($points, 0, $num_points*2), $color));
 }
 
 function wimagefilledpolygon($image, $points, $num_points, $color)
@@ -1994,7 +2118,7 @@ function wimagefilledpolygon($image, $points, $num_points, $color)
 
 	metadump("FPOLY $num_points ".$pts." $r $g $b $a");
 
-	return(imagefilledpolygon($image, $points, $num_points, $color));
+	return(imagefilledpolygon($image, array_splice($points, 0, $num_points*2), $color));
 }
 
 function wimagecreatetruecolor($width, $height)
@@ -2017,7 +2141,7 @@ function wimagettftext($image, $size, $angle, $x, $y, $color, $file, $string)
 
 	metadump("TEXT $x $y $angle $size $file $r $g $b $a $string");
 
-	return(imagettftext($image, $size, $angle, $x, $y, $color, $file, $string));
+	return(imagettftext($image, $size, $angle, ceil($x), ceil($y), $color, $file, $string));
 }
 
 function wm_draw_marker_diamond($im, $col, $x, $y, $size=10)
@@ -2064,7 +2188,7 @@ function wm_draw_marker_box($im, $col, $x, $y, $size=10)
 
 function wm_draw_marker_circle($im, $col, $x, $y, $size=10)
 {
-	imagearc($im,$x, $y ,$size,$size,0,360,$col);
+	imagearc($im,ceil($x), ceil($y) ,$size,$size,0,360,$col);
 }
 
 function draw_spine_chain($im,$spine,$col, $size=10)
@@ -2073,7 +2197,7 @@ function draw_spine_chain($im,$spine,$col, $size=10)
 
     for ($i=0; $i < $newn; $i++)
     {
-		imagearc($im,$spine[$i][X],$spine[$i][Y],$size,$size,0,360,$col);
+		imagearc($im,ceil($spine[$i][X]),ceil($spine[$i][Y]),$size,$size,0,360,$col);
     }
 }
 
@@ -2094,8 +2218,8 @@ function draw_spine($im, $spine,$col)
     for ($i=0; $i <$max_i; $i++)
     {
         imageline($im,
-                    $spine[$i][X],$spine[$i][Y],
-                    $spine[$i+1][X],$spine[$i+1][Y],
+                    ceil($spine[$i][X]),ceil($spine[$i][Y]),
+                    ceil($spine[$i+1][X]),ceil($spine[$i+1][Y]),
                     $col
                     );
     }

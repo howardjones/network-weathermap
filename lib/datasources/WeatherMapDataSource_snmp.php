@@ -14,6 +14,7 @@
 // (that is, TARGET snmp:community:host:in_oid:out_oid
 
 class WeatherMapDataSource_snmp extends WeatherMapDataSource {
+	var $down_cache;
 
 	function Init(&$map)
 	{
